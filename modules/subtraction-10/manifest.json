@@ -1,0 +1,15 @@
+{
+  "id": "subtraction-10",
+  "title": "Вычитание до 10",
+  "subject": "math",
+  "icon": "➖",
+  "description": "Считаем, сколько осталось",
+  "version": "1.0.0",
+  "styles": [
+    "style.css"
+  ],
+  "files": [
+    "texts.js"
+  ],
+  "cycle": "arithmetic"
+}

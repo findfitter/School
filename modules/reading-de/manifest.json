@@ -1,0 +1,11 @@
+{
+  "id": "reading-de",
+  "title": "Wörter lesen",
+  "subject": "german",
+  "icon": "📚",
+  "description": "Finde das Wort zum Bild",
+  "version": "1.0.0",
+  "styles": ["style.css"],
+  "files": ["texts.js", "words.js"],
+  "cycle": "german"
+}

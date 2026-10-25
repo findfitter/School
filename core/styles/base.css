@@ -1,0 +1,162 @@
+/* Основа: переменные, сброс, сенсорные настройки, кнопки. Без :hover — экран сенсорный. */
+
+:root {
+  --bg: #fff7e6;
+  --ink: #2b2d42;
+  --ink-soft: #6b6f85;
+  --card: #ffffff;
+  --primary: #4f8cff;
+  --primary-ink: #ffffff;
+  --accent: #ffd23f;
+  --good: #52c47a;
+  --danger: #e76f51;
+  --soft: #e8eefc;
+  --radius: 24px;
+  --tap: 64px;
+  --shadow: 0 5px 0 rgba(43, 45, 66, 0.14);
+  --font: system-ui, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: clamp(18px, 3vh, 26px);
+  font-weight: 600;
+  line-height: 1.25;
+  overscroll-behavior: none;
+  touch-action: pan-x pan-y; /* без pinch-zoom и двойного тапа */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#app {
+  position: fixed;
+  inset: 0;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.scroll {
+  overflow-y: auto;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+
+h1, h2, p {
+  margin: 0;
+}
+
+/* Кнопки */
+button {
+  font: inherit;
+  color: inherit;
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.btn {
+  min-height: var(--tap);
+  min-width: var(--tap);
+  padding: 0 28px;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn.primary {
+  background: var(--primary);
+  color: var(--primary-ink);
+}
+
+.btn.danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+.btn.quiet {
+  background: var(--soft);
+  box-shadow: none;
+}
+
+.btn.big {
+  min-height: 84px;
+  padding: 0 44px;
+  font-size: 1.3em;
+}
+
+.btn.round {
+  width: var(--tap);
+  padding: 0;
+  font-size: 1.6em;
+}
+
+.btn.pressed, .btn:active, .tile.pressed, .tile:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+button:focus-visible, input:focus-visible {
+  outline: 4px solid var(--primary);
+  outline-offset: 3px;
+}
+
+button:disabled {
+  opacity: 0.5;
+}
+
+/* Игровой экран: модуль рисует в .game-container, кнопка «домой» — поверх */
+.game-screen {
+  touch-action: none;
+}
+
+.game-container {
+  position: absolute;
+  inset: 0;
+  padding: 12px 96px;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.home-btn {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+  width: 72px;
+  height: 72px;
+  padding: 0;
+  font-size: 36px;
+}
+
+.module-error {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  text-align: center;
+}

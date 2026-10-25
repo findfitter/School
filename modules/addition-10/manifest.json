@@ -1,0 +1,15 @@
+{
+  "id": "addition-10",
+  "title": "Сложение до 10",
+  "subject": "math",
+  "icon": "➕",
+  "description": "Считаем и складываем",
+  "version": "1.0.0",
+  "styles": [
+    "style.css"
+  ],
+  "files": [
+    "texts.js"
+  ],
+  "cycle": "arithmetic"
+}

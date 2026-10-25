@@ -1,0 +1,166 @@
+/* Читаем слова. Размеры в vh/vw, чтобы всё помещалось на экране Хромбука без прокрутки. */
+
+.reading {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5vh;
+  touch-action: none;
+}
+
+.rd-top {
+  flex: none;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rd-dots {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.rd-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #d8dcee;
+}
+
+.rd-dot.done {
+  background: var(--good, #52c47a);
+}
+
+.rd-dot.again {
+  border: 3px solid var(--primary, #4f8cff);
+  background: transparent;
+}
+
+.rd-dot.again.done {
+  background: var(--primary, #4f8cff);
+}
+
+.rd-repeat {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--card, #fff);
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  font-size: 36px;
+}
+
+.rd-repeat:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+/* Картинка */
+.rd-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1vh;
+}
+
+.rd-picture {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(150px, 34vh, 300px);
+  height: clamp(150px, 34vh, 300px);
+  border: 6px dashed #b9c3e6;
+  border-radius: 36px;
+  background: var(--card, #fff);
+  font-size: clamp(90px, 22vh, 190px);
+  line-height: 1;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.rd-picture.hot {
+  background: #fff3c4;
+  border-color: var(--accent, #ffd23f);
+}
+
+.rd-picture.ok {
+  border-style: solid;
+  border-color: var(--good, #52c47a);
+  background: #dff6e7;
+}
+
+.rd-picture.hop {
+  animation: rd-hop 0.5s ease-out;
+}
+
+@keyframes rd-hop {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(-4vh); }
+  100% { transform: translateY(0); }
+}
+
+.rd-caption {
+  height: 1.3em;
+  font-size: clamp(32px, 7vh, 60px);
+  font-weight: 800;
+}
+
+/* Слова-ответы */
+.rd-words {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  gap: 3vw;
+  padding-bottom: 1vh;
+}
+
+.rd-word {
+  min-width: clamp(150px, 20vw, 280px);
+  height: clamp(84px, 16vh, 140px);
+  padding: 0 24px;
+  border-radius: 28px;
+  border-bottom: 8px solid var(--primary, #4f8cff);
+  background: var(--card, #fff);
+  color: var(--ink, #2b2d42);
+  font-size: clamp(36px, 8vh, 68px);
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  touch-action: none;
+  transition: transform 0.2s, opacity 0.2s, background 0.15s;
+}
+
+.rd-word:nth-child(2) {
+  border-bottom-color: #8b6cf0;
+}
+
+.rd-word:nth-child(3) {
+  border-bottom-color: #f08c4f;
+}
+
+.rd-word.pressed {
+  box-shadow: none;
+}
+
+.rd-word.reading-now {
+  background: #fff3c4;
+  transform: scale(1.06);
+}
+
+.rd-word.right {
+  background: #dff6e7;
+}
+
+.rd-word.dragging {
+  transition: none;
+  z-index: 20;
+  position: relative;
+}
+
+.rd-word.faded {
+  opacity: 0.3;
+  box-shadow: none;
+}

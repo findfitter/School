@@ -1,0 +1,15 @@
+{
+  "id": "addition-20",
+  "title": "Сложение до 20",
+  "subject": "math",
+  "icon": "➕",
+  "description": "Складываем через десяток",
+  "version": "1.0.0",
+  "styles": [
+    "style.css"
+  ],
+  "files": [
+    "texts.js"
+  ],
+  "cycle": "arithmetic"
+}

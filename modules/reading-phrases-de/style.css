@@ -1,0 +1,168 @@
+/* Читаем два слова. Картинка слева, четыре подписи столбиком справа. */
+
+.phrases {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5vh;
+  touch-action: none;
+}
+
+.rp-top {
+  flex: none;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rp-dots {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.rp-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #d8dcee;
+}
+
+.rp-dot.done {
+  background: var(--good, #52c47a);
+}
+
+.rp-dot.again {
+  border: 3px solid var(--primary, #4f8cff);
+  background: transparent;
+}
+
+.rp-dot.again.done {
+  background: var(--primary, #4f8cff);
+}
+
+.rp-repeat {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--card, #fff);
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  font-size: 36px;
+}
+
+.rp-repeat:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.rp-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4vw;
+}
+
+.rp-picture {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(180px, 46vh, 360px);
+  height: clamp(180px, 46vh, 360px);
+  border: 6px dashed #b9c3e6;
+  border-radius: 36px;
+  background: var(--card, #fff);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.rp-picture canvas {
+  width: 90%;
+  height: 90%;
+}
+
+.rp-picture.hot {
+  background: #fff3c4;
+  border-color: var(--accent, #ffd23f);
+}
+
+.rp-picture.ok {
+  border-style: solid;
+  border-color: var(--good, #52c47a);
+  background: #dff6e7;
+}
+
+.rp-picture.hop {
+  animation: rp-hop 0.5s ease-out;
+}
+
+@keyframes rp-hop {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(-4vh); }
+  100% { transform: translateY(0); }
+}
+
+/* Подписи */
+.rp-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1.8vh;
+}
+
+.rp-option {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: clamp(300px, 36vw, 520px);
+  height: clamp(72px, 13vh, 110px);
+  padding: 0 28px;
+  border-radius: 24px;
+  background: var(--card, #fff);
+  color: var(--ink, #2b2d42);
+  font-size: clamp(30px, 6vh, 52px);
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  touch-action: none;
+  transition: transform 0.2s, opacity 0.2s, background 0.15s;
+}
+
+/* Цветная точка — подсказка: показывается после ошибки */
+.rp-colordot {
+  flex: none;
+  width: 0.8em;
+  height: 0.8em;
+  border-radius: 50%;
+  border: 3px solid rgba(43, 45, 66, 0.25);
+  visibility: hidden;
+}
+
+.show-dots .rp-colordot {
+  visibility: visible;
+}
+
+.rp-option.pressed {
+  box-shadow: none;
+}
+
+.rp-option.reading-now {
+  background: #fff3c4;
+  transform: scale(1.04);
+}
+
+.rp-option.right {
+  background: #dff6e7;
+}
+
+.rp-option.dragging {
+  transition: none;
+  z-index: 20;
+  position: relative;
+}
+
+.rp-option.faded {
+  opacity: 0.3;
+  box-shadow: none;
+}

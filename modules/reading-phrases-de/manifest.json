@@ -1,0 +1,11 @@
+{
+  "id": "reading-phrases-de",
+  "title": "Zwei Wörter lesen",
+  "subject": "german",
+  "icon": "🎨",
+  "description": "Welche Farbe? Wer ist das?",
+  "version": "1.0.0",
+  "styles": ["style.css"],
+  "files": ["texts.js", "data.js"],
+  "cycle": "german"
+}

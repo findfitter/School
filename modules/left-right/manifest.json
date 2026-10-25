@@ -1,0 +1,14 @@
+{
+  "id": "left-right",
+  "title": "Право и лево",
+  "subject": "orientation",
+  "icon": "↔️",
+  "description": "Где лево, а где право",
+  "version": "1.0.0",
+  "styles": [
+    "style.css"
+  ],
+  "files": [
+    "texts.js"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "id": "reading-ru",
+  "title": "Читаем слова",
+  "subject": "russian",
+  "icon": "📚",
+  "description": "Найди слово к картинке",
+  "version": "1.0.0",
+  "styles": [
+    "style.css"
+  ],
+  "files": [
+    "texts.js",
+    "words.js"
+  ],
+  "cycle": "russian"
+}

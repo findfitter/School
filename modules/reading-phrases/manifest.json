@@ -1,0 +1,16 @@
+{
+  "id": "reading-phrases",
+  "title": "Читаем два слова",
+  "subject": "russian",
+  "icon": "🎨",
+  "description": "Какого цвета и кто это?",
+  "version": "1.0.0",
+  "styles": [
+    "style.css"
+  ],
+  "files": [
+    "texts.js",
+    "data.js"
+  ],
+  "cycle": "russian"
+}
