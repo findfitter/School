@@ -94,7 +94,10 @@ export function createSpeech(getSettings, { enabled = true } = {}) {
       release = resolve;
       a.addEventListener('ended', () => resolve(true));
       a.addEventListener('error', () => resolve(false));
-      a.play().catch((err) => resolve(err.name === 'NotAllowedError'));
+      a.play().catch((err) => {
+        console.warn(`Не удалось проиграть ${url}:`, err);
+        resolve(err.name === 'NotAllowedError');
+      });
     });
   }
 

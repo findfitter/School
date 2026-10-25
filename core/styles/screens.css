@@ -609,3 +609,13 @@ input[type="range"]::-webkit-slider-thumb {
   background: radial-gradient(circle, rgba(255, 244, 200, 0.95), rgba(255, 190, 220, 0.9));
   animation: fade-in 0.3s both;
 }
+
+/* Проверка звука: результат можно выделить и скопировать */
+.sound-log {
+  min-height: 1.3em;
+  white-space: pre-wrap;
+  color: var(--ink);
+  font-size: 0.8em;
+  -webkit-user-select: text;
+  user-select: text;
+}

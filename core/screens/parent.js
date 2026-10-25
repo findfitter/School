@@ -15,6 +15,7 @@ export function renderParent(app) {
     statsCard(app),
     modulesCard(app),
     settingsCard(app),
+    soundCard(app),
     dataCard(app, screen, status));
 
   screen.append(
@@ -157,6 +158,68 @@ function voiceRow(app, lang, title, sample) {
     h('span', { text: title }),
     select,
     button('btn', `🔊 ${P.speechTest}`, () => app.services.speech.speak(sample, lang)));
+}
+
+// Проверка звука: сигнал (WebAudio) и английский файл (mp3). Показывает, что именно произошло.
+function soundCard(app) {
+  const out = h('div', { class: 'sound-log' });
+  const lines = [];
+  const log = (text) => {
+    lines.push(text);
+    out.textContent = lines.join('\n');
+  };
+  const reset = () => {
+    lines.length = 0;
+    out.textContent = '';
+  };
+
+  const beep = button('btn', `🔔 ${P.soundBeep}`, () => {
+    reset();
+    app.services.sounds('correct');
+    log(P.soundBeepDone);
+  });
+
+  const word = button('btn', `🔊 ${P.soundWord}`, async () => {
+    reset();
+    const url = 'audio/en/cat.mp3';
+    const standalone = window.matchMedia('(display-mode: standalone)').matches;
+    log(format(P.soundEnv, {
+      mode: standalone ? P.soundStandalone : P.soundBrowser,
+      sw: navigator.serviceWorker?.controller ? P.soundSwYes : P.soundSwNo,
+      volume: Math.round(storage.settings().volume * 100),
+    }));
+    try {
+      const res = await fetch(url, { cache: 'no-store' });
+      const size = (await res.arrayBuffer()).byteLength;
+      log(format(P.soundFetchOk, { status: res.status, type: res.headers.get('content-type'), size }));
+    } catch (err) {
+      log(format(P.soundFetchFail, { error: err.message }));
+    }
+    const audio = new Audio(url);
+    audio.volume = storage.settings().volume;
+    try {
+      await audio.play();
+      log(P.soundPlayOk);
+    } catch (err) {
+      log(format(P.soundPlayFail, { error: `${err.name}: ${err.message}` }));
+      return;
+    }
+    await new Promise((resolve) => {
+      audio.addEventListener('ended', resolve, { once: true });
+      audio.addEventListener('error', resolve, { once: true });
+      setTimeout(resolve, 5000);
+    });
+    log(format(P.soundEnded, {
+      ended: audio.ended ? P.soundEndedYes : P.soundEndedNo,
+      volume: Math.round(audio.volume * 100),
+      muted: audio.muted ? P.soundYes : P.soundNo,
+    }));
+  });
+
+  return card(P.soundTitle,
+    h('p', { class: 'status', text: P.soundHint }),
+    h('div', { class: 'row-wrap' }, beep, word),
+    out);
 }
 
 function dataCard(app, screen, status) {
