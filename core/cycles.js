@@ -31,6 +31,17 @@ function activeMembers(manifests, cycleId) {
   return manifests.filter((m) => m.cycle === cycleId && !off.has(m.id)).map((m) => m.id);
 }
 
+// Если все доступные модули круга уже отмечены пройденными (например, родитель отключил
+// непройденный модуль), кнопки остались бы закрытыми навсегда. Тогда круг просто начинается
+// заново, без награды: награда выдаётся только за настоящее прохождение (completeSeries).
+export function healCycles(manifests) {
+  for (const cycleId of new Set(manifests.map((m) => m.cycle).filter(Boolean))) {
+    const members = activeMembers(manifests, cycleId);
+    const done = storage.cycleDone(cycleId);
+    if (members.length && members.every((id) => done.includes(id))) storage.resetCycle(cycleId);
+  }
+}
+
 // Вызывается, когда серия модуля завершена.
 // Возвращает { superEarned, locked }: получена ли супер-наклейка и закрыт ли теперь модуль.
 export function completeSeries(manifests, manifest) {

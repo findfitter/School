@@ -4,7 +4,7 @@
 import { h, button, format } from '../dom.js';
 import { STR } from '../strings.js';
 import * as storage from '../storage.js';
-import { ALBUMS, CATALOG, WORLDS, WORLD_SIZE, TOTAL_SUPERS, stickerById, worldProgress } from '../rewards.js';
+import { ALBUMS, WORLDS, WORLD_SIZE, TOTAL_SUPERS, stickerById, worldProgress } from '../rewards.js';
 import { superSticker } from '../cycles.js';
 
 const S = STR.stickers;
@@ -153,7 +153,8 @@ export function renderStickers(app) {
 // Сцена мира: полученные предметы стоят на местах, остальные — пунктирные кружки.
 function worldScene(world, count) {
   const items = world.items.map((s, i) => {
-    const style = `left:${s.x}%;top:${s.y}%;font-size:${s.size}cqw`;
+    // Запасной размер для старых версий Chrome без единиц cqw, затем точный размер в cqw.
+    const style = `left:${s.x}%;top:${s.y}%;font-size:calc(min(100vw - 48px, 760px) * ${s.size / 100});font-size:${s.size}cqw`;
     return i < count
       ? h('span', { class: 'scene-item', style, title: s.ru, text: s.emoji })
       : h('span', { class: 'scene-item empty', style, text: '?' });

@@ -9,12 +9,13 @@ import { createSounds } from './sounds.js';
 import { loadRegistry, loadModule, attachStyles, warmCache } from './registry.js';
 import { createContext } from './context.js';
 import { starsFor, CATALOG } from './rewards.js';
-import { completeSeries, isLocked, superSticker } from './cycles.js';
+import { completeSeries, healCycles, isLocked, superSticker } from './cycles.js';
 import { renderMenu } from './screens/menu.js';
 import { renderResult } from './screens/result.js';
 import { renderStickers } from './screens/stickers.js';
 import { renderParent } from './screens/parent.js';
 import { renderLimit } from './screens/limit.js';
+import { renderGate } from './screens/gate.js';
 
 const root = document.getElementById('app');
 document.title = STR.appTitle;
@@ -33,7 +34,7 @@ const TICK_MS = 5000; // как часто считаем время
 const IDLE_MS = 90000; // без касаний дольше этого время не считается (ребёнок отошёл)
 const GRACE_MIN = 5; // сколько минут сверх лимита дают закончить начатое задание
 
-let screenKind = 'menu'; // menu | stickers | game | result | parent | limit
+let screenKind = 'menu'; // menu | stickers | game | result | parent | limit | gate
 let lastActivity = Date.now();
 let lastTick = Date.now();
 
@@ -42,7 +43,7 @@ for (const type of ['pointerdown', 'keydown', 'touchstart']) {
 }
 
 function limitReached(graceMinutes = 0) {
-  const limit = storage.settings().dailyLimit;
+  const limit = storage.todayLimit();
   return limit > 0 && storage.usageOn() >= (limit + graceMinutes) * 60;
 }
 
@@ -51,8 +52,8 @@ function tick() {
   const elapsed = Math.min((now - lastTick) / 1000, (TICK_MS * 2) / 1000);
   lastTick = now;
   if (document.visibilityState !== 'visible') return;
-  // Экран для родителей и экран отдыха время не считают.
-  if (screenKind !== 'parent' && screenKind !== 'limit' && now - lastActivity < IDLE_MS) {
+  // Экран для родителей, проверка для взрослых и экран отдыха время не считают.
+  if (screenKind !== 'parent' && screenKind !== 'limit' && screenKind !== 'gate' && now - lastActivity < IDLE_MS) {
     storage.addUsage(Math.round(elapsed * 10) / 10);
   }
   if (screenKind === 'menu' || screenKind === 'stickers') {
@@ -82,6 +83,7 @@ function show(screen, onLeave = null, kind = 'menu') {
 
 function showMenu() {
   if (limitReached()) return showLimit();
+  healCycles(app.manifests);
   show(renderMenu(app), null, 'menu');
 }
 
@@ -90,8 +92,15 @@ function showStickers() {
   show(renderStickers(app), null, 'stickers');
 }
 
+// Вход на экран родителя: сначала проверка «только для взрослых».
+// Перерисовка самого экрана родителя (после кнопок на нём) проверку не повторяет.
 function showParent() {
-  show(renderParent(app), null, 'parent');
+  if (screenKind === 'parent') return show(renderParent(app), null, 'parent');
+  const gate = renderGate(app, {
+    onPass: () => show(renderParent(app), null, 'parent'),
+    onCancel: () => showMenu(),
+  });
+  show(gate.el, gate.onLeave, 'gate');
 }
 
 function showLimit() {

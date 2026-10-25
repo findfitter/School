@@ -5,7 +5,11 @@
   "icon": "➖",
   "description": "Вычитаем через десяток",
   "version": "1.0.0",
-  "styles": ["style.css"],
-  "files": ["texts.js"],
-  "cycle": "arithmetic"
+  "styles": [
+    "style.css"
+  ],
+  "files": [
+    "texts.js"
+  ],
+  "cycle": "math"
 }

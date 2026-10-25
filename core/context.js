@@ -16,6 +16,7 @@ function cleanResult(result = {}) {
 export function createContext({ container, manifest, services, onFinish }) {
   const s = storage.settings();
   const voice = VOICE_ENABLED || Boolean(manifest.voice); // озвучка: везде или только в этом модуле
+  const hard = storage.hardToPractice(manifest.id);
   let finished = false;
   return Object.freeze({
     container,
@@ -28,11 +29,11 @@ export function createContext({ container, manifest, services, onFinish }) {
       volume: s.volume,
       translation: s.translation,
     }),
-    hard: Object.freeze(storage.hardKeys(manifest.id)),
+    hard: Object.freeze(hard),
     finish(result) {
       if (finished) return;
       finished = true;
-      onFinish(cleanResult(result));
+      onFinish({ ...cleanResult(result), offered: hard });
     },
   });
 }

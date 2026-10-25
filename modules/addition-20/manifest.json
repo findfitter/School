@@ -11,5 +11,5 @@
   "files": [
     "texts.js"
   ],
-  "cycle": "arithmetic"
+  "cycle": "math"
 }

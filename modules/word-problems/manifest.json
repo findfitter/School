@@ -5,7 +5,12 @@
   "icon": "📝",
   "description": "Прочитай и реши",
   "version": "1.0.0",
-  "styles": ["style.css"],
-  "files": ["texts.js", "data.js"],
-  "cycle": "numbers"
+  "styles": [
+    "style.css"
+  ],
+  "files": [
+    "texts.js",
+    "data.js"
+  ],
+  "cycle": "math"
 }

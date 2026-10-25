@@ -1,4 +1,4 @@
-// Экран для родителя (без защиты): статистика, модули, настройки, данные.
+// Экран для родителя (вход через проверку для взрослых, см. gate.js): статистика, время, модули, настройки, данные.
 
 import { h, onTap, button, format } from '../dom.js';
 import { STR } from '../strings.js';
@@ -12,6 +12,7 @@ export function renderParent(app) {
   const status = h('p', { class: 'status', 'aria-live': 'polite' });
 
   const body = h('main', { class: 'scroll content parent-body' },
+    todayCard(app),
     statsCard(app),
     usageCard(),
     modulesCard(app),
@@ -53,6 +54,35 @@ function statsCard(app) {
         h('th', { text: head.module }), h('th', { text: head.series }),
         h('th', { text: head.accuracy }), h('th', { text: head.hard }))),
       h('tbody', {}, rows)));
+}
+
+// «Время на сегодня»: сколько осталось и быстрые действия, когда лимит исчерпан.
+// Работает через дополнительные минуты на сегодня, поэтому статистика времени остаётся точной.
+function todayCard(app) {
+  const limit = storage.settings().dailyLimit;
+  if (!limit) return null;
+  const used = storage.usageOn();
+  const bonus = storage.bonusOn();
+  const total = (limit + bonus) * 60;
+  const left = Math.max(0, total - used);
+
+  const act = (minutes) => () => {
+    storage.setBonus(minutes);
+    app.go.parent(); // перерисовать экран с новыми цифрами
+  };
+  const unlimited = bonus >= 1440;
+  const status = unlimited
+    ? format(P.todayUnlimitedStatus, { used: formatTime(used) })
+    : format(P.todayStatus, { used: formatTime(used), limit: formatTime(limit * 60) })
+      + (bonus ? format(P.todayBonus, { bonus: formatTime(bonus * 60) }) : '');
+
+  return card(P.todayTitle,
+    h('p', { class: left ? 'status' : 'status warn', text: unlimited ? status : left ? `${status}. ${format(P.todayLeft, { left: formatTime(left) })}` : `${status}. ${P.todayOver}` }),
+    h('div', { class: 'row-wrap' },
+      button('btn primary', `⏱ ${P.todayMore}`, act(bonus + 15)),
+      button('btn', `↻ ${P.todayRestart}`, act(Math.round(used / 60))),
+      button('btn', `∞ ${P.todayUnlimited}`, act(1440))),
+    h('p', { class: 'status', text: P.todayNote }));
 }
 
 // Сколько времени проведено в приложении: сегодня, неделя, месяц, по дням; дневной лимит.
@@ -242,7 +272,7 @@ function dataCard(app, screen, status) {
   const exportData = () => {
     const blob = new Blob([storage.exportJson()], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
-    const link = h('a', { href: url, download: `school-progress-${new Date().toISOString().slice(0, 10)}.json` });
+    const link = h('a', { href: url, download: `school-progress-${storage.dayKey()}.json` });
     document.body.append(link);
     link.click();
     link.remove();

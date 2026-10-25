@@ -26,6 +26,7 @@ const CORE_FILES = [
   'core/context.js',
   'core/screens/menu.js',
   'core/screens/result.js',
+  'core/screens/gate.js',
   'core/screens/limit.js',
   'core/screens/stickers.js',
   'core/screens/parent.js',
@@ -57,7 +58,15 @@ self.addEventListener('message', (event) => {
     .map((u) => u.href);
   event.waitUntil(
     caches.open(CACHE).then((cache) =>
-      Promise.all(urls.map((u) => cache.add(u).catch(() => {})))
+      Promise.all(urls.map(async (u) => {
+        // Озвучка почти не меняется — скачиваем только недостающие mp3, а не весь набор при каждом запуске.
+        if (u.endsWith('.mp3') && (await cache.match(u))) return;
+        try {
+          await cache.add(u);
+        } catch (err) {
+          // файла нет или нет сети — не страшно, он подтянется при использовании
+        }
+      }))
     )
   );
 });
@@ -73,7 +82,7 @@ async function networkFirst(req) {
   const cache = await caches.open(CACHE);
   try {
     const res = await fetchWithTimeout(req, 4000);
-    if (res.status === 200) cache.put(req, res.clone());
+    if (res.status === 200) cache.put(req, res.clone()).catch(() => {});
     return res;
   } catch (err) {
     const cached = await cache.match(req, { ignoreSearch: true });

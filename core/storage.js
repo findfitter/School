@@ -4,6 +4,8 @@ import { legacyUnlocked, stickerById } from './rewards.js';
 
 const KEY = 'school-app-v1';
 const APP_ID = 'school-app';
+// Прежние id кругов -> новый id (математика раньше была двумя кругами).
+const CYCLE_ALIASES = { arithmetic: 'math', numbers: 'math' };
 const USAGE_KEEP_DAYS = 400; // сколько дней хранить статистику времени
 const CLEAN_SERIES_TO_FORGET = 3; // трудное задание забывается после стольких серий без ошибки в нём
 
@@ -19,6 +21,12 @@ const DEFAULT_SETTINGS = {
 
 let state = load();
 
+// Если приложение открыто в двух окнах (вкладка и установленное приложение), подхватываем
+// изменения из другого окна, иначе следующее сохранение затёрло бы их старыми данными.
+window.addEventListener('storage', (e) => {
+  if (e.key === KEY && e.newValue) state = load();
+});
+
 function fresh() {
   return {
     settings: { ...DEFAULT_SETTINGS, disabledModules: [], voices: { ...DEFAULT_SETTINGS.voices } },
@@ -26,6 +34,7 @@ function fresh() {
     owned: [], // id купленных наклеек (каталог в rewards.js)
     spent: 0, // сколько звёзд потрачено в магазине
     usage: {}, // время в приложении по дням: { 'ГГГГ-ММ-ДД': секунды }
+    bonus: {}, // дополнительные минуты к лимиту на конкретный день: { 'ГГГГ-ММ-ДД': минуты }
     supers: 0, // сколько супер-наклеек получено
     cycles: {}, // круги: { <id круга>: [id модулей, пройденных в текущем круге] }
     progress: {},
@@ -73,6 +82,9 @@ function normalize(data) {
   s.stars = Math.round(num(data.stars, 0, 1e6, 0));
   s.supers = Math.round(num(data.supers, 0, 1e6, 0));
   const oldest = dayKey(new Date(Date.now() - USAGE_KEEP_DAYS * 86400000));
+  for (const [day, minutes] of Object.entries(data.bonus || {})) {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(day) && day >= oldest) s.bonus[day] = Math.round(num(minutes, 0, 1440, 0));
+  }
   for (const [day, seconds] of Object.entries(data.usage || {})) {
     if (/^\d{4}-\d{2}-\d{2}$/.test(day) && day >= oldest) s.usage[day] = num(seconds, 0, 86400, 0);
   }
@@ -85,8 +97,10 @@ function normalize(data) {
     s.owned = Array.from({ length: legacy }, (_, i) => `base-${i}`);
     s.spent = legacy * 5;
   }
-  for (const [id, done] of Object.entries(data.cycles || {})) {
-    s.cycles[id] = Array.isArray(done) ? done.filter((m) => typeof m === 'string') : [];
+  for (const [oldId, done] of Object.entries(data.cycles || {})) {
+    const id = CYCLE_ALIASES[oldId] || oldId;
+    const modules = Array.isArray(done) ? done.filter((m) => typeof m === 'string') : [];
+    s.cycles[id] = [...new Set([...(s.cycles[id] || []), ...modules])];
   }
   for (const [id, p] of Object.entries(data.progress || {})) s.progress[id] = normalizeProgress(p);
   return s;
@@ -143,6 +157,22 @@ export function dayKey(date = new Date()) {
 export function addUsage(seconds, key = dayKey()) {
   state.usage[key] = Math.min(86400, (state.usage[key] || 0) + seconds);
   save();
+}
+
+// Дополнительное время на день сверх дневного лимита (родитель выдаёт его на экране «Родителям»).
+export function bonusOn(key = dayKey()) {
+  return state.bonus[key] || 0;
+}
+
+export function setBonus(minutes, key = dayKey()) {
+  state.bonus[key] = Math.max(0, Math.min(1440, Math.round(minutes)));
+  save();
+}
+
+// Лимит на сегодня в минутах: дневной лимит плюс дополнительное время (0 — без ограничения).
+export function todayLimit() {
+  const limit = state.settings.dailyLimit;
+  return limit > 0 ? limit + bonusOn() : 0;
 }
 
 export function usageOn(key = dayKey()) {
@@ -211,14 +241,24 @@ export function hardKeys(id) {
   return Object.keys(moduleProgress(id).hard);
 }
 
-export function recordSeries(id, { correct, total, mistakes }) {
+// Трудные задания, которые стоит дать в этой серии: сначала самые частые ошибки.
+export function hardToPractice(id, count = 2) {
+  return Object.entries(moduleProgress(id).hard)
+    .sort((a, b) => b[1].count - a[1].count)
+    .slice(0, count)
+    .map(([key]) => key);
+}
+
+// offered — какие трудные задания модуль получил на эту серию: «чистой» серией считается только
+// серия, в которой такое задание было предложено и решено без ошибки.
+export function recordSeries(id, { correct, total, mistakes, offered }) {
   const p = (state.progress[id] ||= normalizeProgress());
   p.series += 1;
   p.correct += correct;
   p.total += total;
   const wrong = new Set(mistakes.map((m) => m.key));
   for (const [key, item] of Object.entries(p.hard)) {
-    if (wrong.has(key)) continue;
+    if (wrong.has(key) || (offered && !offered.includes(key))) continue;
     item.clean += 1;
     if (item.clean >= CLEAN_SERIES_TO_FORGET) delete p.hard[key];
   }
@@ -231,8 +271,12 @@ export function recordSeries(id, { correct, total, mistakes }) {
   save();
 }
 
+// Сброс прогресса: звёзды, наклейки, статистика, круги. Настройки родителя (лимит времени,
+// громкость, выключенные модули…) сохраняются.
 export function reset() {
+  const keep = state.settings;
   state = fresh();
+  state.settings = keep;
   save();
 }
 

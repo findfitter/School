@@ -707,3 +707,82 @@ input[type="range"]::-webkit-slider-thumb {
   max-width: 22em;
   font-size: 1.3em;
 }
+
+.status.warn {
+  color: var(--danger);
+  font-weight: 800;
+}
+
+/* Проверка «только для взрослых» */
+.gate-screen {
+  align-items: center;
+  justify-content: center;
+  gap: 1.6vh;
+  background: linear-gradient(180deg, #eef2ff, #fff7e6);
+}
+
+.gate-screen h1 {
+  font-size: 1.6em;
+}
+
+.gate-message {
+  min-height: 1.3em;
+  color: var(--ink-soft);
+}
+
+.gate-question {
+  font-size: clamp(34px, 8vh, 64px);
+  font-weight: 800;
+}
+
+.gate-answer {
+  min-width: 4.2ch;
+  padding: 0.1em 0.5em;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  text-align: center;
+  font-size: clamp(34px, 7vh, 56px);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.gate-answer.shake {
+  animation: gate-shake 0.4s;
+}
+
+@keyframes gate-shake {
+  20% { transform: translateX(-10px); }
+  40% { transform: translateX(10px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
+
+.gate-pad {
+  display: grid;
+  grid-template-columns: repeat(3, clamp(78px, 13vh, 110px));
+  gap: clamp(8px, 1.4vh, 14px);
+}
+
+.gate-key {
+  height: clamp(64px, 10.5vh, 88px);
+  border-radius: 20px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  font-size: clamp(28px, 5vh, 40px);
+  font-weight: 800;
+}
+
+.gate-key.ok {
+  background: var(--good);
+  color: #fff;
+}
+
+.gate-key.pressed {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.gate-key:disabled {
+  opacity: 0.4;
+}
