@@ -1,0 +1,11 @@
+{
+  "id": "reading-sentences",
+  "title": "Собери предложение",
+  "subject": "russian",
+  "icon": "🧩",
+  "description": "Составь предложение из слов",
+  "version": "1.0.0",
+  "styles": ["style.css"],
+  "files": ["texts.js", "data.js"],
+  "cycle": "russian"
+}
