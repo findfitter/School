@@ -1,0 +1,11 @@
+{
+  "id": "compare-numbers",
+  "title": "Сравни числа",
+  "subject": "math",
+  "icon": "⚖️",
+  "description": "Больше, меньше или равно",
+  "version": "1.0.0",
+  "styles": ["style.css"],
+  "files": ["texts.js"],
+  "cycle": "numbers"
+}

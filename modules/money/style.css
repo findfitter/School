@@ -1,0 +1,282 @@
+/* Деньги. Монеты рисуются стилями: 1 и 2 ₽ серебристые, 5 и 10 ₽ золотые. */
+
+.money {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5vh;
+  touch-action: none;
+}
+
+.mn-top {
+  flex: none;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mn-dots {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.mn-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #d8dcee;
+}
+
+.mn-dot.done {
+  background: var(--good, #52c47a);
+}
+
+.mn-dot.again {
+  border: 3px solid var(--primary, #4f8cff);
+  background: transparent;
+}
+
+.mn-dot.again.done {
+  background: var(--primary, #4f8cff);
+}
+
+.mn-repeat {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--card, #fff);
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  font-size: 36px;
+}
+
+.mn-prompt {
+  flex: none;
+  text-align: center;
+  font-size: clamp(28px, 6vh, 50px);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.mn-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2vh;
+}
+
+/* Монеты */
+.mn-coin {
+  --d: clamp(64px, 12vh, 108px);
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--d);
+  height: var(--d);
+  padding: 0;
+  border: 0.12em solid rgba(0, 0, 0, 0.18);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #f1f3f7, #b4bac6);
+  color: #3b4050;
+  font-size: calc(var(--d) * 0.46);
+  font-weight: 800;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.18), inset 0 0 0 0.08em rgba(255, 255, 255, 0.6);
+}
+
+.mn-coin.c2 {
+  --d: clamp(68px, 12.8vh, 116px);
+}
+
+.mn-coin.c5 {
+  --d: clamp(72px, 13.6vh, 124px);
+  background: radial-gradient(circle at 35% 30%, #fff1b8, #d9a520);
+  color: #5a4210;
+}
+
+.mn-coin.c10 {
+  --d: clamp(76px, 14.4vh, 132px);
+  background: radial-gradient(circle at 35% 30%, #ffe28a, #c98f10);
+  color: #5a4210;
+  border-color: #b4bac6;
+}
+
+.mn-coin.small {
+  --d: clamp(60px, 9vh, 80px);
+}
+
+.mn-coin.pressed {
+  box-shadow: none;
+}
+
+.mn-coin.dragging {
+  position: relative;
+  z-index: 20;
+  transition: none;
+}
+
+/* Задание «сколько всего» */
+.mn-coins {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2.5vh 2vw;
+  max-width: 90%;
+}
+
+.mn-holder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6vh;
+}
+
+.mn-running {
+  height: 3.6vh;
+  color: var(--primary, #4f8cff);
+  font-size: clamp(20px, 3.6vh, 32px);
+  font-weight: 800;
+  visibility: hidden;
+}
+
+.show-running .mn-running {
+  visibility: visible;
+}
+
+/* Товар и цена */
+.mn-item {
+  display: flex;
+  align-items: center;
+  gap: 2vw;
+}
+
+.mn-emoji {
+  font-size: clamp(56px, 12vh, 100px);
+  line-height: 1;
+}
+
+.mn-tag {
+  padding: 0.2em 0.6em;
+  border-radius: 18px;
+  background: var(--accent, #ffd23f);
+  font-size: clamp(32px, 7vh, 60px);
+  font-weight: 800;
+}
+
+.mn-sub {
+  color: var(--ink-soft, #6b6f85);
+  font-size: clamp(28px, 6vh, 50px);
+  font-weight: 800;
+  visibility: hidden;
+}
+
+.show-sub .mn-sub {
+  visibility: visible;
+}
+
+/* Кошелёк */
+.mn-wallet {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  gap: 1.2vh 1vw;
+  width: min(80vw, 760px);
+  min-height: clamp(90px, 16vh, 140px);
+  padding: 1.2vh 1.5vw;
+  border: 6px dashed #b9c3e6;
+  border-radius: 28px;
+  background: var(--card, #fff);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.mn-wallet.hot {
+  background: #fff3c4;
+  border-color: var(--accent, #ffd23f);
+}
+
+.mn-wallet.ok {
+  border-style: solid;
+  border-color: var(--good, #52c47a);
+  background: #dff6e7;
+}
+
+.mn-wallet.over {
+  background: #fff0e0;
+  border-color: #f0a05a;
+  animation: mn-shake 0.4s;
+}
+
+@keyframes mn-shake {
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+
+.mn-paid {
+  color: var(--ink-soft, #6b6f85);
+  font-size: clamp(22px, 4.4vh, 38px);
+  font-weight: 800;
+}
+
+/* Нижняя панель: ответы-числа или лоток с монетами */
+.mn-bottom {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4vw;
+  min-height: clamp(84px, 16vh, 140px);
+  padding-bottom: 1vh;
+}
+
+.mn-tray {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3vw;
+}
+
+.mn-tray .mn-coin {
+  touch-action: none;
+  transition: transform 0.2s;
+}
+
+.mn-answer {
+  width: clamp(120px, 22vw, 260px);
+  height: clamp(80px, 16vh, 140px);
+  border-radius: 28px;
+  background: var(--primary, #4f8cff);
+  color: #fff;
+  font-size: clamp(44px, 10vh, 88px);
+  font-weight: 800;
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  transition: opacity 0.2s, background 0.15s;
+}
+
+.mn-answer:nth-child(2) {
+  background: #8b6cf0;
+}
+
+.mn-answer:nth-child(3) {
+  background: #f08c4f;
+}
+
+.mn-answer.pressed {
+  box-shadow: none;
+}
+
+.mn-answer.right {
+  background: var(--good, #52c47a);
+}
+
+.mn-answer.faded {
+  opacity: 0.3;
+  box-shadow: none;
+}

@@ -1,0 +1,172 @@
+/* Задачи. Герой и предмет сверху, текст в карточке, подсказка-картинка, три ответа. */
+
+.problems {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5vh;
+  touch-action: none;
+}
+
+.wp-top {
+  flex: none;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wp-dots {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.wp-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #d8dcee;
+}
+
+.wp-dot.done {
+  background: var(--good, #52c47a);
+}
+
+.wp-dot.again {
+  border: 3px solid var(--primary, #4f8cff);
+  background: transparent;
+}
+
+.wp-dot.again.done {
+  background: var(--primary, #4f8cff);
+}
+
+.wp-repeat {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--card, #fff);
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  font-size: 36px;
+}
+
+.wp-who {
+  flex: none;
+  text-align: center;
+  font-size: clamp(48px, 11vh, 90px);
+  line-height: 1.1;
+}
+
+.wp-card {
+  flex: none;
+  align-self: center;
+  max-width: 88%;
+  padding: 2.5vh 3vw;
+  border-radius: 28px;
+  background: var(--card, #fff);
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  text-align: center;
+}
+
+.wp-line {
+  font-size: clamp(26px, 5.6vh, 46px);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.wp-question {
+  margin-top: 1vh;
+  color: var(--primary, #4f8cff);
+  font-size: clamp(28px, 6.2vh, 52px);
+  font-weight: 800;
+}
+
+/* Подсказка: предметы из задачи */
+.wp-hint {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2vw;
+  font-size: clamp(24px, 5vh, 42px);
+  line-height: 1.15;
+  visibility: hidden;
+}
+
+.wp-hint.show {
+  visibility: visible;
+}
+
+.wp-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.1em;
+  max-width: 36vw;
+}
+
+.wp-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+}
+
+.wp-rows .wp-group {
+  max-width: 70vw;
+  justify-content: flex-start;
+}
+
+.wp-op {
+  font-size: 1.4em;
+  font-weight: 800;
+  color: var(--ink-soft, #6b6f85);
+}
+
+.wp-group .gone {
+  opacity: 0.2;
+  filter: grayscale(1);
+}
+
+/* Ответы */
+.wp-answers {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  gap: 4vw;
+  padding-bottom: 1vh;
+}
+
+.wp-answer {
+  width: clamp(120px, 22vw, 260px);
+  height: clamp(80px, 16vh, 140px);
+  border-radius: 28px;
+  background: var(--primary, #4f8cff);
+  color: #fff;
+  font-size: clamp(44px, 10vh, 88px);
+  font-weight: 800;
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  transition: opacity 0.2s, background 0.15s;
+}
+
+.wp-answer:nth-child(2) {
+  background: #8b6cf0;
+}
+
+.wp-answer:nth-child(3) {
+  background: #f08c4f;
+}
+
+.wp-answer.pressed {
+  box-shadow: none;
+}
+
+.wp-answer.right {
+  background: var(--good, #52c47a);
+}
+
+.wp-answer.faded {
+  opacity: 0.3;
+  box-shadow: none;
+}

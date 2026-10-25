@@ -1,0 +1,231 @@
+/* Сравни числа. Два числа по краям, окошко для знака в середине, три знака внизу. */
+
+.compare {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5vh;
+  touch-action: none;
+}
+
+.cm-top {
+  flex: none;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cm-dots {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.cm-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #d8dcee;
+}
+
+.cm-dot.done {
+  background: var(--good, #52c47a);
+}
+
+.cm-dot.again {
+  border: 3px solid var(--primary, #4f8cff);
+  background: transparent;
+}
+
+.cm-dot.again.done {
+  background: var(--primary, #4f8cff);
+}
+
+.cm-repeat {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--card, #fff);
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  font-size: 36px;
+}
+
+.cm-prompt {
+  flex: none;
+  text-align: center;
+  color: var(--ink-soft, #6b6f85);
+  font-size: clamp(22px, 4vh, 34px);
+}
+
+/* Числа и окошко */
+.cm-row {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3vw;
+}
+
+.cm-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1vh;
+  min-width: clamp(160px, 24vw, 340px);
+  padding: 2vh 2vw;
+  border-radius: 28px;
+  background: var(--card, #fff);
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+}
+
+.cm-expr {
+  font-size: clamp(48px, 13vh, 110px);
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.cm-items {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.1em;
+  max-width: 22vw;
+  font-size: clamp(22px, 5vh, 40px);
+  line-height: 1.1;
+}
+
+.cm-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(90px, 14vh, 130px);
+  height: clamp(90px, 14vh, 130px);
+  border: 6px dashed #b9c3e6;
+  border-radius: 28px;
+  color: var(--ink-soft, #6b6f85);
+  font-size: clamp(48px, 11vh, 90px);
+  font-weight: 800;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.cm-slot.hot {
+  background: #fff3c4;
+  border-color: var(--accent, #ffd23f);
+}
+
+.cm-slot.ok {
+  border-style: solid;
+  border-color: var(--good, #52c47a);
+  background: #dff6e7;
+  color: var(--ink, #2b2d42);
+}
+
+/* Подсказка: столбики */
+.cm-bars {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  gap: 3vw;
+  height: 3.2vh;
+  visibility: hidden;
+}
+
+.cm-bars.show {
+  visibility: visible;
+}
+
+.cm-bar {
+  width: clamp(160px, 24vw, 340px);
+  height: 100%;
+  border-radius: 999px;
+  background: var(--soft, #e8eefc);
+  overflow: hidden;
+}
+
+.cm-bar-fill {
+  height: 100%;
+  min-width: 2.2em;
+  border-radius: 999px;
+  background: var(--primary, #4f8cff);
+  color: #fff;
+  font-size: 2.2vh;
+  font-weight: 800;
+  line-height: 3.2vh;
+  text-align: right;
+  padding-right: 0.6em;
+  transition: width 0.4s;
+}
+
+.cm-bar:last-child .cm-bar-fill {
+  background: #f08c4f;
+}
+
+/* Знаки */
+.cm-signs {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  gap: 4vw;
+  padding-bottom: 1vh;
+}
+
+.cm-sign-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6vh;
+}
+
+.cm-sign {
+  width: clamp(110px, 20vw, 240px);
+  height: clamp(80px, 16vh, 140px);
+  border-radius: 28px;
+  background: var(--primary, #4f8cff);
+  color: #fff;
+  font-size: clamp(48px, 11vh, 96px);
+  font-weight: 800;
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  touch-action: none;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.cm-sign-wrap:nth-child(2) .cm-sign {
+  background: #8b6cf0;
+}
+
+.cm-sign-wrap:nth-child(3) .cm-sign {
+  background: #f08c4f;
+}
+
+.cm-caption {
+  height: 3vh;
+  color: var(--ink-soft, #6b6f85);
+  font-size: clamp(16px, 2.6vh, 22px);
+  visibility: hidden;
+}
+
+.show-captions .cm-caption {
+  visibility: visible;
+}
+
+.cm-sign.pressed {
+  box-shadow: none;
+}
+
+.cm-sign.right {
+  background: var(--good, #52c47a);
+}
+
+.cm-sign.dragging {
+  transition: none;
+  z-index: 20;
+  position: relative;
+}
+
+.cm-sign.faded {
+  opacity: 0.3;
+  box-shadow: none;
+}

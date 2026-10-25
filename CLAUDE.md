@@ -56,7 +56,7 @@ audio/ru/, audio/de/   необязательные озвучки <ключ>.mp
 
 ## Круги и супер-наклейки
 
-Модули с одинаковым `cycle` в манифесте образуют круг. Сейчас три круга: `arithmetic` (`addition-10`, `addition-20`, `subtraction-10`), `russian` (`reading-ru`, `reading-phrases`, `reading-sentences`) и `german` (`reading-de`, `reading-phrases-de`, `reading-sentences-de`). Супер-наклейки всех кругов копятся в одной общей сказке.
+Модули с одинаковым `cycle` в манифесте образуют круг. Сейчас четыре круга: `arithmetic` (`addition-10`, `addition-20`, `subtraction-10`, `subtraction-20`), `numbers` (`compare-numbers`, `word-problems`, `money`), `russian` (`reading-ru`, `reading-phrases`, `reading-sentences`) и `german` (`reading-de`, `reading-phrases-de`, `reading-sentences-de`). Супер-наклейки всех кругов копятся в одной общей сказке.
 Завершённая серия закрывает кнопку модуля (серая плитка с ✓), остальные остаются доступны в любом порядке.
 Когда пройдены все включённые модули круга, ядро выдаёт супер-наклейку, открывает все кнопки, и круг начинается заново (`core/cycles.js`).
 Модули без `cycle` доступны всегда. Закрытый модуль нельзя повторить, в том числе кнопкой «Ещё раз». Модуль, выключенный родителем, в круг не входит.

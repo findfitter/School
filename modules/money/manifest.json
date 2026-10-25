@@ -1,0 +1,11 @@
+{
+  "id": "money",
+  "title": "Деньги",
+  "subject": "math",
+  "icon": "💰",
+  "description": "Считаем монеты и покупаем",
+  "version": "1.0.0",
+  "styles": ["style.css"],
+  "files": ["texts.js"],
+  "cycle": "numbers"
+}

@@ -1,0 +1,11 @@
+{
+  "id": "subtraction-20",
+  "title": "Вычитание до 20",
+  "subject": "math",
+  "icon": "➖",
+  "description": "Вычитаем через десяток",
+  "version": "1.0.0",
+  "styles": ["style.css"],
+  "files": ["texts.js"],
+  "cycle": "arithmetic"
+}

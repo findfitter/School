@@ -1,0 +1,213 @@
+/* Вычитание до 20. Размеры в vh/vw, чтобы всё помещалось на экране Хромбука без прокрутки. */
+
+.sub20 {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5vh;
+  touch-action: none;
+}
+
+.s20-top {
+  flex: none;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.s20-dots {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.s20-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #d8dcee;
+}
+
+.s20-dot.done {
+  background: var(--good, #52c47a);
+}
+
+.s20-dot.again {
+  border: 3px solid var(--primary, #4f8cff);
+  background: transparent;
+}
+
+.s20-dot.again.done {
+  background: var(--primary, #4f8cff);
+}
+
+.s20-repeat {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--card, #fff);
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  font-size: 36px;
+}
+
+.s20-repeat:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+/* Пример */
+.s20-eq {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2vw;
+  font-size: clamp(56px, 15vh, 130px);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.s20-op {
+  color: var(--ink-soft, #6b6f85);
+}
+
+.s20-slot {
+  min-width: 1.2em;
+  padding: 0 0.1em;
+  text-align: center;
+  border: 6px dashed #b9c3e6;
+  border-radius: 24px;
+  color: var(--ink-soft, #6b6f85);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.s20-slot.hot {
+  background: #fff3c4;
+  border-color: var(--accent, #ffd23f);
+}
+
+.s20-slot.ok {
+  border-style: solid;
+  border-color: var(--good, #52c47a);
+  background: #dff6e7;
+  color: var(--ink, #2b2d42);
+}
+
+/* Предметы для пересчёта */
+.s20-things {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3vw;
+  font-size: clamp(36px, 9vh, 72px);
+}
+
+.s20-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.15em;
+  max-width: 70vw;
+}
+
+.s20-thing {
+  position: relative;
+  line-height: 1.1;
+}
+
+.s20-thing.hop {
+  animation: s20-hop 0.5s ease-out;
+}
+
+@keyframes s20-hop {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(-0.35em); }
+  100% { transform: translateY(0); }
+}
+
+.s20-badge {
+  position: absolute;
+  right: -0.1em;
+  bottom: -0.1em;
+  min-width: 1.1em;
+  height: 1.1em;
+  padding: 0 0.15em;
+  border-radius: 999px;
+  background: var(--accent, #ffd23f);
+  color: var(--ink, #2b2d42);
+  font-size: 0.5em;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
+  animation: s20-pop 0.25s ease-out;
+}
+
+@keyframes s20-pop {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}
+
+/* Ответы */
+.s20-answers {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  gap: 4vw;
+  padding-bottom: 1vh;
+}
+
+.s20-answer {
+  width: clamp(120px, 22vw, 260px);
+  height: clamp(88px, 18vh, 160px);
+  border-radius: 28px;
+  background: var(--primary, #4f8cff);
+  color: #fff;
+  font-size: clamp(48px, 11vh, 96px);
+  font-weight: 800;
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  touch-action: none;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.s20-answer:nth-child(2) {
+  background: #8b6cf0;
+}
+
+.s20-answer:nth-child(3) {
+  background: #f08c4f;
+}
+
+.s20-answer.pressed {
+  box-shadow: none;
+}
+
+.s20-answer.dragging {
+  transition: none;
+  z-index: 20;
+  position: relative;
+}
+
+.s20-answer.faded {
+  opacity: 0.3;
+  box-shadow: none;
+}
+
+/* Вычтенные предметы бледнеют и уменьшаются — «улетели» */
+.s20-thing.gone {
+  opacity: 0.22;
+  filter: grayscale(1);
+  transform: scale(0.8);
+}
+
+/* Больше десяти предметов — делаем их мельче */
+.s20-things.many {
+  font-size: clamp(26px, 5.5vh, 46px);
+}
+
+.s20-things.many .s20-group {
+  max-width: 62vw;
+}
