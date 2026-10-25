@@ -26,6 +26,7 @@ const CORE_FILES = [
   'core/context.js',
   'core/screens/menu.js',
   'core/screens/result.js',
+  'core/screens/limit.js',
   'core/screens/stickers.js',
   'core/screens/parent.js',
   'core/styles/base.css',

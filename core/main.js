@@ -14,6 +14,7 @@ import { renderMenu } from './screens/menu.js';
 import { renderResult } from './screens/result.js';
 import { renderStickers } from './screens/stickers.js';
 import { renderParent } from './screens/parent.js';
+import { renderLimit } from './screens/limit.js';
 
 const root = document.getElementById('app');
 document.title = STR.appTitle;
@@ -27,6 +28,42 @@ const services = {
 let cleanup = null;
 let runToken = 0;
 
+// ---------- Время в приложении и дневной лимит ----------
+const TICK_MS = 5000; // как часто считаем время
+const IDLE_MS = 90000; // без касаний дольше этого время не считается (ребёнок отошёл)
+const GRACE_MIN = 5; // сколько минут сверх лимита дают закончить начатое задание
+
+let screenKind = 'menu'; // menu | stickers | game | result | parent | limit
+let lastActivity = Date.now();
+let lastTick = Date.now();
+
+for (const type of ['pointerdown', 'keydown', 'touchstart']) {
+  document.addEventListener(type, () => { lastActivity = Date.now(); }, { passive: true, capture: true });
+}
+
+function limitReached(graceMinutes = 0) {
+  const limit = storage.settings().dailyLimit;
+  return limit > 0 && storage.usageOn() >= (limit + graceMinutes) * 60;
+}
+
+function tick() {
+  const now = Date.now();
+  const elapsed = Math.min((now - lastTick) / 1000, (TICK_MS * 2) / 1000);
+  lastTick = now;
+  if (document.visibilityState !== 'visible') return;
+  // Экран для родителей и экран отдыха время не считают.
+  if (screenKind !== 'parent' && screenKind !== 'limit' && now - lastActivity < IDLE_MS) {
+    storage.addUsage(Math.round(elapsed * 10) / 10);
+  }
+  if (screenKind === 'menu' || screenKind === 'stickers') {
+    if (limitReached()) showLimit();
+  } else if (screenKind === 'game' || screenKind === 'result') {
+    if (limitReached(GRACE_MIN)) showLimit();
+  } else if (screenKind === 'limit' && !limitReached()) {
+    showMenu(); // наступил новый день или родитель увеличил лимит
+  }
+}
+
 const app = {
   root,
   services,
@@ -34,7 +71,8 @@ const app = {
   go: { menu: showMenu, stickers: showStickers, parent: showParent, play },
 };
 
-function show(screen, onLeave = null) {
+function show(screen, onLeave = null, kind = 'menu') {
+  screenKind = kind;
   runToken += 1;
   services.speech.stop();
   if (cleanup) cleanup();
@@ -43,19 +81,26 @@ function show(screen, onLeave = null) {
 }
 
 function showMenu() {
-  show(renderMenu(app));
+  if (limitReached()) return showLimit();
+  show(renderMenu(app), null, 'menu');
 }
 
 function showStickers() {
-  show(renderStickers(app));
+  if (limitReached()) return showLimit();
+  show(renderStickers(app), null, 'stickers');
 }
 
 function showParent() {
-  show(renderParent(app));
+  show(renderParent(app), null, 'parent');
+}
+
+function showLimit() {
+  show(renderLimit(app), null, 'limit');
 }
 
 async function play(manifest) {
   if (isLocked(manifest)) return showMenu();
+  if (limitReached()) return showLimit();
   const container = h('div', { class: 'game-container' });
   const home = button('btn home-btn', '🏠', () => showMenu());
   home.setAttribute('aria-label', STR.common.home);
@@ -64,7 +109,7 @@ async function play(manifest) {
   show(h('div', { class: 'screen game-screen' }, container, home), () => {
     if (typeof stopModule === 'function') stopModule();
     styles.detach();
-  });
+  }, 'game');
   const mine = runToken;
 
   try {
@@ -109,7 +154,7 @@ function finishSeries(manifest, result) {
     locked: cycle.locked,
     superSticker: cycle.superEarned ? superSticker(storage.supers()) : null,
   });
-  show(screen.el, screen.onLeave);
+  show(screen.el, screen.onLeave, 'result');
 }
 
 // Запрещаем масштабирование жестами и прокрутку во время игры.
@@ -136,6 +181,7 @@ async function init() {
   }
   showMenu();
   warmCache(app.manifests);
+  setInterval(tick, TICK_MS);
 }
 
 init();

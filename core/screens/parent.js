@@ -13,9 +13,9 @@ export function renderParent(app) {
 
   const body = h('main', { class: 'scroll content parent-body' },
     statsCard(app),
+    usageCard(),
     modulesCard(app),
     settingsCard(app),
-    soundCard(app),
     dataCard(app, screen, status));
 
   screen.append(
@@ -53,6 +53,69 @@ function statsCard(app) {
         h('th', { text: head.module }), h('th', { text: head.series }),
         h('th', { text: head.accuracy }), h('th', { text: head.hard }))),
       h('tbody', {}, rows)));
+}
+
+// Сколько времени проведено в приложении: сегодня, неделя, месяц, по дням; дневной лимит.
+const LIMIT_OPTIONS = [0, 15, 20, 30, 45, 60, 90, 120, 180]; // минуты, 0 — без ограничения
+
+function formatTime(seconds) {
+  const minutes = Math.round(seconds / 60);
+  if (seconds > 0 && minutes === 0) return P.usageLessMinute;
+  if (minutes === 0) return P.usageNone;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return h ? `${h} ${P.usageHour} ${m ? `${m} ${P.usageMinute}` : ''}`.trim() : `${m} ${P.usageMinute}`;
+}
+
+function usageCard() {
+  const days = storage.usageDays(30);
+  const total = (count) => days.slice(0, count).reduce((sum, d) => sum + d.seconds, 0);
+
+  const stat = (title, seconds, note) =>
+    h('div', { class: 'usage-stat' },
+      h('div', { class: 'usage-stat-title', text: title }),
+      h('div', { class: 'usage-stat-value', text: formatTime(seconds) }),
+      note ? h('div', { class: 'usage-stat-note', text: note }) : null);
+  const average = (seconds, count) => format(P.usageAverage, { time: formatTime(seconds / count) });
+
+  const limitValue = h('output', { class: 'value wide' });
+  const paintLimit = () => {
+    const minutes = storage.settings().dailyLimit;
+    limitValue.textContent = minutes ? formatTime(minutes * 60) : P.usageLimitOff;
+  };
+  const stepLimit = (direction) => () => {
+    const current = storage.settings().dailyLimit;
+    // Ближайший пункт списка, затем шаг в нужную сторону.
+    let index = LIMIT_OPTIONS.reduce((best, v, i) => (Math.abs(v - current) < Math.abs(LIMIT_OPTIONS[best] - current) ? i : best), 0);
+    index = Math.min(LIMIT_OPTIONS.length - 1, Math.max(0, index + direction));
+    storage.setSettings({ dailyLimit: LIMIT_OPTIONS[index] });
+    paintLimit();
+  };
+  paintLimit();
+
+  const max = Math.max(1, ...days.map((d) => d.seconds));
+  const rows = days.map((d, i) => {
+    const date = d.date.toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'short' });
+    const label = i === 0 ? `${date} · ${P.usageDayToday}` : i === 1 ? `${date} · ${P.usageDayYesterday}` : date;
+    const fill = h('div', { class: 'usage-bar-fill' });
+    fill.style.width = `${(d.seconds / max) * 100}%`;
+    return h('div', { class: 'usage-row' },
+      h('span', { class: 'usage-date', text: label }),
+      h('div', { class: 'usage-bar' }, fill),
+      h('span', { class: 'usage-time', text: formatTime(d.seconds) }));
+  });
+
+  return card(P.usageTitle,
+    h('div', { class: 'usage-stats' },
+      stat(P.usageToday, total(1)),
+      stat(P.usageWeek, total(7), average(total(7), 7)),
+      stat(P.usageMonth, total(30), average(total(30), 30))),
+    h('div', { class: 'row-between' },
+      h('span', { text: P.usageLimit }),
+      h('div', { class: 'stepper' }, button('btn round', '−', stepLimit(-1)), limitValue, button('btn round', '+', stepLimit(1)))),
+    h('p', { class: 'status', text: P.usageLimitNote }),
+    h('h3', { class: 'usage-days-title', text: P.usageDays }),
+    h('div', { class: 'usage-days' }, rows));
 }
 
 function modulesCard(app) {
@@ -158,68 +221,6 @@ function voiceRow(app, lang, title, sample) {
     h('span', { text: title }),
     select,
     button('btn', `🔊 ${P.speechTest}`, () => app.services.speech.speak(sample, lang)));
-}
-
-// Проверка звука: сигнал (WebAudio) и английский файл (mp3). Показывает, что именно произошло.
-function soundCard(app) {
-  const out = h('div', { class: 'sound-log' });
-  const lines = [];
-  const log = (text) => {
-    lines.push(text);
-    out.textContent = lines.join('\n');
-  };
-  const reset = () => {
-    lines.length = 0;
-    out.textContent = '';
-  };
-
-  const beep = button('btn', `🔔 ${P.soundBeep}`, () => {
-    reset();
-    app.services.sounds('correct');
-    log(P.soundBeepDone);
-  });
-
-  const word = button('btn', `🔊 ${P.soundWord}`, async () => {
-    reset();
-    const url = 'audio/en/cat.mp3';
-    const standalone = window.matchMedia('(display-mode: standalone)').matches;
-    log(format(P.soundEnv, {
-      mode: standalone ? P.soundStandalone : P.soundBrowser,
-      sw: navigator.serviceWorker?.controller ? P.soundSwYes : P.soundSwNo,
-      volume: Math.round(storage.settings().volume * 100),
-    }));
-    try {
-      const res = await fetch(url, { cache: 'no-store' });
-      const size = (await res.arrayBuffer()).byteLength;
-      log(format(P.soundFetchOk, { status: res.status, type: res.headers.get('content-type'), size }));
-    } catch (err) {
-      log(format(P.soundFetchFail, { error: err.message }));
-    }
-    const audio = new Audio(url);
-    audio.volume = storage.settings().volume;
-    try {
-      await audio.play();
-      log(P.soundPlayOk);
-    } catch (err) {
-      log(format(P.soundPlayFail, { error: `${err.name}: ${err.message}` }));
-      return;
-    }
-    await new Promise((resolve) => {
-      audio.addEventListener('ended', resolve, { once: true });
-      audio.addEventListener('error', resolve, { once: true });
-      setTimeout(resolve, 5000);
-    });
-    log(format(P.soundEnded, {
-      ended: audio.ended ? P.soundEndedYes : P.soundEndedNo,
-      volume: Math.round(audio.volume * 100),
-      muted: audio.muted ? P.soundYes : P.soundNo,
-    }));
-  });
-
-  return card(P.soundTitle,
-    h('p', { class: 'status', text: P.soundHint }),
-    h('div', { class: 'row-wrap' }, beep, word),
-    out);
 }
 
 function dataCard(app, screen, status) {

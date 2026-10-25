@@ -4,6 +4,7 @@ import { legacyUnlocked, stickerById } from './rewards.js';
 
 const KEY = 'school-app-v1';
 const APP_ID = 'school-app';
+const USAGE_KEEP_DAYS = 400; // сколько дней хранить статистику времени
 const CLEAN_SERIES_TO_FORGET = 3; // трудное задание забывается после стольких серий без ошибки в нём
 
 const DEFAULT_SETTINGS = {
@@ -13,6 +14,7 @@ const DEFAULT_SETTINGS = {
   disabledModules: [],
   voices: { ru: '', de: '' }, // имя выбранного голоса; пусто — подбирать автоматически
   translation: false, // показывать русский перевод под английскими словами
+  dailyLimit: 0, // ограничение времени в день, минуты (0 — без ограничения)
 };
 
 let state = load();
@@ -23,6 +25,7 @@ function fresh() {
     stars: 0,
     owned: [], // id купленных наклеек (каталог в rewards.js)
     spent: 0, // сколько звёзд потрачено в магазине
+    usage: {}, // время в приложении по дням: { 'ГГГГ-ММ-ДД': секунды }
     supers: 0, // сколько супер-наклеек получено
     cycles: {}, // круги: { <id круга>: [id модулей, пройденных в текущем круге] }
     progress: {},
@@ -59,6 +62,7 @@ function normalize(data) {
   s.settings.volume = num(d.volume, 0, 1, DEFAULT_SETTINGS.volume);
   s.settings.speechRate = num(d.speechRate, 0.5, 1.5, DEFAULT_SETTINGS.speechRate);
   s.settings.translation = Boolean(d.translation);
+  s.settings.dailyLimit = Math.round(num(d.dailyLimit, 0, 600, 0));
   s.settings.disabledModules = Array.isArray(d.disabledModules)
     ? d.disabledModules.filter((id) => typeof id === 'string')
     : [];
@@ -68,6 +72,10 @@ function normalize(data) {
   }
   s.stars = Math.round(num(data.stars, 0, 1e6, 0));
   s.supers = Math.round(num(data.supers, 0, 1e6, 0));
+  const oldest = dayKey(new Date(Date.now() - USAGE_KEEP_DAYS * 86400000));
+  for (const [day, seconds] of Object.entries(data.usage || {})) {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(day) && day >= oldest) s.usage[day] = num(seconds, 0, 86400, 0);
+  }
   if (Array.isArray(data.owned)) {
     s.owned = [...new Set(data.owned.filter((id) => stickerById.has(id)))];
     s.spent = Math.round(num(data.spent, 0, 1e7, 0));
@@ -122,6 +130,33 @@ export function stars() {
 export function addStars(n) {
   state.stars += n;
   save();
+}
+
+// ---------- Время в приложении ----------
+
+// Ключ дня по местному времени: «2026-10-28».
+export function dayKey(date = new Date()) {
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+export function addUsage(seconds, key = dayKey()) {
+  state.usage[key] = Math.min(86400, (state.usage[key] || 0) + seconds);
+  save();
+}
+
+export function usageOn(key = dayKey()) {
+  return state.usage[key] || 0;
+}
+
+// Последние count дней, сегодняшний первым: [{ key, date, seconds }].
+export function usageDays(count) {
+  return Array.from({ length: count }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    const key = dayKey(date);
+    return { key, date, seconds: state.usage[key] || 0 };
+  });
 }
 
 // Звёзд на счету: всего заработано минус потрачено в магазине.

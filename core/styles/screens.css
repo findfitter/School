@@ -610,12 +610,100 @@ input[type="range"]::-webkit-slider-thumb {
   animation: fade-in 0.3s both;
 }
 
-/* Проверка звука: результат можно выделить и скопировать */
-.sound-log {
-  min-height: 1.3em;
-  white-space: pre-wrap;
-  color: var(--ink);
+/* Время в приложении */
+.usage-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.usage-stat {
+  flex: 1 1 200px;
+  padding: 12px 18px;
+  border-radius: var(--radius);
+  background: var(--soft);
+}
+
+.usage-stat-title {
+  color: var(--ink-soft);
   font-size: 0.8em;
-  -webkit-user-select: text;
-  user-select: text;
+}
+
+.usage-stat-value {
+  font-size: 1.5em;
+  font-weight: 800;
+}
+
+.usage-stat-note {
+  color: var(--ink-soft);
+  font-size: 0.75em;
+}
+
+.value.wide {
+  min-width: 9ch;
+}
+
+.usage-days-title {
+  margin: 6px 0 0;
+  font-size: 1em;
+}
+
+.usage-days {
+  max-height: 34vh;
+  overflow-y: auto;
+  touch-action: pan-y;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.usage-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 220px) 1fr minmax(110px, 150px);
+  align-items: center;
+  gap: 12px;
+  font-size: 0.8em;
+}
+
+.usage-bar {
+  height: 14px;
+  border-radius: 7px;
+  background: var(--soft);
+  overflow: hidden;
+}
+
+.usage-bar-fill {
+  height: 100%;
+  border-radius: 7px;
+  background: var(--primary);
+}
+
+.usage-time {
+  text-align: right;
+  font-weight: 800;
+}
+
+/* Экран «На сегодня достаточно» */
+.limit-screen {
+  align-items: center;
+  justify-content: center;
+  gap: 2.4vh;
+  padding: 0 8vw;
+  text-align: center;
+  background: linear-gradient(180deg, #2b2d4a, #4b3b78);
+  color: #fff;
+}
+
+.limit-icon {
+  font-size: clamp(90px, 22vh, 180px);
+  line-height: 1;
+}
+
+.limit-screen h1 {
+  font-size: 2.2em;
+}
+
+.limit-screen p {
+  max-width: 22em;
+  font-size: 1.3em;
 }
