@@ -21,7 +21,7 @@ export function renderParent(app) {
     h('header', { class: 'bar' },
       button('btn', `⬅ ${STR.common.back}`, () => app.go.menu()),
       h('h1', { text: P.title }),
-      h('div', { class: 'chip' }, format(P.totalStars, { stars: storage.stars(), supers: storage.supers() }))),
+      h('div', { class: 'chip' }, format(P.totalStars, { stars: storage.stars(), balance: storage.balance(), supers: storage.supers() }))),
     body);
   return screen;
 }

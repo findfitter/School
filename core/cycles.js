@@ -3,11 +3,21 @@
 // ребёнок получает супер-наклейку и все модули круга снова открываются.
 
 import * as storage from './storage.js';
-import { SUPER_STICKERS } from './rewards.js';
+import { WORLDS, WORLD_SIZE, TOTAL_SUPERS } from './rewards.js';
 
-// n-я супер-наклейка (с 1); после последней набор повторяется.
+// n-я супер-наклейка (с 1): предмет, его мир, и что произошло с миром.
+// После последнего мира наборы повторяются по кругу (лишние лежат отдельным рядом).
 export function superSticker(n) {
-  return SUPER_STICKERS[(n - 1) % SUPER_STICKERS.length];
+  const idx = (n - 1) % TOTAL_SUPERS;
+  const w = Math.floor(idx / WORLD_SIZE);
+  const worldDone = idx % WORLD_SIZE === WORLD_SIZE - 1;
+  return {
+    ...WORLDS[w].items[idx % WORLD_SIZE],
+    world: WORLDS[w],
+    worldDone,
+    nextWorld: worldDone && w + 1 < WORLDS.length ? WORLDS[w + 1] : null,
+    allWorldsDone: worldDone && w + 1 === WORLDS.length,
+  };
 }
 
 // Модуль закрыт, если уже пройден в текущем круге.

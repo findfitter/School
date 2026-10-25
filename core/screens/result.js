@@ -1,7 +1,7 @@
 import { h, button, format } from '../dom.js';
 import { STR } from '../strings.js';
 
-export function renderResult(app, { manifest, result, stars, newStickers, locked, superSticker }) {
+export function renderResult(app, { manifest, result, stars, canBuy, locked, superSticker }) {
   const lang = (STR.subjects[manifest.subject] || STR.subjects.other).lang;
   const t = STR.result[lang];
   const praise = t.praise[stars];
@@ -10,10 +10,9 @@ export function renderResult(app, { manifest, result, stars, newStickers, locked
     h('span', { class: `star ${n <= stars ? 'earned' : 'empty'}`, style: `--i:${n}`, text: n <= stars ? '⭐' : '☆' })
   );
 
-  const sticker = newStickers.length
-    ? h('div', { class: 'new-sticker' },
-        h('div', { class: 'new-sticker-icons' }, newStickers.map((s) => h('span', { text: s }))),
-        h('div', { text: t.newSticker }))
+  // Подсказка про магазин, если на счету хватает звёзд хотя бы на одну наклейку.
+  const shop = canBuy && !superSticker
+    ? h('div', { class: 'shop-hint' }, '🛍️ ', t.shopHint)
     : null;
 
   // Пройденное в круге задание закрыто: «ещё раз» не предлагаем.
@@ -26,7 +25,7 @@ export function renderResult(app, { manifest, result, stars, newStickers, locked
     h('div', { class: 'stars' }, starEls),
     h('h1', { text: praise }),
     h('p', { class: 'score', text: format(t.score, result) }),
-    sticker,
+    shop,
     locked ? h('p', { class: 'score', text: t.nextTask }) : null,
     h('div', { class: 'row' }, buttons)
   );
@@ -52,7 +51,11 @@ const SPARKLES = ['✨', '💖', '⭐', '🌸', '💫'];
 
 function superPopup(app, text, sticker, lang) {
   const name = sticker[lang] || sticker.ru;
-  const message = format(text.text, { name });
+  const world = sticker.world;
+  const parts = [format(text.text, { name, grow: world.grow[lang] || world.grow.ru })];
+  if (sticker.nextWorld) parts.push(format(text.worldDone, { world: sticker.nextWorld.title[lang] || sticker.nextWorld.title.ru }));
+  if (sticker.allWorldsDone) parts.push(text.allDone);
+  const message = parts.join(' ');
   app.services.speech.speak(`${text.title} ${message}`, lang);
 
   const sparkles = Array.from({ length: 16 }, (_, i) =>

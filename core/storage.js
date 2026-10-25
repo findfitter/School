@@ -1,5 +1,7 @@
 // Настройки и прогресс в localStorage. Данные никуда не отправляются.
 
+import { legacyUnlocked, stickerById } from './rewards.js';
+
 const KEY = 'school-app-v1';
 const APP_ID = 'school-app';
 const CLEAN_SERIES_TO_FORGET = 3; // трудное задание забывается после стольких серий без ошибки в нём
@@ -18,6 +20,8 @@ function fresh() {
   return {
     settings: { ...DEFAULT_SETTINGS, disabledModules: [], voices: { ...DEFAULT_SETTINGS.voices } },
     stars: 0,
+    owned: [], // id купленных наклеек (каталог в rewards.js)
+    spent: 0, // сколько звёзд потрачено в магазине
     supers: 0, // сколько супер-наклеек получено
     cycles: {}, // круги: { <id круга>: [id модулей, пройденных в текущем круге] }
     progress: {},
@@ -62,6 +66,15 @@ function normalize(data) {
   }
   s.stars = Math.round(num(data.stars, 0, 1e6, 0));
   s.supers = Math.round(num(data.supers, 0, 1e6, 0));
+  if (Array.isArray(data.owned)) {
+    s.owned = [...new Set(data.owned.filter((id) => stickerById.has(id)))];
+    s.spent = Math.round(num(data.spent, 0, 1e7, 0));
+  } else {
+    // Старый прогресс: первые наклейки выдавались сами по 5 звёзд — переносим их в коллекцию.
+    const legacy = legacyUnlocked(s.stars);
+    s.owned = Array.from({ length: legacy }, (_, i) => `base-${i}`);
+    s.spent = legacy * 5;
+  }
   for (const [id, done] of Object.entries(data.cycles || {})) {
     s.cycles[id] = Array.isArray(done) ? done.filter((m) => typeof m === 'string') : [];
   }
@@ -107,6 +120,25 @@ export function stars() {
 export function addStars(n) {
   state.stars += n;
   save();
+}
+
+// Звёзд на счету: всего заработано минус потрачено в магазине.
+export function balance() {
+  return Math.max(0, state.stars - state.spent);
+}
+
+export function owned() {
+  return [...state.owned];
+}
+
+// Покупка наклейки из каталога. Возвращает true, если хватило звёзд.
+export function buySticker(id) {
+  const sticker = stickerById.get(id);
+  if (!sticker || state.owned.includes(id) || balance() < sticker.price) return false;
+  state.owned.push(id);
+  state.spent += sticker.price;
+  save();
+  return true;
 }
 
 export function supers() {

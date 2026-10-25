@@ -33,10 +33,12 @@ export const STR = {
     ru: {
       praise: { 1: 'Молодец! Попробуем ещё?', 2: 'Здорово!', 3: 'Отлично!' },
       score: 'Верно: {correct} из {total}',
-      newSticker: 'Новая наклейка!',
+      shopHint: 'Можно купить наклейку в магазине!',
       superPopup: {
         title: 'Ура! Супер-наклейка!',
-        text: 'Ты получила «{name}»! Твоя сказка растёт.',
+        text: 'Ты получила «{name}»! {grow}',
+        worldDone: 'Мир собран! Открылся новый мир: «{world}».',
+        allDone: 'Все миры собраны! Ты большая молодец!',
         ok: 'Ура!',
       },
       nextTask: 'Отлично! Выбери другое задание.',
@@ -46,10 +48,12 @@ export const STR = {
     de: {
       praise: { 1: 'Gut gemacht! Noch einmal?', 2: 'Toll gemacht!', 3: 'Super!' },
       score: '{correct} von {total} richtig',
-      newSticker: 'Neuer Sticker!',
+      shopHint: 'Im Laden gibt es neue Sticker!',
       superPopup: {
         title: 'Hurra! Super-Sticker!',
-        text: 'Du hast «{name}» bekommen! Dein Märchen wächst.',
+        text: 'Du hast «{name}» bekommen! {grow}',
+        worldDone: 'Welt fertig! Neue Welt: «{world}».',
+        allDone: 'Alle Welten sind fertig! Super gemacht!',
         ok: 'Hurra!',
       },
       nextTask: 'Prima! Such dir eine andere Aufgabe aus.',
@@ -60,12 +64,22 @@ export const STR = {
 
   stickers: {
     title: 'Мои наклейки',
-    progress: 'До новой наклейки: {left} ⭐',
-    complete: 'Все наклейки собраны! 🎉',
-    locked: '{stars} ⭐',
-    superTitle: 'Моя сказка',
-    superHint: 'Пройди все задания круга — в сказке появится новый предмет!',
+    tabMine: 'Моя коллекция',
+    tabShop: 'Магазин',
+    balance: '{n} ⭐',
+    worldProgress: '{n} из {total}',
+    worldLocked: 'Следующий мир: «{world}»',
+    worldHint: 'Пройди все задания круга — в мире появится новый предмет!',
     superMore: 'Ещё сокровища',
+    albumProgress: '{n} из {total}',
+    mineEmpty: 'Здесь появятся твои наклейки. Загляни в магазин!',
+    price: '{price} ⭐',
+    pick: 'Выбери наклейку',
+    buy: 'Купить за {price} ⭐',
+    notEnough: 'Не хватает {n} ⭐',
+    owned: 'Уже у тебя',
+    bought: 'Теперь это твоя наклейка!',
+    ok: 'Ура!',
   },
 
   errors: {
@@ -74,7 +88,7 @@ export const STR = {
 
   parent: {
     title: 'Для родителей',
-    totalStars: 'Звёзд: {stars} · Супер-наклеек: {supers}',
+    totalStars: 'Звёзд: {stars} (на счету {balance}) · Супер-наклеек: {supers}',
     statsTitle: 'Статистика',
     statsHead: { module: 'Модуль', series: 'Серий', accuracy: 'Точность', hard: 'Трудные задания' },
     statsNone: '—',

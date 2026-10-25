@@ -28,7 +28,7 @@ export function renderMenu(app) {
     h('header', { class: 'bar' },
       h('h1', { text: STR.appTitle }),
       h('div', { class: 'bar-actions' },
-        h('div', { class: 'chip' }, `⭐ ${storage.stars()}`),
+        h('div', { class: 'chip' }, `⭐ ${storage.balance()}`),
         button('btn', `🎁 ${STR.menu.stickers}`, () => app.go.stickers()),
         button('btn quiet', `⚙️ ${STR.menu.parent}`, () => app.go.parent()))),
     h('main', { class: 'scroll content' },

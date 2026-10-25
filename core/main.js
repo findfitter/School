@@ -8,7 +8,7 @@ import { createSpeech } from './speech.js';
 import { createSounds } from './sounds.js';
 import { loadRegistry, loadModule, attachStyles, warmCache } from './registry.js';
 import { createContext } from './context.js';
-import { starsFor, unlockedCount, STICKERS } from './rewards.js';
+import { starsFor, CATALOG } from './rewards.js';
 import { completeSeries, isLocked, superSticker } from './cycles.js';
 import { renderMenu } from './screens/menu.js';
 import { renderResult } from './screens/result.js';
@@ -97,16 +97,15 @@ async function play(manifest) {
 
 function finishSeries(manifest, result) {
   const stars = starsFor(result.correct, result.total);
-  const before = unlockedCount(storage.stars());
   storage.recordSeries(manifest.id, result);
   storage.addStars(stars);
-  const after = unlockedCount(storage.stars());
   const cycle = completeSeries(app.manifests, manifest);
   const screen = renderResult(app, {
     manifest,
     result,
     stars,
-    newStickers: STICKERS.slice(before, after),
+    balance: storage.balance(),
+    canBuy: CATALOG.some((s) => !storage.owned().includes(s.id) && s.price <= storage.balance()),
     locked: cycle.locked,
     superSticker: cycle.superEarned ? superSticker(storage.supers()) : null,
   });
