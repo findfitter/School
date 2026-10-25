@@ -1,6 +1,7 @@
 // Собирает ctx — единственное, что видит модуль.
 
 import * as storage from './storage.js';
+import { VOICE_ENABLED } from './config.js';
 
 function cleanResult(result = {}) {
   const total = Math.max(0, Math.round(Number(result.total) || 0));
@@ -14,13 +15,19 @@ function cleanResult(result = {}) {
 
 export function createContext({ container, manifest, services, onFinish }) {
   const s = storage.settings();
+  const voice = VOICE_ENABLED || Boolean(manifest.voice); // озвучка: везде или только в этом модуле
   let finished = false;
   return Object.freeze({
     container,
-    voice: services.voice,
-    speak: (text, lang, key) => services.speech.speak(text, lang, key),
+    voice,
+    speak: (text, lang, key) => services.speech.speak(text, lang, key, voice),
     sound: (name) => services.sounds(name),
-    settings: Object.freeze({ seriesLength: s.seriesLength, speechRate: s.speechRate, volume: s.volume }),
+    settings: Object.freeze({
+      seriesLength: s.seriesLength,
+      speechRate: s.speechRate,
+      volume: s.volume,
+      translation: s.translation,
+    }),
     hard: Object.freeze(storage.hardKeys(manifest.id)),
     finish(result) {
       if (finished) return;

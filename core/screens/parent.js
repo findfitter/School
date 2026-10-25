@@ -107,12 +107,26 @@ function settingsCard(app) {
     },
   });
 
+  const translation = h('button', { class: 'switch', type: 'button', role: 'switch' });
+  const paintTranslation = () => {
+    const on = storage.settings().translation;
+    translation.classList.toggle('on', on);
+    translation.setAttribute('aria-checked', String(on));
+    translation.textContent = on ? P.on : P.off;
+  };
+  onTap(translation, () => {
+    storage.setSettings({ translation: !storage.settings().translation });
+    paintTranslation();
+  });
+  paintTranslation();
+
   return card(P.settingsTitle,
     h('div', { class: 'row-between' },
       h('span', { text: P.seriesLength }),
       h('div', { class: 'stepper' },
         button('btn round', '−', step(-1)), lengthValue, button('btn round', '+', step(1)))),
     h('div', { class: 'row-between' }, h('span', { text: P.volume }), volume, volumeValue),
+    h('div', { class: 'row-between' }, h('span', { text: P.translation }), translation),
     // Настройки голоса показываются только когда озвучка включена (core/config.js).
     app.services.voice && h('div', { class: 'row-between' }, h('span', { text: P.speechRate }), rate, rateValue),
     app.services.voice && voiceRow(app, 'ru', P.voiceRu, P.speechSampleRu),

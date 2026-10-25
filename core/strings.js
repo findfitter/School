@@ -9,10 +9,11 @@ export const STR = {
     math: { title: 'Математика', icon: '🔢', lang: 'ru' },
     russian: { title: 'Русский язык', icon: '📖', lang: 'ru' },
     german: { title: 'Deutsch', icon: '🇩🇪', lang: 'de' },
+    english: { title: 'English', icon: '🇬🇧', lang: 'ru' },
     orientation: { title: 'Право и лево', icon: '↔️', lang: 'ru' },
     other: { title: 'Другое', icon: '🧩', lang: 'ru' },
   },
-  subjectOrder: ['math', 'orientation', 'russian', 'german'],
+  subjectOrder: ['math', 'orientation', 'russian', 'german', 'english'],
 
   common: {
     home: 'Домой',
@@ -97,6 +98,7 @@ export const STR = {
     seriesLength: 'Заданий в серии',
     volume: 'Громкость',
     speechRate: 'Скорость речи',
+    translation: 'Показывать перевод английских слов',
     speechTest: 'Проверить',
     voiceRu: 'Голос: русский',
     voiceDe: 'Голос: немецкий',

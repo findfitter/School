@@ -1,11 +1,12 @@
 // Озвучка: сначала файл audio/<язык>/<ключ>.mp3, если его нет — Web Speech API.
 
-const LOCALES = { ru: 'ru-RU', de: 'de-DE' };
+const LOCALES = { ru: 'ru-RU', de: 'de-DE', en: 'en-US' };
 
-// enabled: false — звука нет, но speak() всё равно «длится» примерно как речь,
-// чтобы подсказки в модулях сохраняли темп.
+// enabled — включена ли озвучка по умолчанию. Если выключена, speak() ничего не произносит,
+// но всё равно «длится» примерно как речь, чтобы подсказки в модулях сохраняли темп.
+// Отдельному модулю озвучку можно включить параметром `on` в speak() (поле voice в манифесте).
 export function createSpeech(getSettings, { enabled = true } = {}) {
-  const synth = enabled && 'speechSynthesis' in window ? window.speechSynthesis : null;
+  const synth = 'speechSynthesis' in window ? window.speechSynthesis : null;
   const missingFiles = new Set();
   let token = 0; // каждая новая фраза и stop() обнуляют предыдущую
   let release = null; // завершает ожидание текущей фразы
@@ -122,11 +123,11 @@ export function createSpeech(getSettings, { enabled = true } = {}) {
     });
   }
 
-  async function speak(text, lang = 'ru', key) {
+  async function speak(text, lang = 'ru', key, on = enabled) {
     stop();
     const mine = token;
     if (!text) return;
-    if (!enabled) {
+    if (!on) {
       await new Promise((resolve) => {
         const timer = setTimeout(resolve, 400 + text.length * 60);
         release = () => {

@@ -12,6 +12,7 @@ const DEFAULT_SETTINGS = {
   speechRate: 0.9,
   disabledModules: [],
   voices: { ru: '', de: '' }, // имя выбранного голоса; пусто — подбирать автоматически
+  translation: false, // показывать русский перевод под английскими словами
 };
 
 let state = load();
@@ -57,6 +58,7 @@ function normalize(data) {
   s.settings.seriesLength = Math.round(num(d.seriesLength, 3, 30, DEFAULT_SETTINGS.seriesLength));
   s.settings.volume = num(d.volume, 0, 1, DEFAULT_SETTINGS.volume);
   s.settings.speechRate = num(d.speechRate, 0.5, 1.5, DEFAULT_SETTINGS.speechRate);
+  s.settings.translation = Boolean(d.translation);
   s.settings.disabledModules = Array.isArray(d.disabledModules)
     ? d.disabledModules.filter((id) => typeof id === 'string')
     : [];
