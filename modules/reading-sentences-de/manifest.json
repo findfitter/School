@@ -1,0 +1,11 @@
+{
+  "id": "reading-sentences-de",
+  "title": "Sätze bauen",
+  "subject": "german",
+  "icon": "🧩",
+  "description": "Bring die Wörter in die richtige Reihenfolge",
+  "version": "1.0.0",
+  "styles": ["style.css"],
+  "files": ["texts.js", "data.js"],
+  "cycle": "german"
+}
