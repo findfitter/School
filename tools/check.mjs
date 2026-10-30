@@ -157,6 +157,54 @@ if (existsSync(wordsPath)) {
   notes.push(`английский словарь: ${topics.length} тем, ${wordCount} слов`);
 }
 
+// 7в. Русские и немецкие банки: слова для чтения (тихо отбрасываются повторы слова и картинки),
+// существительные для «двух слов» и предложения (уникальные ключи, нет повторов слова внутри предложения)
+const bankUrl = (p) => 'file:///' + `${ROOT}/modules/${p}`;
+for (const [id, lang] of [['reading-ru', 'ru'], ['reading-de', 'de']]) {
+  const path = `${ROOT}/modules/${id}/words.js`;
+  if (!existsSync(path)) continue;
+  const pairs = read(path).match(/const PAIRS = `([\s\S]*?)`/);
+  const tokens = pairs ? pairs[1].split(/[\n|]/).map((t) => t.trim()).filter(Boolean) : [];
+  const { WORDS } = await import(bankUrl(`${id}/words.js`));
+  if (tokens.length !== WORDS.length) {
+    const seenToken = new Set();
+    for (const t of tokens) {
+      const [w, e] = t.split(/\s+/);
+      if (seenToken.has(w.toLowerCase()) || seenToken.has(e)) add('СЛОВАРЬ', id, `«${t}» тихо отброшено: слово или картинка уже есть выше`);
+      seenToken.add(w.toLowerCase()); seenToken.add(e);
+    }
+  }
+  const tooLong = WORDS.filter((x) => [...x.word].length > 10);
+  for (const x of tooLong) add('СЛОВАРЬ', id, `слово «${x.word}» длиннее 10 букв — не помещается на карточку`);
+  notes.push(`${id}: слов для чтения ${WORDS.length}`);
+}
+for (const id of ['reading-phrases', 'reading-phrases-de']) {
+  const path = `${ROOT}/modules/${id}/data.js`;
+  if (!existsSync(path)) continue;
+  const { NOUNS } = await import(bankUrl(`${id}/data.js`));
+  const words = new Set(); const emojis = new Set();
+  for (const n of NOUNS) {
+    if (words.has(n.word.toLowerCase())) add('СЛОВАРЬ', id, `предмет «${n.word}» повторяется`);
+    if (emojis.has(n.emoji)) add('СЛОВАРЬ', id, `картинка ${n.emoji} («${n.word}») повторяется`);
+    words.add(n.word.toLowerCase()); emojis.add(n.emoji);
+  }
+  notes.push(`${id}: предметов ${NOUNS.length}`);
+}
+for (const id of ['reading-sentences', 'reading-sentences-de']) {
+  const path = `${ROOT}/modules/${id}/data.js`;
+  if (!existsSync(path)) continue;
+  const { SENTENCES } = await import(bankUrl(`${id}/data.js`));
+  const keys = new Set();
+  for (const s of SENTENCES) {
+    if (keys.has(s.key)) add('ПРЕДЛОЖЕНИЯ', id, `предложение «${s.key}» повторяется`);
+    keys.add(s.key);
+    const lower = s.words.map((w) => w.toLowerCase());
+    if (new Set(lower).size !== lower.length) add('ПРЕДЛОЖЕНИЯ', id, `в «${s.key}» слово повторяется — фишки перепутаются`);
+    if (!s.scene.length || s.scene.some((e) => !e)) add('ПРЕДЛОЖЕНИЯ', id, `у «${s.key}» нет картинки`);
+  }
+  notes.push(`${id}: предложений ${SENTENCES.length}`);
+}
+
 // 8. Классы в CSS и JS: быстрый поиск мёртвых стилей и неопределённых переменных
 const vars = new Set([...css.map(read).join('\n').matchAll(/--([\w-]+)\s*:/g)].map((m) => m[1]));
 for (const f of css) {

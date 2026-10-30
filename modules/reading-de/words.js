@@ -10,6 +10,13 @@ Banane 🍌|Kuchen 🍰|Pizza 🍕|Tomate 🍅|Gurke 🥒|Möhre 🥕|Zitrone �
 Zebra 🦓|Tiger 🐯|Biene 🐝|Spinne 🕷️|Schlange 🐍|Krabbe 🦀|Delfin 🐬|Giraffe 🦒|Pinguin 🐧|Papagei 🦜|Elefant 🐘
 Känguru 🦘|Schwein 🐖|Schnecke 🐌|Rakete 🚀|Ballon 🎈|Brille 👓|Schloss 🏰|Geschenk 🎁|Gitarre 🎸|Trommel 🥁
 Telefon 📱|Flugzeug ✈️|Fahrrad 🚲|Traktor 🚜|Krokodil 🐊|Erdbeere 🍓|Kartoffel 🥔|Schlüssel 🔑|Regenbogen 🌈
+Stier 🐂|Hirsch 🦌|Küken 🐥|Taube 🕊️|Adler 🦅|Dino 🦖|Nilpferd 🦛|Nashorn 🦏|Waschbär 🦝|Schwan 🦢|Flamingo 🦩|Pfau 🦚|Ameise 🐜|Raupe 🐛
+Skorpion 🦂|Panda 🐼|Koala 🐨|Lama 🦙|Kaninchen 🐰|Frosch 🐸|Burger 🍔|Pommes 🍟|Torte 🎂|Croissant 🥐|Honig 🍯|Tee ☕|Suppe 🍲|Reis 🍚
+Nudeln 🍝|Mais 🌽|Chili 🌶️|Aubergine 🍆|Brokkoli 🥦|Knoblauch 🧄|Erdnuss 🥜|Kastanie 🌰|Melone 🍈|Kiwi 🥝|Mango 🥭|Kokosnuss 🥥|Avocado 🥑|Orange 🍊
+Salz 🧂|Wasser 💧|Stuhl 🪑|Sofa 🛋️|Lampe 💡|Computer 💻|Bleistift ✏️|Stift 🖊️|Lineal 📏|Schere ✂️|Rucksack 🎒|Schal 🧣|Handschuh 🧤|Hemd 👕
+Mantel 🧥|Ring 💍|Tasche 👜|Schiff 🚢|Taxi 🚕|Hammer 🔨|Magnet 🧲|Geige 🎻|Klavier 🎹|Trompete 🎺|Mikrofon 🎤|Kamera 📷|Fahne 🚩|Pokal 🏆
+Medaille 🏅|Schnee ❄️|Berg ⛰️|Welle 🌊|Insel 🏝️|Strand 🏖️|Tulpe 🌷|Kaktus 🌵|Palme 🌴|Blatt 🍃|Gras 🌿|Kleeblatt 🍀|Auge 👁️|Zunge 👅
+Gehirn 🧠|Knochen 🦴|Hand ✋|Schule 🏫|Brücke 🌉|Zelt ⛺|Brunnen ⛲|Karte 🗺️|Kompass 🧭|Lupe 🔍|Waage ⚖️|Anker ⚓|Muschel 🐚
 `;
 
 const seen = new Set();
