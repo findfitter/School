@@ -1,4 +1,5 @@
-/* Раздел собаки (прототип): косточки, купленные собаки, выбор собаки. Без :hover — экран сенсорный. */
+/* Раздел собаки (прототип): двор с собаками, корм и уборка, выбор собаки. Без :hover — экран сенсорный.
+   Экран без прокрутки: слева двор, справа косточки, кнопки и магазин. */
 
 /* Кнопка собаки в меню (справа вверху) */
 .dog-btn {
@@ -21,31 +22,46 @@
 }
 
 .dog-content {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+  flex: 1;
+  min-height: 0;
+  padding: 4px 24px 12px;
+  overflow-y: auto; /* запасной вариант для очень низкого окна; на обычном экране прокрутки нет */
+  overscroll-behavior: contain;
 }
 
-/* Сколько косточек заработано */
-.dog-stats {
+/* ---------- Главный экран: слева двор, справа косточки, кнопки и магазин ---------- */
+.dog-home {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(250px, 1fr);
+  gap: 16px;
+  height: 100%;
+}
+
+.dog-side {
   display: flex;
-  align-items: center;
-  gap: 24px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+
+.dog-side .btn {
+  min-height: var(--tap);
+  padding: 0 18px;
+  font-size: 0.95em;
 }
 
 .dog-earned {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 10px 26px 10px 18px;
+  gap: 14px;
+  padding: 8px 18px 8px 14px;
   border-radius: var(--radius);
   background: var(--card);
   box-shadow: var(--shadow);
 }
 
 .dog-earned-bone {
-  font-size: 2.4em;
+  font-size: 2.2em;
   line-height: 1;
 }
 
@@ -56,29 +72,90 @@
 
 .dog-earned small {
   color: var(--ink-soft);
-  font-size: 0.75em;
+  font-size: 0.68em;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
-.dog-stats .hint-line {
-  flex: 1;
-  min-width: 180px;
+.dog-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dog-action {
+  justify-content: space-between;
+}
+
+.dog-action span:last-child {
+  padding: 2px 14px;
+  border-radius: 999px;
+  background: rgba(43, 45, 66, 0.14);
+  font-size: 0.85em;
+}
+
+.dog-shop {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 2px 14px 12px;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.dog-shop .section-title {
+  margin: 8px 0 0;
+  font-size: 1em;
+}
+
+.dog-shop-btn {
+  background: var(--soft);
+  box-shadow: none;
+}
+
+.dog-side .hint-line,
+.dog-buy-btn {
+  margin-top: auto;
+}
+
+.dog-side .hint-line {
   padding: 0;
+  text-align: center;
+}
+
+.dog-empty .dog-buy-btn {
+  margin-top: 12px;
+  padding: 0 32px;
+}
+
+/* Пока собак нет */
+.dog-empty {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.dog-empty p {
+  max-width: 32em;
+  color: var(--ink-soft);
+}
+
+.dog-earned-line {
   font-size: 0.8em;
 }
 
-/* Рисунок собаки */
 .dog-art-box {
   position: relative;
-  width: clamp(120px, 24vh, 190px);
+  width: clamp(120px, 26vh, 200px);
   aspect-ratio: 240 / 270;
-}
-
-.dog-art-box.big {
-  width: clamp(170px, 38vh, 290px);
-}
-
-.dog-preview .dog-art-box.big {
-  width: clamp(120px, 25vh, 230px);
 }
 
 .dog-art.ghost {
@@ -97,40 +174,6 @@
   color: var(--ink-soft);
 }
 
-.dog-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding: 18px 24px 26px;
-  border-radius: var(--radius);
-  background: var(--card);
-  box-shadow: var(--shadow);
-  text-align: center;
-}
-
-.dog-empty p {
-  color: var(--ink-soft);
-}
-
-/* Купленные собаки */
-.dog-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.dog-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 16px 22px 14px;
-  border-radius: var(--radius);
-  background: var(--card);
-  box-shadow: var(--shadow);
-}
-
 .dog-name {
   font-size: 1.25em;
   line-height: 1.1;
@@ -141,48 +184,50 @@
   font-size: 0.8em;
 }
 
-.dog-more {
-  display: flex;
-  justify-content: center;
-}
-
-/* Кнопки для просмотра прототипа */
+/* Кнопки для просмотра прототипа (в шапке) */
 .dog-proto {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  padding: 6px 12px;
+  gap: 8px;
+  padding: 4px 10px;
   border: 3px dashed #c9cfe6;
   border-radius: var(--radius);
-  color: var(--ink-soft);
   font-size: 0.7em;
 }
 
-.dog-proto .btn {
-  min-height: 52px;
-  padding: 0 18px;
+.dog-proto[hidden] {
+  display: none;
 }
 
-/* Выбор собаки: слева картинка, справа выбор */
+.dog-proto .btn {
+  min-height: 48px;
+  padding: 0 14px;
+}
+
+/* ---------- Выбор собаки: слева картинка, справа выбор; без прокрутки ---------- */
 .dog-create {
   display: flex;
-  gap: 4vw;
-  align-items: flex-start;
+  gap: 24px;
+  height: 100%;
+  align-items: stretch;
 }
 
 .dog-preview {
   flex: none;
-  position: sticky;
-  top: 0;
+  width: clamp(210px, 26vw, 280px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 12px 24px 12px;
+  justify-content: center;
+  gap: 2px;
+  padding: 10px 16px;
   border-radius: var(--radius);
   background: var(--card);
   box-shadow: var(--shadow);
+}
+
+.dog-preview .dog-art-box {
+  width: clamp(110px, 24vh, 190px);
 }
 
 .dog-preview .dog-name {
@@ -190,9 +235,26 @@
   font-size: 1.5em;
 }
 
+.dog-age {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  font-weight: 800;
+}
+
 .dog-controls {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.dog-controls .section-title {
+  margin: 10px 0 6px;
+  font-size: 1em;
 }
 
 .dog-controls .section-title:first-child {
@@ -204,16 +266,16 @@
 .dog-names {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
 }
 
 .dog-names {
-  margin-top: 12px;
+  margin-top: 8px;
 }
 
 .chip-btn {
   min-height: var(--tap);
-  padding: 0 22px;
+  padding: 0 18px;
   border-radius: var(--radius);
   background: var(--card);
   box-shadow: var(--shadow);
@@ -271,15 +333,10 @@
   outline: none;
 }
 
-.dog-preview .section-title {
-  margin: 10px 0 4px;
-  font-size: 1em;
-}
-
 .dog-stepper {
   display: inline-flex;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
 }
 
 .dog-age-value {
@@ -287,6 +344,19 @@
   text-align: center;
   font-size: 1.3em;
   font-weight: 800;
+}
+
+.dog-footer {
+  min-height: 84px;
+}
+
+.dog-footer .btn {
+  min-height: var(--tap);
+  font-size: 1.15em;
+}
+
+.dog-footer .btn.primary {
+  min-width: 280px;
 }
 
 .dog-popup .dog-art-box {
@@ -399,16 +469,11 @@
   100% { transform: translateY(0) scale(1, 1); }
 }
 
-/* ---------- Двор ---------- */
-.dog-yard {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
+/* ---------- Двор: все собаки вместе ---------- */
 .dog-stage {
   position: relative;
-  height: clamp(200px, 35vh, 380px);
+  height: 100%;
+  min-height: 0;
   border-radius: var(--radius);
   overflow: hidden;
   background: linear-gradient(180deg, #bfe3ff 0%, #e4f4ff 58%);
@@ -425,24 +490,81 @@
   background: linear-gradient(180deg, #b7ec9c, #7fd08a);
 }
 
-.dog-center {
+/* Место собаки: имя сверху, сама собака стоит на траве */
+.dog-slot {
   position: absolute;
-  left: 50%;
-  bottom: 7%;
-  display: flex;
-  align-items: flex-end;
+  top: 4%;
+  bottom: 22%;
+  width: 33%;
   transform: translateX(-50%);
-}
-
-.dog-wrap {
-  width: clamp(120px, 28vh, 260px);
-  aspect-ratio: 240 / 270;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   cursor: pointer;
   touch-action: manipulation;
 }
 
+.dogs-1 .dog-slot {
+  width: 60%;
+}
+
+.dogs-2 .dog-slot {
+  width: 46%;
+}
+
+.dog-center {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  margin-top: auto;
+}
+
+.dog-wrap {
+  width: clamp(150px, 40vh, 320px);
+  aspect-ratio: 240 / 270;
+}
+
+.dogs-2 .dog-wrap {
+  width: clamp(120px, 32vh, 260px);
+}
+
+.dogs-3 .dog-wrap {
+  width: clamp(96px, 26vh, 200px);
+}
+
 .dog-wrap .dog-art {
   pointer-events: none;
+}
+
+.dog-tag {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2px 16px 4px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.78);
+  font-size: 0.9em;
+  line-height: 1.15;
+  transition: background 0.2s;
+}
+
+.dog-tag.selected {
+  background: var(--accent);
+}
+
+.dog-pointer {
+  font-size: 0.7em;
+  line-height: 1;
+  color: transparent;
+}
+
+.dog-tag.selected .dog-pointer {
+  color: var(--ink);
+  animation: pointer-bob 0.9s ease-in-out infinite;
+}
+
+@keyframes pointer-bob {
+  50% { transform: translateY(4px); }
 }
 
 .dog-bowl {
@@ -484,9 +606,9 @@
 
 .dog-bubble {
   position: absolute;
-  top: 10%;
-  left: 60%;
-  padding: 8px 20px;
+  top: 26%;
+  right: 0;
+  padding: 6px 18px;
   border-radius: 24px;
   background: #fff;
   box-shadow: var(--shadow);
@@ -521,33 +643,12 @@
   to { transform: translateY(-90px) scale(1.2); opacity: 0; }
 }
 
-.dog-caption {
-  position: absolute;
-  left: 14px;
-  top: 12px;
-  display: flex;
-  flex-direction: column;
-  padding: 6px 16px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.85);
-  line-height: 1.15;
-}
-
-.dog-caption strong {
-  font-size: 1.2em;
-}
-
-.dog-caption span {
-  color: var(--ink-soft);
-  font-size: 0.75em;
-}
-
 .dog-note {
   position: absolute;
   left: 50%;
   bottom: 8px;
   transform: translateX(-50%);
-  max-width: 92%;
+  max-width: 94%;
   padding: 4px 18px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.7);
@@ -595,60 +696,14 @@
   100% { transform: translate(-50%, -50%); }
 }
 
-.dog-actions {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-}
-
-.dog-action {
-  flex: 1;
-  max-width: 340px;
-  min-height: 72px;
-}
-
-.dog-action span:last-child {
-  padding: 2px 14px;
-  border-radius: 999px;
-  background: rgba(43, 45, 66, 0.14);
-  font-size: 0.85em;
-}
-
-.dog-switch {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.dog-shop {
-  padding: 4px 18px 16px;
-  border-radius: var(--radius);
-  background: var(--card);
-  box-shadow: var(--shadow);
-}
-
-.dog-shop .section-title {
-  margin-top: 12px;
-}
-
-.dog-shop-row {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.dog-shop-row .hint-line {
-  padding: 0;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .dog-art *,
   .dog-wrap,
   .dog-fx,
   .dog-poop,
   .dog-bubble,
-  .dog-can {
+  .dog-can,
+  .dog-pointer {
     animation: none !important;
   }
 }

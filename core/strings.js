@@ -125,6 +125,7 @@ export const STR = {
     pooping: 'Ой…',
     cleaned: 'Чисто!',
     petHint: 'Погладь собаку — коснись её',
+    chooseHint: 'Коснись собаки, чтобы выбрать её',
     yourDogs: 'Твои собаки',
     protoBone: '+1 🦴',
     protoReset: 'Сбросить косточки и собак',

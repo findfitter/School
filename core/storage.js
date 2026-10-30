@@ -241,7 +241,11 @@ export function dogs() {
 // Покупка собаки: цена зависит от того, сколько собак уже есть. Возвращает купленную собаку или null.
 export function buyDog(raw) {
   const price = dogPrice(state.dogs.length);
-  const dog = cleanDog({ ...raw, id: `dog-${Date.now().toString(36)}` });
+  // id уникален, даже если две покупки случились в одну миллисекунду
+  let id = '';
+  do id = `dog-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+  while (state.dogs.some((d) => d.id === id));
+  const dog = cleanDog({ ...raw, id });
   if (price == null || !dog || bonesBalance() < price) return null;
   state.dogs.push(dog);
   state.bonesSpent += price;

@@ -6,12 +6,12 @@ export const DOG_PRICES = [3, 5, 8]; // первая собака — 3 кост
 export const MAX_DOGS = DOG_PRICES.length;
 export const MAX_AGE = 15;
 
-// Корм и пакетики: одна косточка — одна упаковка из 5. Больше MAX_POOPS какашек не бывает:
-// пока их не уберут, кормить нельзя (так двор не заполнится).
+// Корм и пакетики: одна косточка — одна упаковка из 5. Больше MAX_POOPS какашек у одной собаки не бывает:
+// пока их не уберут, кормить её нельзя (так двор не заполнится).
 export const PACK_PRICE = 1;
 export const FOOD_PACK = 5;
 export const BAG_PACK = 5;
-export const MAX_POOPS = 6;
+export const MAX_POOPS = 4;
 
 export const dogPrice = (ownedCount) => (ownedCount < MAX_DOGS ? DOG_PRICES[ownedCount] : null);
 
