@@ -1,92 +1,266 @@
 {
   "topics": [
     {
-      "id": "animals",
-      "title": "Animals",
-      "ru": "Животные",
-      "icon": "🐾",
+      "id": "animals", "title": "Animals", "ru": "Животные", "icon": "🐾",
       "words": [
-        { "en": "cat", "ru": "кот", "emoji": "🐱" },
-        { "en": "dog", "ru": "собака", "emoji": "🐶" },
-        { "en": "bird", "ru": "птица", "emoji": "🐦" },
-        { "en": "fish", "ru": "рыба", "emoji": "🐟" },
-        { "en": "horse", "ru": "лошадь", "emoji": "🐴" },
-        { "en": "cow", "ru": "корова", "emoji": "🐄" },
-        { "en": "pig", "ru": "свинья", "emoji": "🐖" },
-        { "en": "duck", "ru": "утка", "emoji": "🦆" },
-        { "en": "rabbit", "ru": "кролик", "emoji": "🐰" },
-        { "en": "mouse", "ru": "мышь", "emoji": "🐭" },
-        { "en": "bear", "ru": "медведь", "emoji": "🐻" },
-        { "en": "frog", "ru": "лягушка", "emoji": "🐸" }
+        {"en": "cat", "ru": "кот", "emoji": "🐱"},
+        {"en": "dog", "ru": "собака", "emoji": "🐶"},
+        {"en": "bird", "ru": "птица", "emoji": "🐦"},
+        {"en": "fish", "ru": "рыба", "emoji": "🐟"},
+        {"en": "horse", "ru": "лошадь", "emoji": "🐴"},
+        {"en": "cow", "ru": "корова", "emoji": "🐄"},
+        {"en": "pig", "ru": "свинья", "emoji": "🐖"},
+        {"en": "duck", "ru": "утка", "emoji": "🦆"},
+        {"en": "rabbit", "ru": "кролик", "emoji": "🐰"},
+        {"en": "mouse", "ru": "мышь", "emoji": "🐭"},
+        {"en": "bear", "ru": "медведь", "emoji": "🐻"},
+        {"en": "frog", "ru": "лягушка", "emoji": "🐸"},
+        {"en": "lion", "ru": "лев", "emoji": "🦁"},
+        {"en": "monkey", "ru": "обезьяна", "emoji": "🐵"},
+        {"en": "elephant", "ru": "слон", "emoji": "🐘"},
+        {"en": "tiger", "ru": "тигр", "emoji": "🐯"},
+        {"en": "sheep", "ru": "овца", "emoji": "🐑"},
+        {"en": "chicken", "ru": "курица", "emoji": "🐔"},
+        {"en": "snake", "ru": "змея", "emoji": "🐍"},
+        {"en": "turtle", "ru": "черепаха", "emoji": "🐢"}
       ]
     },
     {
-      "id": "colours",
-      "title": "Colours",
-      "ru": "Цвета",
-      "icon": "🎨",
+      "id": "colours", "title": "Colours", "ru": "Цвета", "icon": "🎨",
       "words": [
-        { "en": "red", "ru": "красный", "color": "#e53935" },
-        { "en": "blue", "ru": "синий", "color": "#1e66f5" },
-        { "en": "green", "ru": "зелёный", "color": "#2e9e4f" },
-        { "en": "yellow", "ru": "жёлтый", "color": "#ffd400" },
-        { "en": "orange", "ru": "оранжевый", "color": "#fb8c00" },
-        { "en": "purple", "ru": "фиолетовый", "color": "#8e44ad" },
-        { "en": "pink", "ru": "розовый", "color": "#ff8fc7" },
-        { "en": "black", "ru": "чёрный", "color": "#222222" },
-        { "en": "white", "ru": "белый", "color": "#ffffff" },
-        { "en": "brown", "ru": "коричневый", "color": "#8d5524" }
+        {"en": "red", "ru": "красный", "color": "#e53935"},
+        {"en": "blue", "ru": "синий", "color": "#1e66f5"},
+        {"en": "green", "ru": "зелёный", "color": "#2e9e4f"},
+        {"en": "yellow", "ru": "жёлтый", "color": "#ffd400"},
+        {"en": "orange", "ru": "оранжевый", "color": "#fb8c00"},
+        {"en": "purple", "ru": "фиолетовый", "color": "#8e44ad"},
+        {"en": "pink", "ru": "розовый", "color": "#ff8fc7"},
+        {"en": "black", "ru": "чёрный", "color": "#222222"},
+        {"en": "white", "ru": "белый", "color": "#ffffff"},
+        {"en": "brown", "ru": "коричневый", "color": "#8d5524"},
+        {"en": "grey", "ru": "серый", "color": "#9e9e9e"}
       ]
     },
     {
-      "id": "numbers",
-      "title": "Numbers",
-      "ru": "Числа",
-      "icon": "🔢",
+      "id": "numbers", "title": "Numbers", "ru": "Числа", "icon": "🔢",
       "words": [
-        { "en": "one", "ru": "один", "number": 1 },
-        { "en": "two", "ru": "два", "number": 2 },
-        { "en": "three", "ru": "три", "number": 3 },
-        { "en": "four", "ru": "четыре", "number": 4 },
-        { "en": "five", "ru": "пять", "number": 5 },
-        { "en": "six", "ru": "шесть", "number": 6 },
-        { "en": "seven", "ru": "семь", "number": 7 },
-        { "en": "eight", "ru": "восемь", "number": 8 },
-        { "en": "nine", "ru": "девять", "number": 9 },
-        { "en": "ten", "ru": "десять", "number": 10 }
+        {"en": "one", "ru": "один", "number": 1},
+        {"en": "two", "ru": "два", "number": 2},
+        {"en": "three", "ru": "три", "number": 3},
+        {"en": "four", "ru": "четыре", "number": 4},
+        {"en": "five", "ru": "пять", "number": 5},
+        {"en": "six", "ru": "шесть", "number": 6},
+        {"en": "seven", "ru": "семь", "number": 7},
+        {"en": "eight", "ru": "восемь", "number": 8},
+        {"en": "nine", "ru": "девять", "number": 9},
+        {"en": "ten", "ru": "десять", "number": 10}
       ]
     },
     {
-      "id": "family",
-      "title": "Family",
-      "ru": "Семья",
-      "icon": "👨‍👩‍👧",
+      "id": "numbers2", "title": "Numbers 11–20", "ru": "Числа 11–20", "icon": "🔟",
       "words": [
-        { "en": "mum", "ru": "мама", "emoji": "👩" },
-        { "en": "dad", "ru": "папа", "emoji": "👨" },
-        { "en": "sister", "ru": "сестра", "emoji": "👧" },
-        { "en": "brother", "ru": "брат", "emoji": "👦" },
-        { "en": "grandma", "ru": "бабушка", "emoji": "👵" },
-        { "en": "grandpa", "ru": "дедушка", "emoji": "👴" },
-        { "en": "baby", "ru": "малыш", "emoji": "👶" }
+        {"en": "eleven", "ru": "одиннадцать", "number": 11},
+        {"en": "twelve", "ru": "двенадцать", "number": 12},
+        {"en": "thirteen", "ru": "тринадцать", "number": 13},
+        {"en": "fourteen", "ru": "четырнадцать", "number": 14},
+        {"en": "fifteen", "ru": "пятнадцать", "number": 15},
+        {"en": "sixteen", "ru": "шестнадцать", "number": 16},
+        {"en": "seventeen", "ru": "семнадцать", "number": 17},
+        {"en": "eighteen", "ru": "восемнадцать", "number": 18},
+        {"en": "nineteen", "ru": "девятнадцать", "number": 19},
+        {"en": "twenty", "ru": "двадцать", "number": 20}
       ]
     },
     {
-      "id": "food",
-      "title": "Food",
-      "ru": "Еда",
-      "icon": "🍎",
+      "id": "family", "title": "Family", "ru": "Семья", "icon": "👨‍👩‍👧",
       "words": [
-        { "en": "apple", "ru": "яблоко", "emoji": "🍎" },
-        { "en": "banana", "ru": "банан", "emoji": "🍌" },
-        { "en": "milk", "ru": "молоко", "emoji": "🥛" },
-        { "en": "bread", "ru": "хлеб", "emoji": "🍞" },
-        { "en": "egg", "ru": "яйцо", "emoji": "🥚" },
-        { "en": "cake", "ru": "торт", "emoji": "🍰" },
-        { "en": "ice cream", "ru": "мороженое", "emoji": "🍦" },
-        { "en": "juice", "ru": "сок", "emoji": "🧃" },
-        { "en": "cheese", "ru": "сыр", "emoji": "🧀" },
-        { "en": "water", "ru": "вода", "emoji": "💧" }
+        {"en": "mum", "ru": "мама", "emoji": "👩"},
+        {"en": "dad", "ru": "папа", "emoji": "👨"},
+        {"en": "sister", "ru": "сестра", "emoji": "👧"},
+        {"en": "brother", "ru": "брат", "emoji": "👦"},
+        {"en": "grandma", "ru": "бабушка", "emoji": "👵"},
+        {"en": "grandpa", "ru": "дедушка", "emoji": "👴"},
+        {"en": "baby", "ru": "малыш", "emoji": "👶"}
+      ]
+    },
+    {
+      "id": "food", "title": "Food", "ru": "Еда", "icon": "🍎",
+      "words": [
+        {"en": "apple", "ru": "яблоко", "emoji": "🍎"},
+        {"en": "banana", "ru": "банан", "emoji": "🍌"},
+        {"en": "milk", "ru": "молоко", "emoji": "🥛"},
+        {"en": "bread", "ru": "хлеб", "emoji": "🍞"},
+        {"en": "egg", "ru": "яйцо", "emoji": "🥚"},
+        {"en": "cake", "ru": "торт", "emoji": "🍰"},
+        {"en": "ice cream", "ru": "мороженое", "emoji": "🍦"},
+        {"en": "juice", "ru": "сок", "emoji": "🧃"},
+        {"en": "cheese", "ru": "сыр", "emoji": "🧀"},
+        {"en": "water", "ru": "вода", "emoji": "💧"},
+        {"en": "pizza", "ru": "пицца", "emoji": "🍕"},
+        {"en": "chocolate", "ru": "шоколад", "emoji": "🍫"},
+        {"en": "candy", "ru": "конфета", "emoji": "🍬"},
+        {"en": "rice", "ru": "рис", "emoji": "🍚"},
+        {"en": "soup", "ru": "суп", "emoji": "🍲"},
+        {"en": "sandwich", "ru": "бутерброд", "emoji": "🥪"},
+        {"en": "popcorn", "ru": "попкорн", "emoji": "🍿"},
+        {"en": "cookie", "ru": "печенье", "emoji": "🍪"},
+        {"en": "tea", "ru": "чай", "emoji": "☕"}
+      ]
+    },
+    {
+      "id": "fruit", "title": "Fruit & veg", "ru": "Фрукты и овощи", "icon": "🍓",
+      "words": [
+        {"en": "carrot", "ru": "морковь", "emoji": "🥕"},
+        {"en": "potato", "ru": "картошка", "emoji": "🥔"},
+        {"en": "tomato", "ru": "помидор", "emoji": "🍅"},
+        {"en": "grapes", "ru": "виноград", "emoji": "🍇"},
+        {"en": "strawberry", "ru": "клубника", "emoji": "🍓"},
+        {"en": "lemon", "ru": "лимон", "emoji": "🍋"},
+        {"en": "cherry", "ru": "вишня", "emoji": "🍒"},
+        {"en": "pineapple", "ru": "ананас", "emoji": "🍍"},
+        {"en": "watermelon", "ru": "арбуз", "emoji": "🍉"},
+        {"en": "pear", "ru": "груша", "emoji": "🍐"}
+      ]
+    },
+    {
+      "id": "body", "title": "Body", "ru": "Тело", "icon": "🙋",
+      "words": [
+        {"en": "eye", "ru": "глаз", "emoji": "👁️"},
+        {"en": "ear", "ru": "ухо", "emoji": "👂"},
+        {"en": "nose", "ru": "нос", "emoji": "👃"},
+        {"en": "mouth", "ru": "рот", "emoji": "👄"},
+        {"en": "hand", "ru": "рука", "emoji": "✋"},
+        {"en": "foot", "ru": "нога (стопа)", "emoji": "🦶"},
+        {"en": "leg", "ru": "нога", "emoji": "🦵"},
+        {"en": "tooth", "ru": "зуб", "emoji": "🦷"},
+        {"en": "tongue", "ru": "язык", "emoji": "👅"},
+        {"en": "brain", "ru": "мозг", "emoji": "🧠"}
+      ]
+    },
+    {
+      "id": "toys", "title": "Toys", "ru": "Игрушки", "icon": "🧸",
+      "words": [
+        {"en": "ball", "ru": "мяч", "emoji": "⚽"},
+        {"en": "teddy bear", "ru": "плюшевый мишка", "emoji": "🧸"},
+        {"en": "kite", "ru": "воздушный змей", "emoji": "🪁"},
+        {"en": "robot", "ru": "робот", "emoji": "🤖"},
+        {"en": "drum", "ru": "барабан", "emoji": "🥁"},
+        {"en": "guitar", "ru": "гитара", "emoji": "🎸"},
+        {"en": "balloon", "ru": "воздушный шар", "emoji": "🎈"},
+        {"en": "present", "ru": "подарок", "emoji": "🎁"}
+      ]
+    },
+    {
+      "id": "school", "title": "School", "ru": "Школа", "icon": "🎒",
+      "words": [
+        {"en": "book", "ru": "книга", "emoji": "📖"},
+        {"en": "pencil", "ru": "карандаш", "emoji": "✏️"},
+        {"en": "pen", "ru": "ручка", "emoji": "🖊️"},
+        {"en": "bag", "ru": "рюкзак", "emoji": "🎒"},
+        {"en": "ruler", "ru": "линейка", "emoji": "📏"},
+        {"en": "scissors", "ru": "ножницы", "emoji": "✂️"},
+        {"en": "clock", "ru": "часы", "emoji": "⏰"},
+        {"en": "school", "ru": "школа", "emoji": "🏫"},
+        {"en": "teacher", "ru": "учитель", "emoji": "👩‍🏫"},
+        {"en": "computer", "ru": "компьютер", "emoji": "💻"}
+      ]
+    },
+    {
+      "id": "clothes", "title": "Clothes", "ru": "Одежда", "icon": "👕",
+      "words": [
+        {"en": "shirt", "ru": "рубашка", "emoji": "👕"},
+        {"en": "jeans", "ru": "джинсы", "emoji": "👖"},
+        {"en": "dress", "ru": "платье", "emoji": "👗"},
+        {"en": "shoe", "ru": "ботинок", "emoji": "👟"},
+        {"en": "sock", "ru": "носок", "emoji": "🧦"},
+        {"en": "coat", "ru": "пальто", "emoji": "🧥"},
+        {"en": "scarf", "ru": "шарф", "emoji": "🧣"},
+        {"en": "gloves", "ru": "перчатки", "emoji": "🧤"},
+        {"en": "hat", "ru": "шляпа", "emoji": "👒"},
+        {"en": "cap", "ru": "кепка", "emoji": "🧢"}
+      ]
+    },
+    {
+      "id": "weather", "title": "Weather", "ru": "Погода", "icon": "⛅",
+      "words": [
+        {"en": "sun", "ru": "солнце", "emoji": "☀️"},
+        {"en": "rain", "ru": "дождь", "emoji": "🌧️"},
+        {"en": "cloud", "ru": "облако", "emoji": "☁️"},
+        {"en": "snow", "ru": "снег", "emoji": "❄️"},
+        {"en": "wind", "ru": "ветер", "emoji": "💨"},
+        {"en": "rainbow", "ru": "радуга", "emoji": "🌈"},
+        {"en": "moon", "ru": "луна", "emoji": "🌙"},
+        {"en": "star", "ru": "звезда", "emoji": "⭐"}
+      ]
+    },
+    {
+      "id": "home", "title": "Home", "ru": "Дом", "icon": "🏠",
+      "words": [
+        {"en": "house", "ru": "дом", "emoji": "🏠"},
+        {"en": "door", "ru": "дверь", "emoji": "🚪"},
+        {"en": "bed", "ru": "кровать", "emoji": "🛏️"},
+        {"en": "sofa", "ru": "диван", "emoji": "🛋️"},
+        {"en": "key", "ru": "ключ", "emoji": "🔑"},
+        {"en": "phone", "ru": "телефон", "emoji": "📱"},
+        {"en": "TV", "ru": "телевизор", "emoji": "📺"},
+        {"en": "bath", "ru": "ванна", "emoji": "🛁"}
+      ]
+    },
+    {
+      "id": "transport", "title": "Transport", "ru": "Транспорт", "icon": "🚗",
+      "words": [
+        {"en": "car", "ru": "машина", "emoji": "🚗"},
+        {"en": "bus", "ru": "автобус", "emoji": "🚌"},
+        {"en": "train", "ru": "поезд", "emoji": "🚂"},
+        {"en": "plane", "ru": "самолёт", "emoji": "✈️"},
+        {"en": "boat", "ru": "лодка", "emoji": "⛵"},
+        {"en": "bike", "ru": "велосипед", "emoji": "🚲"},
+        {"en": "taxi", "ru": "такси", "emoji": "🚕"},
+        {"en": "helicopter", "ru": "вертолёт", "emoji": "🚁"},
+        {"en": "ship", "ru": "корабль", "emoji": "🚢"},
+        {"en": "rocket", "ru": "ракета", "emoji": "🚀"},
+        {"en": "tractor", "ru": "трактор", "emoji": "🚜"},
+        {"en": "fire engine", "ru": "пожарная машина", "emoji": "🚒"}
+      ]
+    },
+    {
+      "id": "actions", "title": "Actions", "ru": "Действия", "icon": "🏃",
+      "words": [
+        {"en": "run", "ru": "бежать", "emoji": "🏃"},
+        {"en": "walk", "ru": "идти", "emoji": "🚶"},
+        {"en": "swim", "ru": "плавать", "emoji": "🏊"},
+        {"en": "sleep", "ru": "спать", "emoji": "😴"},
+        {"en": "dance", "ru": "танцевать", "emoji": "💃"},
+        {"en": "sing", "ru": "петь", "emoji": "🎤"},
+        {"en": "write", "ru": "писать", "emoji": "✍️"},
+        {"en": "clap", "ru": "хлопать", "emoji": "👏"},
+        {"en": "laugh", "ru": "смеяться", "emoji": "😂"}
+      ]
+    },
+    {
+      "id": "feelings", "title": "Feelings", "ru": "Чувства", "icon": "😊",
+      "words": [
+        {"en": "happy", "ru": "счастливый", "emoji": "😊"},
+        {"en": "sad", "ru": "грустный", "emoji": "😢"},
+        {"en": "angry", "ru": "сердитый", "emoji": "😠"},
+        {"en": "scared", "ru": "испуганный", "emoji": "😨"},
+        {"en": "surprised", "ru": "удивлённый", "emoji": "😮"},
+        {"en": "cool", "ru": "классный", "emoji": "😎"},
+        {"en": "love", "ru": "любовь", "emoji": "😍"},
+        {"en": "sleepy", "ru": "сонный", "emoji": "🥱"}
+      ]
+    },
+    {
+      "id": "nature", "title": "Nature", "ru": "Природа", "icon": "🌳",
+      "words": [
+        {"en": "tree", "ru": "дерево", "emoji": "🌳"},
+        {"en": "flower", "ru": "цветок", "emoji": "🌸"},
+        {"en": "grass", "ru": "трава", "emoji": "🌿"},
+        {"en": "sea", "ru": "море", "emoji": "🌊"},
+        {"en": "mountain", "ru": "гора", "emoji": "⛰️"},
+        {"en": "beach", "ru": "пляж", "emoji": "🏖️"},
+        {"en": "fire", "ru": "огонь", "emoji": "🔥"},
+        {"en": "leaf", "ru": "лист", "emoji": "🍃"}
       ]
     }
   ]

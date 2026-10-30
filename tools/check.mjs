@@ -125,6 +125,38 @@ for (const id of registry) {
   for (const f of m.files || []) if (f.endsWith('.mp3') && !existsSync(resolve(dir, f))) add('АУДИО', id, `нет файла ${f}`);
 }
 
+// 7б. Английский словарь: повторы слов и картинок (иначе в тесте два одинаковых варианта),
+// озвучка на каждое слово и её наличие в списках files обоих английских модулей
+const wordsPath = `${ROOT}/modules/english-words/words.json`;
+if (existsSync(wordsPath)) {
+  const slug = (t) => t.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-+|-+$/g, '');
+  const topics = JSON.parse(read(wordsPath)).topics;
+  const seenWord = new Map();
+  const seenPicture = new Map();
+  const englishModules = ['english-words', 'english-quiz'].filter((id) => existsSync(`${ROOT}/modules/${id}/manifest.json`));
+  const listedAudio = new Map(englishModules.map((id) => [id, new Set((JSON.parse(read(`${ROOT}/modules/${id}/manifest.json`)).files || []))]));
+  let wordCount = 0;
+  for (const topic of topics) {
+    if (topic.words.length < 4) add('СЛОВАРЬ', topic.id, `в теме меньше 4 слов (${topic.words.length}) — тест не сможет подобрать варианты`);
+    for (const w of topic.words) {
+      wordCount++;
+      const key = w.en.toLowerCase();
+      if (seenWord.has(key)) add('СЛОВАРЬ', w.en, `слово повторяется (${seenWord.get(key)} и ${topic.id})`);
+      seenWord.set(key, topic.id);
+      const picture = w.emoji || w.color || `number-${w.number}`;
+      if (!picture || picture === 'number-undefined') add('СЛОВАРЬ', w.en, 'нет картинки (emoji, color или number)');
+      if (seenPicture.has(picture)) add('СЛОВАРЬ', w.en, `картинка ${picture} уже у слова «${seenPicture.get(picture)}»`);
+      seenPicture.set(picture, w.en);
+      const audio = `audio/en/${slug(w.en)}.mp3`;
+      if (!existsSync(`${ROOT}/${audio}`)) add('АУДИО', w.en, `нет озвучки ${audio} — запустите tools/make_audio.py`);
+      for (const [id, files] of listedAudio) {
+        if (!files.has(`../../${audio}`)) add('ОФЛАЙН', id, `озвучка «${w.en}» не в списке files манифеста — запустите tools/make_audio.py`);
+      }
+    }
+  }
+  notes.push(`английский словарь: ${topics.length} тем, ${wordCount} слов`);
+}
+
 // 8. Классы в CSS и JS: быстрый поиск мёртвых стилей и неопределённых переменных
 const vars = new Set([...css.map(read).join('\n').matchAll(/--([\w-]+)\s*:/g)].map((m) => m[1]));
 for (const f of css) {

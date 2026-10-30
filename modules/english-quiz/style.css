@@ -25,36 +25,41 @@
   flex-wrap: wrap;
   align-content: center;
   justify-content: center;
-  gap: 2.2vh 2vw;
+  gap: 1.6vh 1.2vw;
 }
 
+/* Плитки компактные: тем много (18), прокрутки в модуле нет, всё должно поместиться. */
 .eq-topic {
-  width: clamp(150px, 19vw, 220px);
-  min-height: clamp(120px, 25vh, 200px);
+  width: clamp(104px, 12.5vw, 150px);
+  min-height: clamp(86px, 16vh, 120px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 0.5vh;
-  padding: 10px;
-  border-radius: 28px;
+  padding: 6px;
+  border-radius: 22px;
   background: var(--card, #fff);
   box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
 }
 
 .eq-topic-icon {
-  font-size: clamp(44px, 9vh, 72px);
+  font-size: clamp(30px, 6vh, 48px);
   line-height: 1;
 }
 
 .eq-topic-title {
-  font-size: clamp(20px, 3.8vh, 32px);
+  font-size: clamp(14px, 2.5vh, 21px);
   font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
 }
 
 .eq-topic-ru {
   color: var(--ink-soft, #6b6f85);
-  font-size: clamp(15px, 2.6vh, 21px);
+  font-size: clamp(11px, 1.9vh, 15px);
+  line-height: 1.1;
+  text-align: center;
 }
 
 /* Серия */
@@ -192,7 +197,9 @@
 }
 
 .eq-stars {
-  max-width: 18vw;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-all;
   font-size: clamp(12px, 2.2vh, 18px);
   line-height: 1.1;
   text-align: center;

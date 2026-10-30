@@ -58,7 +58,7 @@ export async function warmCache(manifests) {
   }
   try {
     const reg = await navigator.serviceWorker.ready;
-    reg.active?.postMessage({ type: 'precache', urls });
+    reg.active?.postMessage({ type: 'precache', urls: [...new Set(urls)] });
   } catch (err) {
     console.warn('Не удалось передать список файлов service worker', err);
   }
