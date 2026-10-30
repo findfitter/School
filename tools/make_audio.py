@@ -1,7 +1,11 @@
-"""Создаёт озвучку английских слов голосом Sonia (британский английский).
+"""Создаёт озвучку английских слов, сочетаний и предложений голосом Sonia (британский английский).
 
-Слова берутся из modules/english-words/words.json. Файлы кладутся в audio/en/<слово>.mp3,
-имя файла строится так же, как ключ в приложении (core/speech.js): «ice cream» -> ice-cream.mp3.
+Что озвучивается:
+  * слова из modules/english-words/words.json (модули english-words и english-quiz);
+  * сочетания «цвет + предмет» из modules/english-phrases/phrases.json (красный кот -> «red cat»);
+  * предложения из modules/english-sentences/sentences.json.
+Файлы кладутся в audio/en/<текст>.mp3, имя файла строится так же, как ключ в приложении
+(core/speech.js): «ice cream» -> ice-cream.mp3, «The cat sleeps.» -> the-cat-sleeps.mp3.
 Уже созданные файлы пропускаются, поэтому после добавления слов достаточно запустить скрипт снова.
 Заодно скрипт обновляет списки файлов в манифестах английских модулей (для работы без интернета).
 
@@ -12,8 +16,8 @@
 Запуск:
     python tools/make_audio.py
 
-Скрипту нужен интернет: он отправляет короткие слова («cat», «ice cream»…) в сервис синтеза речи
-Microsoft Edge и сохраняет ответ.
+Скрипту нужен интернет: он отправляет короткие тексты («cat», «red cat», «The cat sleeps.»…) в сервис
+синтеза речи Microsoft Edge и сохраняет ответ.
 """
 import asyncio
 import json
@@ -32,14 +36,13 @@ import edge_tts
 
 VOICE = "en-GB-SoniaNeural"
 RATE = "-10%"  # чуть медленнее обычного, как для ребёнка
+PARALLEL = 4  # сколько файлов создаётся одновременно
 
 ROOT = Path(__file__).resolve().parent.parent
-WORDS = ROOT / "modules" / "english-words" / "words.json"
-# Манифесты модулей, которые используют эти слова, и их собственные файлы (озвучка добавляется после них).
-MANIFESTS = {
-    ROOT / "modules" / "english-words" / "manifest.json": ["texts.js", "words.json"],
-    ROOT / "modules" / "english-quiz" / "manifest.json": ["texts.js", "../english-words/words.json"],
-}
+MODULES = ROOT / "modules"
+WORDS = MODULES / "english-words" / "words.json"
+PHRASES = MODULES / "english-phrases" / "phrases.json"
+SENTENCES = MODULES / "english-sentences" / "sentences.json"
 OUT = ROOT / "audio" / "en"
 
 
@@ -48,9 +51,27 @@ def slug(text: str) -> str:
     return re.sub(r"[^\w]+", "-", text.lower(), flags=re.UNICODE).strip("-")
 
 
-def all_words() -> list[str]:
+def words() -> list[str]:
     topics = json.loads(WORDS.read_text(encoding="utf-8"))["topics"]
     return [w["en"] for t in topics for w in t["words"]]
+
+
+def phrases() -> list[str]:
+    data = json.loads(PHRASES.read_text(encoding="utf-8"))
+    return [f"{color} {noun}" for color in data["colors"] for noun in data["nouns"]]
+
+
+def sentences() -> list[str]:
+    return [s["en"] for s in json.loads(SENTENCES.read_text(encoding="utf-8"))["sentences"]]
+
+
+# Манифест модуля -> (его собственные файлы, какие тексты он озвучивает). Озвучка добавляется после файлов.
+MANIFESTS = {
+    MODULES / "english-words" / "manifest.json": (["texts.js", "words.json"], words),
+    MODULES / "english-quiz" / "manifest.json": (["texts.js", "../english-words/words.json"], words),
+    MODULES / "english-phrases" / "manifest.json": (["texts.js", "phrases.json", "../english-words/words.json"], phrases),
+    MODULES / "english-sentences" / "manifest.json": (["texts.js", "sentences.json"], sentences),
+}
 
 
 async def make(text: str) -> str:
@@ -62,28 +83,36 @@ async def make(text: str) -> str:
     return f"{target.stat().st_size // 1024} КБ"
 
 
-def update_manifests(words: list[str]) -> None:
+def update_manifests() -> None:
     """Списки файлов в манифестах: по ним приложение сохраняет озвучку для работы без интернета."""
-    audio = [f"../../audio/en/{slug(w)}.mp3" for w in words if (OUT / f"{slug(w)}.mp3").exists()]
-    for path, base in MANIFESTS.items():
+    for path, (base, texts) in MANIFESTS.items():
         if not path.exists():
             continue
+        audio = [f"../../audio/en/{slug(t)}.mp3" for t in texts() if (OUT / f"{slug(t)}.mp3").exists()]
         manifest = json.loads(path.read_text(encoding="utf-8"))
         manifest["files"] = base + audio
         path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 async def main() -> int:
-    words = all_words()
+    texts = list(dict.fromkeys([*words(), *phrases(), *sentences()]))  # без повторов, порядок сохраняется
     failed = 0
-    for text in words:
-        try:
-            print(f"{text:12} {await make(text)}")
-        except Exception as err:  # сеть, голос недоступен и т. п.
-            failed += 1
-            print(f"{text:12} ОШИБКА: {err}")
-    update_manifests(words)
-    print(f"\nГотово: {len(words) - failed} из {len(words)}")
+    gate = asyncio.Semaphore(PARALLEL)
+
+    async def one(text: str) -> None:
+        nonlocal failed
+        async with gate:
+            try:
+                result = await make(text)
+                if result != "есть":
+                    print(f"{text:34} {result}")
+            except Exception as err:  # сеть, голос недоступен и т. п.
+                failed += 1
+                print(f"{text:34} ОШИБКА: {err}")
+
+    await asyncio.gather(*(one(t) for t in texts))
+    update_manifests()
+    print(f"\nГотово: {len(texts) - failed} из {len(texts)}")
     return 1 if failed else 0
 
 

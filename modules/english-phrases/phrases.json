@@ -1,0 +1,37 @@
+{
+  "colors": [
+    "red",
+    "blue",
+    "green",
+    "yellow",
+    "orange",
+    "purple",
+    "pink"
+  ],
+  "nouns": [
+    "cat",
+    "dog",
+    "bird",
+    "fish",
+    "horse",
+    "cow",
+    "pig",
+    "duck",
+    "rabbit",
+    "bear",
+    "frog",
+    "lion",
+    "elephant",
+    "apple",
+    "ball",
+    "car",
+    "bus",
+    "house",
+    "hat",
+    "star",
+    "balloon",
+    "kite",
+    "flower",
+    "mouse"
+  ]
+}

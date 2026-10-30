@@ -157,6 +157,43 @@ if (existsSync(wordsPath)) {
   notes.push(`английский словарь: ${topics.length} тем, ${wordCount} слов`);
 }
 
+// 7б2. Английские «два слова» и предложения: слова из phrases.json есть в словаре, озвучка каждого
+// сочетания и предложения существует и перечислена в files манифеста, у предложений нет повторов
+if (existsSync(wordsPath) && existsSync(`${ROOT}/modules/english-phrases/phrases.json`)) {
+  const slugOf = (t) => t.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-+|-+$/g, '');
+  const dictionary = new Map(JSON.parse(read(wordsPath)).topics.flatMap((t) => t.words).map((w) => [w.en, w]));
+  const setup = JSON.parse(read(`${ROOT}/modules/english-phrases/phrases.json`));
+  const checkAudio = (moduleId, texts) => {
+    const listed = new Set(JSON.parse(read(`${ROOT}/modules/${moduleId}/manifest.json`)).files || []);
+    for (const text of texts) {
+      const audio = `audio/en/${slugOf(text)}.mp3`;
+      if (!existsSync(`${ROOT}/${audio}`)) add('АУДИО', moduleId, `нет озвучки «${text}» — запустите tools/make_audio.py`);
+      else if (!listed.has(`../../${audio}`)) add('ОФЛАЙН', moduleId, `озвучка «${text}» не в списке files манифеста — запустите tools/make_audio.py`);
+    }
+  };
+  for (const id of setup.colors) if (!dictionary.get(id)?.color) add('СЛОВАРЬ', 'english-phrases', `цвет «${id}» не найден в words.json`);
+  for (const id of setup.nouns) if (!dictionary.get(id)?.emoji) add('СЛОВАРЬ', 'english-phrases', `предмет «${id}» не найден в words.json или без эмодзи`);
+  if (new Set(setup.nouns.map((n) => dictionary.get(n)?.emoji)).size !== setup.nouns.length) add('СЛОВАРЬ', 'english-phrases', 'у двух предметов одна картинка');
+  checkAudio('english-phrases', setup.colors.flatMap((c) => setup.nouns.map((n) => `${c} ${n}`)));
+
+  const { sentences } = JSON.parse(read(`${ROOT}/modules/english-sentences/sentences.json`));
+  const seenText = new Set();
+  const seenScene = new Set();
+  for (const s of sentences) {
+    if (seenText.has(s.en)) add('ПРЕДЛОЖЕНИЯ', 'english-sentences', `«${s.en}» повторяется`);
+    seenText.add(s.en);
+    const sceneKey = `${s.kind}|${s.scene.join('')}`;
+    if (seenScene.has(sceneKey)) add('ПРЕДЛОЖЕНИЯ', 'english-sentences', `у «${s.en}» та же картинка, что у другого предложения типа ${s.kind} — ответ неоднозначен`);
+    seenScene.add(sceneKey);
+    if (!s.ru || s.scene.length !== 2 || s.scene.some((e) => !e)) add('ПРЕДЛОЖЕНИЯ', 'english-sentences', `у «${s.en}» нет перевода или двух картинок`);
+  }
+  for (const kind of ['do', 'act', 'place', 'feel']) {
+    if (sentences.filter((s) => s.kind === kind).length < 5) add('ПРЕДЛОЖЕНИЯ', 'english-sentences', `в типе ${kind} меньше 5 предложений — не хватит неверных картинок`);
+  }
+  checkAudio('english-sentences', sentences.map((s) => s.en));
+  notes.push(`английский: сочетаний ${setup.colors.length * setup.nouns.length}, предложений ${sentences.length}`);
+}
+
 // 7в. Русские и немецкие банки: слова для чтения (тихо отбрасываются повторы слова и картинки),
 // существительные для «двух слов» и предложения (уникальные ключи, нет повторов слова внутри предложения)
 const bankUrl = (p) => 'file:///' + `${ROOT}/modules/${p}`;

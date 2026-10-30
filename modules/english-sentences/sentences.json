@@ -1,0 +1,850 @@
+{
+ "sentences": [
+  {
+   "kind": "do",
+   "en": "The cat sleeps.",
+   "ru": "Кот спит.",
+   "scene": [
+    "🐱",
+    "💤"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The cat runs.",
+   "ru": "Кот бежит.",
+   "scene": [
+    "🐱",
+    "🏃"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The dog runs.",
+   "ru": "Собака бежит.",
+   "scene": [
+    "🐶",
+    "🏃"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The dog sleeps.",
+   "ru": "Собака спит.",
+   "scene": [
+    "🐶",
+    "💤"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The bird flies.",
+   "ru": "Птица летит.",
+   "scene": [
+    "🐦",
+    "☁️"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The bird sings.",
+   "ru": "Птица поёт.",
+   "scene": [
+    "🐦",
+    "🎵"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The fish swims.",
+   "ru": "Рыба плывёт.",
+   "scene": [
+    "🐟",
+    "🌊"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The duck swims.",
+   "ru": "Утка плывёт.",
+   "scene": [
+    "🦆",
+    "🌊"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The duck flies.",
+   "ru": "Утка летит.",
+   "scene": [
+    "🦆",
+    "☁️"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The frog swims.",
+   "ru": "Лягушка плывёт.",
+   "scene": [
+    "🐸",
+    "🌊"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The rabbit runs.",
+   "ru": "Кролик бежит.",
+   "scene": [
+    "🐰",
+    "🏃"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The rabbit sleeps.",
+   "ru": "Кролик спит.",
+   "scene": [
+    "🐰",
+    "💤"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The bear sleeps.",
+   "ru": "Медведь спит.",
+   "scene": [
+    "🐻",
+    "💤"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The bear walks.",
+   "ru": "Медведь идёт.",
+   "scene": [
+    "🐻",
+    "🚶"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The elephant walks.",
+   "ru": "Слон идёт.",
+   "scene": [
+    "🐘",
+    "🚶"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The horse runs.",
+   "ru": "Лошадь бежит.",
+   "scene": [
+    "🐴",
+    "🏃"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The boy runs.",
+   "ru": "Мальчик бежит.",
+   "scene": [
+    "👦",
+    "🏃"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The boy sings.",
+   "ru": "Мальчик поёт.",
+   "scene": [
+    "👦",
+    "🎵"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The boy sleeps.",
+   "ru": "Мальчик спит.",
+   "scene": [
+    "👦",
+    "💤"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The boy claps.",
+   "ru": "Мальчик хлопает.",
+   "scene": [
+    "👦",
+    "👏"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The girl dances.",
+   "ru": "Девочка танцует.",
+   "scene": [
+    "👧",
+    "💃"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The girl sings.",
+   "ru": "Девочка поёт.",
+   "scene": [
+    "👧",
+    "🎵"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The girl laughs.",
+   "ru": "Девочка смеётся.",
+   "scene": [
+    "👧",
+    "😂"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The baby sleeps.",
+   "ru": "Малыш спит.",
+   "scene": [
+    "👶",
+    "💤"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "The baby laughs.",
+   "ru": "Малыш смеётся.",
+   "scene": [
+    "👶",
+    "😂"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "Mum sings.",
+   "ru": "Мама поёт.",
+   "scene": [
+    "👩",
+    "🎵"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "Mum dances.",
+   "ru": "Мама танцует.",
+   "scene": [
+    "👩",
+    "💃"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "Dad walks.",
+   "ru": "Папа идёт.",
+   "scene": [
+    "👨",
+    "🚶"
+   ]
+  },
+  {
+   "kind": "do",
+   "en": "Dad laughs.",
+   "ru": "Папа смеётся.",
+   "scene": [
+    "👨",
+    "😂"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The cat drinks milk.",
+   "ru": "Кот пьёт молоко.",
+   "scene": [
+    "🐱",
+    "🥛"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The cat eats fish.",
+   "ru": "Кот ест рыбу.",
+   "scene": [
+    "🐱",
+    "🐟"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The dog drinks water.",
+   "ru": "Собака пьёт воду.",
+   "scene": [
+    "🐶",
+    "💧"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The dog plays with a ball.",
+   "ru": "Собака играет с мячом.",
+   "scene": [
+    "🐶",
+    "⚽"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The rabbit eats a carrot.",
+   "ru": "Кролик ест морковку.",
+   "scene": [
+    "🐰",
+    "🥕"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The mouse eats cheese.",
+   "ru": "Мышь ест сыр.",
+   "scene": [
+    "🐭",
+    "🧀"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The monkey eats a banana.",
+   "ru": "Обезьяна ест банан.",
+   "scene": [
+    "🐵",
+    "🍌"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The horse eats an apple.",
+   "ru": "Лошадь ест яблоко.",
+   "scene": [
+    "🐴",
+    "🍎"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The cow eats grass.",
+   "ru": "Корова ест траву.",
+   "scene": [
+    "🐄",
+    "🌿"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The elephant drinks water.",
+   "ru": "Слон пьёт воду.",
+   "scene": [
+    "🐘",
+    "💧"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The duck eats bread.",
+   "ru": "Утка ест хлеб.",
+   "scene": [
+    "🦆",
+    "🍞"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The bear eats fish.",
+   "ru": "Медведь ест рыбу.",
+   "scene": [
+    "🐻",
+    "🐟"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The boy eats an apple.",
+   "ru": "Мальчик ест яблоко.",
+   "scene": [
+    "👦",
+    "🍎"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The boy drinks juice.",
+   "ru": "Мальчик пьёт сок.",
+   "scene": [
+    "👦",
+    "🧃"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The boy eats pizza.",
+   "ru": "Мальчик ест пиццу.",
+   "scene": [
+    "👦",
+    "🍕"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The boy reads a book.",
+   "ru": "Мальчик читает книгу.",
+   "scene": [
+    "👦",
+    "📖"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The boy rides a bike.",
+   "ru": "Мальчик едет на велосипеде.",
+   "scene": [
+    "👦",
+    "🚲"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The boy wears a cap.",
+   "ru": "Мальчик в кепке.",
+   "scene": [
+    "👦",
+    "🧢"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The girl eats ice cream.",
+   "ru": "Девочка ест мороженое.",
+   "scene": [
+    "👧",
+    "🍦"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The girl eats cake.",
+   "ru": "Девочка ест торт.",
+   "scene": [
+    "👧",
+    "🍰"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The girl drinks milk.",
+   "ru": "Девочка пьёт молоко.",
+   "scene": [
+    "👧",
+    "🥛"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The girl reads a book.",
+   "ru": "Девочка читает книгу.",
+   "scene": [
+    "👧",
+    "📖"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The girl plays with a kite.",
+   "ru": "Девочка играет с воздушным змеем.",
+   "scene": [
+    "👧",
+    "🪁"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The girl wears a dress.",
+   "ru": "Девочка в платье.",
+   "scene": [
+    "👧",
+    "👗"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "The baby drinks milk.",
+   "ru": "Малыш пьёт молоко.",
+   "scene": [
+    "👶",
+    "🥛"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "Mum drinks tea.",
+   "ru": "Мама пьёт чай.",
+   "scene": [
+    "👩",
+    "☕"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "Mum eats soup.",
+   "ru": "Мама ест суп.",
+   "scene": [
+    "👩",
+    "🍲"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "Mum wears a hat.",
+   "ru": "Мама в шляпе.",
+   "scene": [
+    "👩",
+    "👒"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "Dad eats bread.",
+   "ru": "Папа ест хлеб.",
+   "scene": [
+    "👨",
+    "🍞"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "Dad drinks tea.",
+   "ru": "Папа пьёт чай.",
+   "scene": [
+    "👨",
+    "☕"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "Dad drives a car.",
+   "ru": "Папа ведёт машину.",
+   "scene": [
+    "👨",
+    "🚗"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "Grandma eats cake.",
+   "ru": "Бабушка ест торт.",
+   "scene": [
+    "👵",
+    "🍰"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "Grandma wears a scarf.",
+   "ru": "Бабушка в шарфе.",
+   "scene": [
+    "👵",
+    "🧣"
+   ]
+  },
+  {
+   "kind": "act",
+   "en": "Grandpa drinks tea.",
+   "ru": "Дедушка пьёт чай.",
+   "scene": [
+    "👴",
+    "☕"
+   ]
+  },
+  {
+   "kind": "place",
+   "en": "The cat is on the sofa.",
+   "ru": "Кот на диване.",
+   "scene": [
+    "🐱",
+    "🛋️"
+   ]
+  },
+  {
+   "kind": "place",
+   "en": "The cat is on the bed.",
+   "ru": "Кот на кровати.",
+   "scene": [
+    "🐱",
+    "🛏️"
+   ]
+  },
+  {
+   "kind": "place",
+   "en": "The dog is in the house.",
+   "ru": "Собака в доме.",
+   "scene": [
+    "🐶",
+    "🏠"
+   ]
+  },
+  {
+   "kind": "place",
+   "en": "The mouse is in the house.",
+   "ru": "Мышь в доме.",
+   "scene": [
+    "🐭",
+    "🏠"
+   ]
+  },
+  {
+   "kind": "place",
+   "en": "The bird is in the tree.",
+   "ru": "Птица на дереве.",
+   "scene": [
+    "🐦",
+    "🌳"
+   ]
+  },
+  {
+   "kind": "place",
+   "en": "The monkey is in the tree.",
+   "ru": "Обезьяна на дереве.",
+   "scene": [
+    "🐵",
+    "🌳"
+   ]
+  },
+  {
+   "kind": "place",
+   "en": "The fish is in the sea.",
+   "ru": "Рыба в море.",
+   "scene": [
+    "🐟",
+    "🌊"
+   ]
+  },
+  {
+   "kind": "place",
+   "en": "The frog is on the leaf.",
+   "ru": "Лягушка на листе.",
+   "scene": [
+    "🐸",
+    "🍃"
+   ]
+  },
+  {
+   "kind": "place",
+   "en": "The bear is on the mountain.",
+   "ru": "Медведь на горе.",
+   "scene": [
+    "🐻",
+    "⛰️"
+   ]
+  },
+  {
+   "kind": "place",
+   "en": "The rabbit is on the grass.",
+   "ru": "Кролик на траве.",
+   "scene": [
+    "🐰",
+    "🌿"
+   ]
+  },
+  {
+   "kind": "place",
+   "en": "The baby is in the bath.",
+   "ru": "Малыш в ванне.",
+   "scene": [
+    "👶",
+    "🛁"
+   ]
+  },
+  {
+   "kind": "place",
+   "en": "The boy is at school.",
+   "ru": "Мальчик в школе.",
+   "scene": [
+    "👦",
+    "🏫"
+   ]
+  },
+  {
+   "kind": "place",
+   "en": "The boy is in the boat.",
+   "ru": "Мальчик в лодке.",
+   "scene": [
+    "👦",
+    "⛵"
+   ]
+  },
+  {
+   "kind": "place",
+   "en": "The girl is on the beach.",
+   "ru": "Девочка на пляже.",
+   "scene": [
+    "👧",
+    "🏖️"
+   ]
+  },
+  {
+   "kind": "place",
+   "en": "The girl is on the sofa.",
+   "ru": "Девочка на диване.",
+   "scene": [
+    "👧",
+    "🛋️"
+   ]
+  },
+  {
+   "kind": "place",
+   "en": "The teacher is at school.",
+   "ru": "Учительница в школе.",
+   "scene": [
+    "👩‍🏫",
+    "🏫"
+   ]
+  },
+  {
+   "kind": "place",
+   "en": "Dad is in the car.",
+   "ru": "Папа в машине.",
+   "scene": [
+    "👨",
+    "🚗"
+   ]
+  },
+  {
+   "kind": "place",
+   "en": "Mum is on the bus.",
+   "ru": "Мама в автобусе.",
+   "scene": [
+    "👩",
+    "🚌"
+   ]
+  },
+  {
+   "kind": "place",
+   "en": "Grandpa is in the house.",
+   "ru": "Дедушка в доме.",
+   "scene": [
+    "👴",
+    "🏠"
+   ]
+  },
+  {
+   "kind": "feel",
+   "en": "The boy is happy.",
+   "ru": "Мальчик рад.",
+   "scene": [
+    "👦",
+    "😊"
+   ]
+  },
+  {
+   "kind": "feel",
+   "en": "The boy is sad.",
+   "ru": "Мальчику грустно.",
+   "scene": [
+    "👦",
+    "😢"
+   ]
+  },
+  {
+   "kind": "feel",
+   "en": "The girl is sad.",
+   "ru": "Девочке грустно.",
+   "scene": [
+    "👧",
+    "😢"
+   ]
+  },
+  {
+   "kind": "feel",
+   "en": "The girl is scared.",
+   "ru": "Девочке страшно.",
+   "scene": [
+    "👧",
+    "😨"
+   ]
+  },
+  {
+   "kind": "feel",
+   "en": "The baby is sleepy.",
+   "ru": "Малыш хочет спать.",
+   "scene": [
+    "👶",
+    "🥱"
+   ]
+  },
+  {
+   "kind": "feel",
+   "en": "The baby is happy.",
+   "ru": "Малыш рад.",
+   "scene": [
+    "👶",
+    "😊"
+   ]
+  },
+  {
+   "kind": "feel",
+   "en": "The dog is happy.",
+   "ru": "Собака рада.",
+   "scene": [
+    "🐶",
+    "😊"
+   ]
+  },
+  {
+   "kind": "feel",
+   "en": "The cat is angry.",
+   "ru": "Кот злится.",
+   "scene": [
+    "🐱",
+    "😠"
+   ]
+  },
+  {
+   "kind": "feel",
+   "en": "The rabbit is scared.",
+   "ru": "Кролик боится.",
+   "scene": [
+    "🐰",
+    "😨"
+   ]
+  },
+  {
+   "kind": "feel",
+   "en": "The bear is angry.",
+   "ru": "Медведь злится.",
+   "scene": [
+    "🐻",
+    "😠"
+   ]
+  },
+  {
+   "kind": "feel",
+   "en": "Mum is happy.",
+   "ru": "Мама рада.",
+   "scene": [
+    "👩",
+    "😊"
+   ]
+  },
+  {
+   "kind": "feel",
+   "en": "Dad is surprised.",
+   "ru": "Папа удивлён.",
+   "scene": [
+    "👨",
+    "😮"
+   ]
+  }
+ ]
+}
