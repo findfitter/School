@@ -1,0 +1,10 @@
+{
+  "id": "reading-letters",
+  "title": "Собери слово из букв (тест)",
+  "subject": "russian",
+  "icon": "🔤",
+  "description": "Тест: сложи слово из букв по картинке",
+  "version": "0.1.0",
+  "styles": ["style.css"],
+  "files": ["texts.js", "../reading-ru/words.js"]
+}

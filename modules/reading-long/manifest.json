@@ -1,0 +1,10 @@
+{
+  "id": "reading-long",
+  "title": "Длинные предложения (тест)",
+  "subject": "russian",
+  "icon": "📜",
+  "description": "Тест: предложения из 5–6 слов",
+  "version": "0.1.0",
+  "styles": ["style.css"],
+  "files": ["texts.js", "data.js", "../reading-sentences/data.js"]
+}

@@ -227,7 +227,7 @@ for (const id of ['reading-phrases', 'reading-phrases-de']) {
   }
   notes.push(`${id}: предметов ${NOUNS.length}`);
 }
-for (const id of ['reading-sentences', 'reading-sentences-de']) {
+for (const id of ['reading-sentences', 'reading-sentences-de', 'reading-long']) {
   const path = `${ROOT}/modules/${id}/data.js`;
   if (!existsSync(path)) continue;
   const { SENTENCES } = await import(bankUrl(`${id}/data.js`));
