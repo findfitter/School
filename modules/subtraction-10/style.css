@@ -58,12 +58,13 @@
 
 /* Пример */
 .s10-eq {
-  flex: none;
+  flex: 1;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2vw;
-  font-size: clamp(56px, 15vh, 130px);
+  gap: 2.4vw;
+  font-size: clamp(72px, 22vh, 190px);
   font-weight: 800;
   line-height: 1;
 }
@@ -92,63 +93,6 @@
   border-color: var(--good, #52c47a);
   background: #dff6e7;
   color: var(--ink, #2b2d42);
-}
-
-/* Предметы для пересчёта */
-.s10-things {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 3vw;
-  font-size: clamp(36px, 9vh, 72px);
-}
-
-.s10-group {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.15em;
-  max-width: 70vw;
-}
-
-.s10-thing {
-  position: relative;
-  line-height: 1.1;
-}
-
-.s10-thing.hop {
-  animation: s10-hop 0.5s ease-out;
-}
-
-@keyframes s10-hop {
-  0% { transform: translateY(0); }
-  40% { transform: translateY(-0.35em); }
-  100% { transform: translateY(0); }
-}
-
-.s10-badge {
-  position: absolute;
-  right: -0.1em;
-  bottom: -0.1em;
-  min-width: 1.1em;
-  height: 1.1em;
-  padding: 0 0.15em;
-  border-radius: 999px;
-  background: var(--accent, #ffd23f);
-  color: var(--ink, #2b2d42);
-  font-size: 0.5em;
-  font-style: normal;
-  font-weight: 800;
-  line-height: 1.1;
-  text-align: center;
-  animation: s10-pop 0.25s ease-out;
-}
-
-@keyframes s10-pop {
-  from { transform: scale(0); }
-  to { transform: scale(1); }
 }
 
 /* Ответы */
@@ -194,11 +138,4 @@
 .s10-answer.faded {
   opacity: 0.3;
   box-shadow: none;
-}
-
-/* Вычтенные предметы бледнеют и уменьшаются — «улетели» */
-.s10-thing.gone {
-  opacity: 0.22;
-  filter: grayscale(1);
-  transform: scale(0.8);
 }
