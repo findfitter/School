@@ -13,6 +13,7 @@ export function renderParent(app) {
 
   const body = h('main', { class: 'scroll content parent-body' },
     todayCard(app),
+    dogCard(app),
     statsCard(app),
     usageCard(),
     modulesCard(app),
@@ -30,6 +31,13 @@ export function renderParent(app) {
 
 function card(title, ...children) {
   return h('section', { class: 'card' }, h('h2', { text: title }), children);
+}
+
+// ВРЕМЕННО: раздел собаки (прототип) открывается отсюда, пока его нет на главном экране.
+function dogCard(app) {
+  return card(P.dogTitle,
+    h('p', { class: 'hint-line', text: P.dogHint }),
+    button('btn primary', `🐶 ${P.dogOpen}`, () => app.go.dog('parent')));
 }
 
 function statsCard(app) {

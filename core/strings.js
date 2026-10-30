@@ -23,7 +23,6 @@ export const STR = {
   },
 
   menu: {
-    dog: 'Моя собака',
     stickers: 'Наклейки',
     parent: 'Родителям',
     done: 'Пройдено',
@@ -196,6 +195,9 @@ export const STR = {
     speechSampleRu: 'Привет! Давай учиться.',
     speechSampleDe: 'Hallo! Los geht’s.',
     dataTitle: 'Данные',
+    dogTitle: 'Собака (прототип)',
+    dogHint: 'Временно здесь: раздел собаки и косточек пока не вынесен на главный экран.',
+    dogOpen: 'Открыть раздел собаки',
     export: 'Сохранить прогресс в файл',
     import: 'Загрузить прогресс из файла',
     importOk: 'Прогресс загружен.',

@@ -93,9 +93,12 @@ function showStickers() {
   show(renderStickers(app), null, 'stickers');
 }
 
-function showDog() {
+// Раздел собаки пока открывается из экрана для родителя (from = 'parent'): «Назад» возвращает туда
+// без повторной проверки для взрослых.
+function showDog(from = 'parent') {
   if (limitReached()) return showLimit();
-  show(renderDog(app), null, 'dog');
+  const onBack = from === 'parent' ? () => show(renderParent(app), null, 'parent') : showMenu;
+  show(renderDog(app, { onBack }), null, 'dog');
 }
 
 // Вход на экран родителя: сначала проверка «только для взрослых».

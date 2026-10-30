@@ -30,22 +30,10 @@ export function renderMenu(app) {
       h('div', { class: 'bar-actions' },
         h('div', { class: 'chip' }, `⭐ ${storage.balance()}`),
         button('btn', `🎁 ${STR.menu.stickers}`, () => app.go.stickers()),
-        button('btn quiet', `⚙️ ${STR.menu.parent}`, () => app.go.parent()),
-        dogButton(app))),
+        button('btn quiet', `⚙️ ${STR.menu.parent}`, () => app.go.parent()))),
     h('main', { class: 'scroll content' },
       sections.length ? sections : h('p', { class: 'empty', text: STR.menu.empty }))
   );
-}
-
-// Значок собаки справа вверху: открывает раздел собаки, рядом — сколько косточек на счету.
-function dogButton(app) {
-  const el = button('btn dog-btn', [h('span', { text: '🐶' }), h('small', { text: `🦴 ${storage.bonesBalance()}` })], () => {
-    app.services.sounds('tap');
-    app.go.dog();
-  });
-  el.setAttribute('aria-label', STR.menu.dog);
-  el.title = STR.menu.dog;
-  return el;
 }
 
 function tile(app, manifest) {

@@ -24,7 +24,7 @@ const SUGGESTED_NAMES = NAMES.slice(0, 6); // готовые имена в вы�
 // Где стоят собаки во дворе (в % ширины сцены) в зависимости от их числа.
 const SLOTS = { 1: [50], 2: [30, 70], 3: [18, 50, 82] };
 
-export function renderDog(app) {
+export function renderDog(app, { onBack = () => app.go.menu() } = {}) {
   let draft = null; // собака, которую выбирают сейчас (пока не куплена), или null
   let selectedId = null; // какая собака выбрана во дворе
   let busy = false; // идёт кормление
@@ -38,7 +38,7 @@ export function renderDog(app) {
   const footer = h('footer', { class: 'buy-bar dog-footer' });
   const screen = h('div', { class: 'screen dog-screen' },
     h('header', { class: 'bar' },
-      button('btn', `⬅ ${STR.common.back}`, () => (draft ? closeCreator() : app.go.menu())),
+      button('btn', `⬅ ${STR.common.back}`, () => (draft ? closeCreator() : onBack())),
       h('h1', { text: D.title }),
       proto,
       chip),

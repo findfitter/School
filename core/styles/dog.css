@@ -1,20 +1,6 @@
 /* Раздел собаки (прототип): двор с собаками, корм и уборка, выбор собаки. Без :hover — экран сенсорный.
    Экран без прокрутки: слева двор, справа косточки, кнопки и магазин. */
 
-/* Кнопка собаки в меню (справа вверху) */
-.dog-btn {
-  position: relative;
-  min-width: var(--tap);
-  padding: 0 18px;
-  font-size: 1.4em;
-  background: #ffe9d1;
-}
-
-.dog-btn small {
-  font-size: 0.6em;
-  font-weight: 800;
-}
-
 .dog-art {
   display: block;
   width: 100%;
