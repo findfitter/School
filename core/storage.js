@@ -1,7 +1,7 @@
 // Настройки и прогресс в localStorage. Данные никуда не отправляются.
 
 import { legacyUnlocked, stickerById } from './rewards.js';
-import { cleanDog, dogPrice } from './dogs.js';
+import { cleanDog, dogPrice, PACK_PRICE, FOOD_PACK, BAG_PACK, MAX_POOPS } from './dogs.js';
 
 const KEY = 'school-app-v1';
 const APP_ID = 'school-app';
@@ -39,7 +39,9 @@ function fresh() {
     supers: 0, // сколько супер-наклеек получено
     bones: 0, // косточек заработано (за особое сложное задание), прототип
     bonesSpent: 0, // косточек потрачено на собак
-    dogs: [], // купленные собаки: { id, name, breed, color, age }
+    dogs: [], // купленные собаки: { id, name, breed, color, age, poops }
+    food: 0, // банок корма в запасе
+    bags: 0, // пакетиков для уборки в запасе
     cycles: {}, // круги: { <id круга>: [id модулей, пройденных в текущем круге] }
     progress: {},
   };
@@ -87,6 +89,8 @@ function normalize(data) {
   s.supers = Math.round(num(data.supers, 0, 1e6, 0));
   s.bones = Math.round(num(data.bones, 0, 1e6, 0));
   s.bonesSpent = Math.round(num(data.bonesSpent, 0, 1e6, 0));
+  s.food = Math.round(num(data.food, 0, 9999, 0));
+  s.bags = Math.round(num(data.bags, 0, 9999, 0));
   s.dogs = (Array.isArray(data.dogs) ? data.dogs : []).map(cleanDog).filter(Boolean).slice(0, 12);
   const oldest = dayKey(new Date(Date.now() - USAGE_KEEP_DAYS * 86400000));
   for (const [day, minutes] of Object.entries(data.bonus || {})) {
@@ -245,11 +249,54 @@ export function buyDog(raw) {
   return { ...dog };
 }
 
-// Только для прототипа: вернуть косточки и собак в начальное состояние.
+export function food() {
+  return state.food;
+}
+
+export function bags() {
+  return state.bags;
+}
+
+// Упаковка корма (5 банок) или пакетиков (5 штук) за косточку. Возвращает true, если хватило косточек.
+function buyPack(field, amount) {
+  if (bonesBalance() < PACK_PRICE) return false;
+  state.bonesSpent += PACK_PRICE;
+  state[field] += amount;
+  save();
+  return true;
+}
+
+export const buyFood = () => buyPack('food', FOOD_PACK);
+export const buyBags = () => buyPack('bags', BAG_PACK);
+
+// Покормить собаку: тратится банка корма, во дворе прибавляется одна какашка.
+// Возвращает false, если корма нет, собаки нет или двор не убран.
+export function feedDog(id) {
+  const dog = state.dogs.find((d) => d.id === id);
+  if (!dog || state.food < 1 || dog.poops >= MAX_POOPS) return false;
+  state.food -= 1;
+  dog.poops += 1;
+  save();
+  return true;
+}
+
+// Убрать одну какашку: тратится один пакетик.
+export function cleanPoop(id) {
+  const dog = state.dogs.find((d) => d.id === id);
+  if (!dog || state.bags < 1 || dog.poops < 1) return false;
+  state.bags -= 1;
+  dog.poops -= 1;
+  save();
+  return true;
+}
+
+// Только для прототипа: вернуть косточки, запасы и собак в начальное состояние.
 export function resetDogs() {
   state.bones = 0;
   state.bonesSpent = 0;
   state.dogs = [];
+  state.food = 0;
+  state.bags = 0;
   save();
 }
 

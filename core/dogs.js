@@ -6,6 +6,13 @@ export const DOG_PRICES = [3, 5, 8]; // первая собака — 3 кост
 export const MAX_DOGS = DOG_PRICES.length;
 export const MAX_AGE = 15;
 
+// Корм и пакетики: одна косточка — одна упаковка из 5. Больше MAX_POOPS какашек не бывает:
+// пока их не уберут, кормить нельзя (так двор не заполнится).
+export const PACK_PRICE = 1;
+export const FOOD_PACK = 5;
+export const BAG_PACK = 5;
+export const MAX_POOPS = 6;
+
 export const dogPrice = (ownedCount) => (ownedCount < MAX_DOGS ? DOG_PRICES[ownedCount] : null);
 
 export const BREEDS = [
@@ -58,6 +65,7 @@ export function cleanDog(raw) {
     breed: raw.breed,
     color: raw.color,
     age: Number.isFinite(age) ? Math.min(MAX_AGE, Math.max(0, age)) : 1,
+    poops: Math.min(MAX_POOPS, Math.max(0, Math.round(Number(raw.poops)) || 0)), // сколько какашек во дворе
   };
 }
 
@@ -142,8 +150,9 @@ export function drawDog({ breed = 'labrador', color = 'ginger', age = 3 } = {}) 
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 270" role="img" aria-hidden="true">
   <ellipse cx="120" cy="258" rx="70" ry="9" fill="rgba(0,0,0,0.12)"/>
-  <g transform="translate(120 256) scale(${bodyScale}) translate(-120 -256)">
-    ${tails}
+"  <g transform="translate(120 256) scale(${bodyScale}) translate(-120 -256)">
+    <g class="dog-tail">${tails}</g>
+    <g class="dog-body">
     <ellipse cx="120" cy="204" rx="54" ry="${bodyRy}" fill="${base}"${edge}/>
     ${fluff}
     <ellipse cx="120" cy="212" rx="28" ry="${bodyRy - 12}" fill="${husky ? '#ffffff' : light}"/>
@@ -151,7 +160,8 @@ export function drawDog({ breed = 'labrador', color = 'ginger', age = 3 } = {}) 
     <rect x="130" y="${legTop}" width="24" height="${256 - legTop}" rx="12" fill="${base}"${edge}/>
     <ellipse cx="98" cy="254" rx="16" ry="8" fill="${light}"/>
     <ellipse cx="142" cy="254" rx="16" ry="8" fill="${light}"/>
-    <g transform="translate(120 112) scale(${headScale}) translate(-120 -112)">
+    </g>
+    <g transform="translate(120 112) scale(${headScale}) translate(-120 -112)"><g class="dog-head">
       ${ears}
       ${headShape}
       ${topKnot}
@@ -160,14 +170,16 @@ export function drawDog({ breed = 'labrador', color = 'ginger', age = 3 } = {}) 
       ${grey}
       <ellipse cx="120" cy="${snout.cy - 10}" rx="10" ry="7" fill="${ink}"/>
       <path d="M120 ${snout.cy - 4} L120 ${snout.cy + 6} M120 ${snout.cy + 6} Q108 ${snout.cy + 16} 98 ${snout.cy + 8} M120 ${snout.cy + 6} Q132 ${snout.cy + 16} 142 ${snout.cy + 8}" stroke="${ink}" stroke-width="3" stroke-linecap="round" fill="none"/>
-      <ellipse cx="120" cy="${snout.cy + 16}" rx="8" ry="10" fill="#ff8fa3"/>
-      <circle cx="96" cy="102" r="${eyeR}" fill="${eye}"/>
-      <circle cx="144" cy="102" r="${eyeR}" fill="${eye}"/>
-      <circle cx="98.5" cy="99" r="2.6" fill="#ffffff"/>
-      <circle cx="146.5" cy="99" r="2.6" fill="#ffffff"/>
+      <ellipse class="dog-tongue" cx="120" cy="${snout.cy + 16}" rx="8" ry="10" fill="#ff8fa3"/>
+      <g class="dog-eyes">
+        <circle cx="96" cy="102" r="${eyeR}" fill="${eye}"/>
+        <circle cx="144" cy="102" r="${eyeR}" fill="${eye}"/>
+        <circle cx="98.5" cy="99" r="2.6" fill="#ffffff"/>
+        <circle cx="146.5" cy="99" r="2.6" fill="#ffffff"/>
+      </g>
       <ellipse cx="80" cy="126" rx="8" ry="5" fill="#ff8fa3" opacity="0.35"/>
       <ellipse cx="160" cy="126" rx="8" ry="5" fill="#ff8fa3" opacity="0.35"/>
-    </g>
+    </g></g>
     <path d="M84 166 Q120 182 156 166 L158 178 Q120 196 82 178 Z" fill="#e5484d"/>
     <circle cx="120" cy="190" r="9" fill="#ffd23f" stroke="#e0a800" stroke-width="2"/>
   </g>
