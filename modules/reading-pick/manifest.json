@@ -1,15 +1,18 @@
 {
   "id": "reading-pick",
-  "title": "Читаем и ищем картинку (тест)",
+  "title": "Читаем и ищем картинку",
   "subject": "russian",
   "icon": "🔎",
-  "description": "Тест: прочитай и найди картинку",
-  "version": "0.1.0",
-  "styles": ["style.css"],
+  "description": "Прочитай и найди картинку",
+  "version": "1.0.0",
+  "styles": [
+    "style.css"
+  ],
   "files": [
     "texts.js",
     "../reading-ru/words.js",
     "../reading-phrases/data.js",
     "../reading-sentences/data.js"
-  ]
+  ],
+  "cycle": "russian"
 }

@@ -1,0 +1,11 @@
+{
+  "id": "reading-long-de",
+  "title": "Lange Sätze",
+  "subject": "german",
+  "icon": "📜",
+  "description": "Sätze aus sechs Wörtern",
+  "version": "1.0.0",
+  "styles": ["style.css"],
+  "files": ["texts.js", "data.js", "../reading-sentences-de/data.js"],
+  "cycle": "german"
+}

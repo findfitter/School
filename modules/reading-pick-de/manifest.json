@@ -1,0 +1,16 @@
+{
+  "id": "reading-pick-de",
+  "title": "Lesen und Bild finden",
+  "subject": "german",
+  "icon": "🔎",
+  "description": "Lies und finde das passende Bild",
+  "version": "1.0.0",
+  "styles": ["style.css"],
+  "files": [
+    "texts.js",
+    "../reading-de/words.js",
+    "../reading-phrases-de/data.js",
+    "../reading-sentences-de/data.js"
+  ],
+  "cycle": "german"
+}

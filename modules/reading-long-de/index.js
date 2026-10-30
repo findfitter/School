@@ -1,22 +1,22 @@
-// ТЕСТ. Собери слово из букв: показана картинка, буквы лежат вперемешку, ребёнок ставит их по порядку
-// (касанием или перетаскиванием на ряд клеток). Слова — из «Читаем слова» (../reading-ru/words.js).
-// Уровни — длина слова: 0 — 3–4 буквы; 1 — 4–5; 2 — 5–6; 3 — 6–9 и две лишние буквы.
-// Неверная буква мягко «трясётся»; после двух ошибок на одной клетке подсвечивается нужная буква.
-// После ошибки уровень падает, после двух верных подряд растёт. Ошибочные слова повторяются в конце серии.
+// (немецкий) Lange Sätze. Длинные предложения: как «Sätze bauen», но 6 слов. Слова лежат вперемешку,
+// ребёнок ставит их по порядку (касанием или перетаскиванием на рамку). Рядом картинка-подсказка.
+// Уровни: 0 — «Die Katze trinkt Milch und schläft»; 1 — «Der große Hund läuft im Wald» (с прилагательным);
+// 2 — «Hund und Katze spielen im Garten»; 3 — любые, плюс одно лишнее слово.
+// После ошибки уровень падает, после двух верных подряд растёт.
+// Предложения, в которых ошибались, повторяются в конце серии.
 
 import { TEXT } from './texts.js';
-import { WORDS } from '../reading-ru/words.js';
+import { SENTENCES } from './data.js';
 
-const LEVEL_LEN = [[3, 4], [4, 5], [5, 6], [6, 9]]; // длина слова на каждом уровне: от и до
-const EXTRA_LETTERS_LEVEL = 3; // с этого уровня добавляются две лишние буквы
+const LEVEL_KINDS = [['two'], ['adj'], ['pair'], ['two', 'adj', 'pair']];
+const EXTRA_CHIP_LEVEL = 3; // с этого уровня добавляется лишнее слово
 const CLEAN_TO_LEVEL_UP = 2;
-const POINT_AFTER_WRONG = 2; // после стольких ошибок на клетке подсвечивается нужная буква
+const GHOST_AFTER_WRONG = 2; // после стольких ошибок на слоте показываем первую букву
 const DRAG_THRESHOLD = 14; // px, после которого касание считается перетаскиванием
-const ALPHABET = [...'абвгдежзийклмнопрстуфхцчшщыэюя'];
 
 const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 const pick = (list) => list[rnd(0, list.length - 1)];
-const wordsByText = new Map(WORDS.map((w) => [w.word, w]));
+const sentencesByKey = new Map(SENTENCES.map((s) => [s.key, s]));
 
 function shuffle(list) {
   const out = [...list];
@@ -28,29 +28,29 @@ function shuffle(list) {
 }
 
 function makeTask(level, used) {
-  const [min, max] = LEVEL_LEN[level];
-  const pool = WORDS.filter((w) => w.word.length >= min && w.word.length <= max);
-  const fresh = pool.filter((w) => !used.has(w.word));
+  const kind = pick(LEVEL_KINDS[level]);
+  const pool = SENTENCES.filter((s) => s.kind === kind);
+  const fresh = pool.filter((s) => !used.has(s.key));
   return pick(fresh.length ? fresh : pool);
 }
 
-// Буквы-кнопки: нужные вперемешку (и на верхнем уровне две лишние, которых нет в слове).
-function makeLetters(item, level) {
-  const letters = [...item.word];
-  if (level >= EXTRA_LETTERS_LEVEL) {
-    const spare = ALPHABET.filter((l) => !letters.includes(l));
-    letters.push(...shuffle(spare).slice(0, 2));
+// Слова-кнопки: нужные вперемешку (и на верхнем уровне одно лишнее, не подходящее к картинке).
+function makeChips(task, level) {
+  const words = [...task.words];
+  if (level >= EXTRA_CHIP_LEVEL) {
+    const have = new Set(words.map((w) => w.toLowerCase()));
+    const spare = task.extras.filter((w) => !have.has(w.toLowerCase()));
+    if (spare.length) {
+      words.push(pick(spare));
+    }
   }
-  // Не оставляем буквы в том же порядке, что и в слове.
-  let mixed = shuffle(letters);
-  for (let attempt = 0; attempt < 10 && mixed.join('').startsWith(item.word); attempt++) mixed = shuffle(letters);
-  return mixed;
+  return shuffle(words);
 }
 
 function planHardTasks(hardKeys, total) {
   const planned = new Map();
   const positions = shuffle(Array.from({ length: Math.max(0, total - 1) }, (_, i) => i + 1));
-  const tasks = hardKeys.map((key) => wordsByText.get(key)).filter(Boolean);
+  const tasks = hardKeys.map((key) => sentencesByKey.get(key)).filter(Boolean);
   for (const task of shuffle(tasks).slice(0, 2)) {
     if (positions.length) planned.set(positions.pop(), task);
   }
@@ -79,81 +79,82 @@ export function start(ctx) {
     });
 
   // ---------- разметка ----------
-  const root = el('div', 'rletters');
-  const dotsBox = el('div', 'rt-dots');
-  const repeatBtn = el('button', 'rt-repeat', '🔊');
+  const root = el('div', 'rlongde');
+  const dotsBox = el('div', 'rld-dots');
+  const repeatBtn = el('button', 'rld-repeat', '🔊');
   repeatBtn.type = 'button';
   repeatBtn.setAttribute('aria-label', TEXT.repeatLabel);
   repeatBtn.hidden = !ctx.voice; // без озвучки «повторить» не нужна
-  const top = el('div', 'rt-top');
+  const top = el('div', 'rld-top');
   top.append(dotsBox, repeatBtn);
 
-  const picture = el('div', 'rt-picture');
-  const prompt = el('div', 'rt-prompt', TEXT.prompt);
-  const frame = el('div', 'rt-frame');
-  const tray = el('div', 'rt-tray');
-  root.append(top, picture, prompt, frame, tray);
+  const scene = el('div', 'rld-scene');
+  const frame = el('div', 'rld-frame');
+  const tray = el('div', 'rld-tray');
+  root.append(top, scene, frame, tray);
   ctx.container.append(root);
 
   const dots = [];
   for (let i = 0; i < total; i++) addDot(false);
 
   function addDot(again) {
-    const dot = el('span', again ? 'rt-dot again' : 'rt-dot');
+    const dot = el('span', again ? 'rld-dot again' : 'rld-dot');
     dotsBox.append(dot);
     dots.push(dot);
   }
 
+  const sayPrompt = () => ctx.speak(TEXT.prompt, 'de', 'long-prompt');
+  repeatBtn.onclick = () => sayPrompt();
+
   // ---------- одно задание ----------
-  // Возвращает true, если ребёнок собрал слово без единой ошибки.
-  function playTask(item, level) {
+  // Возвращает true, если ребёнок собрал предложение без единой ошибки.
+  function playTask(task, level) {
     return new Promise((resolve) => {
-      const expected = [...item.word];
+      const expected = task.words;
       const slots = [];
-      const tiles = [];
       const wrongAt = expected.map(() => 0);
       let position = 0;
       let wrong = 0;
       let locked = false;
 
-      repeatBtn.onclick = () => ctx.speak(item.word, 'ru');
-      picture.textContent = item.emoji;
-      picture.classList.remove('hop');
-      frame.className = 'rt-frame';
+      scene.replaceChildren(...task.scene.map((emoji) => el('span', 'rld-pic', emoji)));
+      scene.classList.remove('hop');
+      frame.className = 'rld-frame';
       frame.replaceChildren();
       tray.replaceChildren();
 
-      for (let i = 0; i < expected.length; i++) {
-        const slot = el('span', 'rt-slot');
+      for (const word of expected) {
+        const slot = el('span', 'rld-slot');
+        slot.style.minWidth = `calc(${word.length} * 0.62em + 0.8em)`;
         slots.push(slot);
         frame.append(slot);
       }
       slots[0].classList.add('next');
 
-      async function choose(tile) {
-        if (locked || !alive || tile.classList.contains('placed')) return;
-        const letter = tile.dataset.letter;
-        if (letter !== expected[position]) {
+      async function choose(chip) {
+        if (locked || !alive || chip.classList.contains('placed')) return;
+        const word = chip.dataset.word;
+        if (word !== expected[position]) {
           wrong += 1;
           wrongAt[position] += 1;
           ctx.sound('hint');
-          tile.classList.remove('shake');
-          void tile.offsetWidth; // перезапуск анимации
-          tile.classList.add('shake');
-          if (wrongAt[position] >= POINT_AFTER_WRONG) {
-            tiles.find((t) => !t.classList.contains('placed') && t.dataset.letter === expected[position])?.classList.add('point');
+          chip.classList.remove('shake');
+          void chip.offsetWidth; // перезапуск анимации
+          chip.classList.add('shake');
+          if (wrongAt[position] >= GHOST_AFTER_WRONG) {
+            slots[position].dataset.ghost = expected[position][0];
           }
           return;
         }
-        // Верная буква встаёт на своё место.
+        // Верное слово встаёт на своё место.
         ctx.sound('tap');
         const slot = slots[position];
-        slot.textContent = letter;
+        slot.textContent = word;
         slot.classList.remove('next');
         slot.classList.add('filled');
-        tile.classList.remove('point');
-        tile.classList.add('placed');
-        tile.disabled = true;
+        delete slot.dataset.ghost;
+        chip.classList.add('placed');
+        chip.disabled = true;
         position += 1;
         if (position < expected.length) {
           slots[position].classList.add('next');
@@ -161,25 +162,26 @@ export function start(ctx) {
         }
         locked = true;
         frame.classList.add('done');
-        picture.classList.add('hop');
+        scene.classList.add('hop');
         ctx.sound('correct');
-        ctx.speak(item.word, 'ru');
+        ctx.speak(expected.join(' '), 'de');
         await wait(1700);
         resolve(wrong === 0);
       }
 
-      for (const letter of makeLetters(item, level)) {
-        const tile = el('button', 'rt-tile', letter);
-        tile.type = 'button';
-        tile.dataset.letter = letter;
-        makeDraggable(tile, frame, () => choose(tile));
-        tiles.push(tile);
-        tray.append(tile);
+      for (const word of makeChips(task, level)) {
+        const chip = el('button', 'rld-chip', word);
+        chip.type = 'button';
+        chip.dataset.word = word;
+        makeDraggable(chip, frame, () => choose(chip));
+        tray.append(chip);
       }
+
+      sayPrompt();
     });
   }
 
-  // Буква ставится касанием или перетаскиванием на ряд клеток.
+  // Слово ставится касанием или перетаскиванием на рамку с предложением.
   function makeDraggable(button, target, onChoose) {
     let origin = null;
     let dragging = false;
@@ -212,7 +214,7 @@ export function start(ctx) {
         button.classList.add('dragging');
       }
       if (dragging) {
-        button.style.transform = `translate(${dx}px, ${dy}px) scale(1.08)`;
+        button.style.transform = `translate(${dx}px, ${dy}px) scale(1.06)`;
         target.classList.toggle('hot', overTarget(e.clientX, e.clientY));
       }
     });
@@ -240,26 +242,26 @@ export function start(ctx) {
     const hardPlan = planHardTasks(ctx.hard, total);
 
     for (let i = 0; i < total; i++) {
-      const item = hardPlan.get(i) || makeTask(level, used);
-      used.add(item.word);
-      const firstTry = await playTask(item, level);
+      const task = hardPlan.get(i) || makeTask(level, used);
+      used.add(task.key);
+      const firstTry = await playTask(task, level);
       if (!alive) return;
       dots[i].classList.add('done');
       if (firstTry) {
         correct += 1;
         clean += 1;
-        if (clean >= CLEAN_TO_LEVEL_UP && level < LEVEL_LEN.length - 1) {
+        if (clean >= CLEAN_TO_LEVEL_UP && level < LEVEL_KINDS.length - 1) {
           level += 1;
           clean = 0;
         }
       } else {
-        mistakes.set(item.word, item);
+        mistakes.set(task.key, task);
         level = Math.max(0, level - 1);
         clean = 0;
       }
     }
 
-    // Слова, в которых ошиблись, — ещё раз в конце. На результат не влияют.
+    // Ошибочные предложения — ещё раз в конце. На результат не влияют.
     const again = [...mistakes.values()];
     again.forEach(() => addDot(true));
     for (let i = 0; i < again.length; i++) {
@@ -271,7 +273,7 @@ export function start(ctx) {
     ctx.finish({
       correct,
       total,
-      mistakes: again.map((item) => ({ key: item.word, label: `${item.emoji} ${item.word}` })),
+      mistakes: again.map((t) => ({ key: t.key, label: `${t.scene.join('')} ${t.key}` })),
     });
   }
 
