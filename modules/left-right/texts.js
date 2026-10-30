@@ -10,8 +10,8 @@ export const TEXT = {
   walkTitle: 'Куда придёт пчёлка?',
   walkIntro: 'Пчёлка идёт',
   walkAsk: 'Куда она придёт?',
-  goLeft: 'налево',
-  goRight: 'направо',
+  go: { L: 'налево', R: 'направо', U: 'вверх', D: 'вниз' },
+  arrows: { L: '⬅', R: '➡', U: '⬆', D: '⬇' },
   hintLeft: 'Вот лево',
   hintRight: 'А вот право',
   rulerLeft: 'лево',
@@ -26,5 +26,6 @@ export const TEXT = {
     'near-left': 'Кто слева от выделенного?',
     'near-right': 'Кто справа от выделенного?',
     walk: 'Куда придёт пчёлка?',
+    walk3: 'Пчёлка на сетке',
   },
 };

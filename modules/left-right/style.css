@@ -261,6 +261,20 @@
   transition: opacity 0.2s, background 0.15s;
 }
 
+/* Уровень 4: пчёлка на сетке 3×3 */
+.lr-grid {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 1vh 1.2vw;
+}
+
+.lr-cell-grid {
+  width: clamp(64px, 12vh, 110px);
+  height: clamp(64px, 12vh, 110px);
+  max-height: none;
+  font-size: clamp(36px, 7vh, 64px);
+}
+
 /* Состояния ответа */
 .lr-item.right,
 .lr-cell.right {

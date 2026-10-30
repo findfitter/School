@@ -1,0 +1,10 @@
+{
+  "id": "left-right-other",
+  "title": "Лево и право другого",
+  "subject": "orientation",
+  "icon": "🧍",
+  "description": "Где у него правая рука?",
+  "version": "1.0.0",
+  "styles": ["style.css"],
+  "files": ["texts.js"]
+}

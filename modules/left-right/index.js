@@ -1,6 +1,7 @@
-// Право и лево. Задания генерируются кодом, четыре уровня:
+// Право и лево. Задания генерируются кодом, пять уровней:
 //   0 — предмет слева или справа; 1 — кто слева / справа в ряду;
-//   2 — кто слева или справа от выделенного; 3 — куда придёт пчёлка по командам.
+//   2 — кто слева или справа от выделенного; 3 — куда придёт пчёлка по командам (ряд из 5 клеток);
+//   4 — то же на сетке 3×3: команды налево, направо, вверх, вниз.
 // После ошибки уровень падает, после двух верных подряд растёт.
 // Ошибочные типы заданий повторяются в конце серии (с новыми предметами).
 
@@ -10,6 +11,7 @@ const OBJECTS = ['🐱', '🐶', '🐰', '🐻', '🦊', '🐸', '🐵', '🐼',
 const BEE = '🐝';
 const WALK_CELLS = 5;
 const WALK_START = 2;
+const GRID = 3; // сетка 3×3 для пчёлки на верхнем уровне
 const CLEAN_TO_LEVEL_UP = 2;
 
 // Какие типы заданий бывают на каждом уровне (вес — как часто).
@@ -18,6 +20,7 @@ const LEVELS = [
   { side: 1, 'edge-left': 2, 'edge-right': 2 },
   { 'edge-left': 1, 'edge-right': 1, 'edge-mid': 1, 'near-left': 2, 'near-right': 2 },
   { 'near-left': 1, 'near-right': 1, walk: 3 },
+  { walk: 1, walk3: 3 },
 ];
 
 const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -62,11 +65,39 @@ function makeWalk() {
   return { variant: 'walk', steps, answer: pos, prompt: TEXT.walkTitle };
 }
 
+// Пчёлка на сетке 3×3: стартует в случайной клетке, идёт по 2–4 командам и не выходит за край.
+// Ответ — номер клетки (слева направо, сверху вниз), конец пути не совпадает со стартом.
+const MOVES = { L: [0, -1], R: [0, 1], U: [-1, 0], D: [1, 0] };
+
+function makeWalk3() {
+  let start;
+  let steps;
+  let pos;
+  for (let attempt = 0; attempt < 10; attempt++) {
+    start = rnd(0, GRID * GRID - 1);
+    pos = [Math.floor(start / GRID), start % GRID];
+    steps = [];
+    for (let i = rnd(2, 4); i > 0; i--) {
+      const options = Object.keys(MOVES).filter((key) => {
+        const row = pos[0] + MOVES[key][0];
+        const col = pos[1] + MOVES[key][1];
+        return row >= 0 && row < GRID && col >= 0 && col < GRID;
+      });
+      const step = pick(options);
+      steps.push(step);
+      pos = [pos[0] + MOVES[step][0], pos[1] + MOVES[step][1]];
+    }
+    if (pos[0] * GRID + pos[1] !== start) break; // чтобы пчёлка не возвращалась на то же место
+  }
+  return { variant: 'walk3', steps, start, answer: pos[0] * GRID + pos[1], prompt: TEXT.walkTitle };
+}
+
 function makeTask(variant) {
   if (variant === 'side') {
     return { variant, object: pick(OBJECTS), answer: pick(['left', 'right']), prompt: TEXT.sideAsk };
   }
   if (variant === 'walk') return makeWalk();
+  if (variant === 'walk3') return makeWalk3();
   const [kind, part] = variant.split('-');
   if (kind === 'edge') {
     return { variant, items: shuffle(OBJECTS).slice(0, 3), answer: { left: 0, mid: 1, right: 2 }[part], prompt: TEXT.edge[part] };
@@ -81,10 +112,12 @@ function makeTask(variant) {
   };
 }
 
+const isWalk = (task) => task.variant === 'walk' || task.variant === 'walk3';
+
 function spokenText(task) {
-  if (task.variant !== 'walk') return { text: task.prompt };
-  const commands = task.steps.map((s) => (s === 'L' ? TEXT.goLeft : TEXT.goRight)).join(', ');
-  return { text: `${TEXT.walkIntro}: ${commands}. ${TEXT.walkAsk}`, key: `walk-${task.steps.join('').toLowerCase()}` };
+  if (!isWalk(task)) return { text: task.prompt };
+  const commands = task.steps.map((s) => TEXT.go[s]).join(', ');
+  return { text: `${TEXT.walkIntro}: ${commands}. ${TEXT.walkAsk}`, key: `${task.variant}-${task.steps.join('').toLowerCase()}` };
 }
 
 function el(tag, className, text) {
@@ -198,13 +231,16 @@ export function start(ctx) {
         stage.append(field);
         addOption(el('button', 'lr-side', `⬅ ${TEXT.left}`), 'left', answersBox);
         addOption(el('button', 'lr-side', `${TEXT.right} ➡`), 'right', answersBox);
-      } else if (task.variant === 'walk') {
-        commandEls = task.steps.map((s) => el('span', 'lr-cmd', s === 'L' ? '⬅' : '➡'));
+      } else if (isWalk(task)) {
+        commandEls = task.steps.map((s) => el('span', 'lr-cmd', TEXT.arrows[s]));
         const commands = el('div', 'lr-commands');
         commands.append(...commandEls);
-        const cells = el('div', 'lr-cells');
-        for (let i = 0; i < WALK_CELLS; i++) {
-          addOption(el('button', 'lr-cell', i === WALK_START ? BEE : ''), i, cells);
+        const grid = task.variant === 'walk3';
+        const cells = el('div', grid ? 'lr-grid' : 'lr-cells');
+        const count = grid ? GRID * GRID : WALK_CELLS;
+        const start = grid ? task.start : WALK_START;
+        for (let i = 0; i < count; i++) {
+          addOption(el('button', grid ? 'lr-cell lr-cell-grid' : 'lr-cell', i === start ? BEE : ''), i, cells);
         }
         stage.append(commands, cells, makeRuler());
       } else {
@@ -237,7 +273,7 @@ export function start(ctx) {
         for (let i = 0; i < commandEls.length; i++) {
           if (!alive || mine !== hintRun) return;
           commandEls[i].classList.add('lit');
-          await ctx.speak(task.steps[i] === 'L' ? TEXT.goLeft : TEXT.goRight, 'ru');
+          await ctx.speak(TEXT.go[task.steps[i]], 'ru');
           await wait(250);
           commandEls[i].classList.remove('lit');
         }

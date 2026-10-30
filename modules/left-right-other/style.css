@@ -1,0 +1,209 @@
+/* Лево и право другого. Размеры в vh/vw, чтобы всё помещалось на экране Хромбука без прокрутки. */
+
+.leftother {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2vh;
+  touch-action: none;
+}
+
+.lo-top {
+  flex: none;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lo-dots {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.lo-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #d8dcee;
+}
+
+.lo-dot.done {
+  background: var(--good, #52c47a);
+}
+
+.lo-dot.again {
+  border: 3px solid var(--primary, #4f8cff);
+  background: transparent;
+}
+
+.lo-dot.again.done {
+  background: var(--primary, #4f8cff);
+}
+
+.lo-repeat {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--card, #fff);
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  font-size: 36px;
+}
+
+.lo-prompt {
+  flex: none;
+  text-align: center;
+  font-size: clamp(26px, 5.4vh, 46px);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+/* Подсказка словами: место зарезервировано */
+.lo-hint {
+  flex: none;
+  min-height: 2.4em;
+  padding: 0 2vw;
+  color: var(--ink-soft, #6b6f85);
+  font-size: clamp(16px, 3vh, 24px);
+  line-height: 1.2;
+  text-align: center;
+  visibility: hidden;
+}
+
+.lo-hint.show {
+  visibility: visible;
+}
+
+.lo-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lo-scene {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3vw;
+}
+
+.lo-slot {
+  width: clamp(90px, 20vh, 170px);
+  height: clamp(90px, 20vh, 170px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lo-item {
+  font-size: clamp(72px, 16vh, 140px);
+  line-height: 1;
+}
+
+.lo-middle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6vh;
+}
+
+.lo-figure {
+  font-size: clamp(100px, 25vh, 200px);
+  line-height: 1;
+}
+
+/* Человек стоит спиной: тёмный силуэт */
+.lo-figure.back {
+  filter: brightness(0);
+}
+
+.lo-figure.hop {
+  animation: lo-hop 0.5s ease-out;
+}
+
+@keyframes lo-hop {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(-0.12em); }
+  100% { transform: translateY(0); }
+}
+
+.lo-tag {
+  padding: 2px 16px;
+  border-radius: 999px;
+  background: var(--soft, #e8eefc);
+  font-size: clamp(16px, 3vh, 24px);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* Руки, на которые можно нажать («покажи руку») */
+.lo-hand {
+  width: 100%;
+  height: 100%;
+  border-radius: 28px;
+  background: var(--card, #fff);
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  font-size: clamp(56px, 12vh, 100px);
+  line-height: 1;
+  transition: opacity 0.2s, background 0.15s;
+}
+
+/* Ответы «в левой» / «в правой» */
+.lo-answers {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  gap: 4vw;
+  min-height: 1vh;
+  padding-bottom: 1vh;
+}
+
+.lo-answer {
+  min-width: clamp(220px, 28vw, 380px);
+  height: clamp(80px, 15vh, 130px);
+  border-radius: 28px;
+  background: var(--primary, #4f8cff);
+  color: #fff;
+  font-size: clamp(32px, 6.4vh, 56px);
+  font-weight: 800;
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  transition: opacity 0.2s, background 0.15s;
+}
+
+.lo-answer:last-child {
+  background: #f08c4f;
+}
+
+/* Состояния ответа */
+.lo-hand.right {
+  background: #dff6e7;
+  outline: 5px solid var(--good, #52c47a);
+}
+
+.lo-answer.right {
+  background: var(--good, #52c47a);
+}
+
+.lo-hand.pressed,
+.lo-answer.pressed {
+  box-shadow: none;
+}
+
+.lo-hand.faded,
+.lo-answer.faded {
+  opacity: 0.3;
+  box-shadow: none;
+}
+
+.lo-hand.point,
+.lo-answer.point {
+  outline: 6px solid var(--accent, #ffd23f);
+  animation: lo-pulse 0.9s ease-in-out infinite;
+}
+
+@keyframes lo-pulse {
+  50% { transform: scale(1.04); }
+}
