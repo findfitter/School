@@ -3,7 +3,7 @@
   "title": "Право и лево",
   "subject": "orientation",
   "icon": "↔️",
-  "description": "Где лево, а где право",
+  "description": "Куда придёт пчёлка?",
   "version": "1.0.0",
   "styles": [
     "style.css"
