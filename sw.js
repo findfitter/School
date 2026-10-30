@@ -22,6 +22,7 @@ const CORE_FILES = [
   'core/speech.js',
   'core/sounds.js',
   'core/rewards.js',
+  'core/dogs.js',
   'core/registry.js',
   'core/context.js',
   'core/screens/menu.js',
@@ -29,9 +30,11 @@ const CORE_FILES = [
   'core/screens/gate.js',
   'core/screens/limit.js',
   'core/screens/stickers.js',
+  'core/screens/dog.js',
   'core/screens/parent.js',
   'core/styles/base.css',
   'core/styles/screens.css',
+  'core/styles/dog.css',
   'modules/registry.json',
 ];
 

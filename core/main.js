@@ -13,6 +13,7 @@ import { completeSeries, healCycles, isLocked, superSticker } from './cycles.js'
 import { renderMenu } from './screens/menu.js';
 import { renderResult } from './screens/result.js';
 import { renderStickers } from './screens/stickers.js';
+import { renderDog } from './screens/dog.js';
 import { renderParent } from './screens/parent.js';
 import { renderLimit } from './screens/limit.js';
 import { renderGate } from './screens/gate.js';
@@ -34,7 +35,7 @@ const TICK_MS = 5000; // как часто считаем время
 const IDLE_MS = 90000; // без касаний дольше этого время не считается (ребёнок отошёл)
 const GRACE_MIN = 5; // сколько минут сверх лимита дают закончить начатое задание
 
-let screenKind = 'menu'; // menu | stickers | game | result | parent | limit | gate
+let screenKind = 'menu'; // menu | stickers | dog | game | result | parent | limit | gate
 let lastActivity = Date.now();
 let lastTick = Date.now();
 
@@ -56,7 +57,7 @@ function tick() {
   if (screenKind !== 'parent' && screenKind !== 'limit' && screenKind !== 'gate' && now - lastActivity < IDLE_MS) {
     storage.addUsage(Math.round(elapsed * 10) / 10);
   }
-  if (screenKind === 'menu' || screenKind === 'stickers') {
+  if (screenKind === 'menu' || screenKind === 'stickers' || screenKind === 'dog') {
     if (limitReached()) showLimit();
   } else if (screenKind === 'game' || screenKind === 'result') {
     if (limitReached(GRACE_MIN)) showLimit();
@@ -69,7 +70,7 @@ const app = {
   root,
   services,
   manifests: [],
-  go: { menu: showMenu, stickers: showStickers, parent: showParent, play },
+  go: { menu: showMenu, stickers: showStickers, dog: showDog, parent: showParent, play },
 };
 
 function show(screen, onLeave = null, kind = 'menu') {
@@ -90,6 +91,11 @@ function showMenu() {
 function showStickers() {
   if (limitReached()) return showLimit();
   show(renderStickers(app), null, 'stickers');
+}
+
+function showDog() {
+  if (limitReached()) return showLimit();
+  show(renderDog(app), null, 'dog');
 }
 
 // Вход на экран родителя: сначала проверка «только для взрослых».

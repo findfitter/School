@@ -1,0 +1,288 @@
+/* Раздел собаки (прототип): косточки, купленные собаки, выбор собаки. Без :hover — экран сенсорный. */
+
+/* Кнопка собаки в меню (справа вверху) */
+.dog-btn {
+  position: relative;
+  min-width: var(--tap);
+  padding: 0 18px;
+  font-size: 1.4em;
+  background: #ffe9d1;
+}
+
+.dog-btn small {
+  font-size: 0.6em;
+  font-weight: 800;
+}
+
+.dog-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.dog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Сколько косточек заработано */
+.dog-stats {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.dog-earned {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 26px 10px 18px;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.dog-earned-bone {
+  font-size: 2.4em;
+  line-height: 1;
+}
+
+.dog-earned strong,
+.dog-earned small {
+  display: block;
+}
+
+.dog-earned small {
+  color: var(--ink-soft);
+  font-size: 0.75em;
+}
+
+.dog-stats .hint-line {
+  flex: 1;
+  min-width: 220px;
+  padding: 0;
+}
+
+/* Рисунок собаки */
+.dog-art-box {
+  position: relative;
+  width: clamp(120px, 24vh, 190px);
+  aspect-ratio: 240 / 270;
+}
+
+.dog-art-box.big {
+  width: clamp(170px, 38vh, 290px);
+}
+
+.dog-preview .dog-art-box.big {
+  width: clamp(120px, 25vh, 230px);
+}
+
+.dog-art.ghost {
+  filter: grayscale(1) brightness(1.1);
+  opacity: 0.35;
+}
+
+.dog-question {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4em;
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+
+.dog-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 24px 26px;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.dog-empty p {
+  color: var(--ink-soft);
+}
+
+/* Купленные собаки */
+.dog-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.dog-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 22px 14px;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.dog-name {
+  font-size: 1.25em;
+  line-height: 1.1;
+}
+
+.dog-meta {
+  color: var(--ink-soft);
+  font-size: 0.8em;
+}
+
+.dog-more {
+  display: flex;
+  justify-content: center;
+}
+
+/* Кнопки для просмотра прототипа */
+.dog-proto {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 10px 18px;
+  border: 3px dashed #c9cfe6;
+  border-radius: var(--radius);
+  color: var(--ink-soft);
+  font-size: 0.8em;
+}
+
+/* Выбор собаки: слева картинка, справа выбор */
+.dog-create {
+  display: flex;
+  gap: 4vw;
+  align-items: flex-start;
+}
+
+.dog-preview {
+  flex: none;
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 24px 12px;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.dog-preview .dog-name {
+  min-height: 1.2em;
+  font-size: 1.5em;
+}
+
+.dog-controls {
+  flex: 1;
+  min-width: 0;
+}
+
+.dog-controls .section-title:first-child {
+  margin-top: 0;
+}
+
+.dog-chips,
+.dog-swatches,
+.dog-names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.dog-names {
+  margin-top: 12px;
+}
+
+.chip-btn {
+  min-height: var(--tap);
+  padding: 0 22px;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  font-weight: 800;
+}
+
+.chip-btn.small {
+  min-height: 52px;
+  padding: 0 16px;
+  font-size: 0.85em;
+  background: var(--soft);
+  box-shadow: none;
+}
+
+.chip-btn.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.chip-btn.pressed {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+.swatch {
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: 50%;
+  border: 4px solid rgba(43, 45, 66, 0.18);
+  box-shadow: var(--shadow);
+}
+
+.swatch.active {
+  border-color: var(--ink);
+  outline: 4px solid var(--accent);
+}
+
+.dog-input {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 0 20px;
+  border: 4px solid #c9cfe6;
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.2em;
+  font-weight: 800;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.dog-input:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.dog-preview .section-title {
+  margin: 10px 0 4px;
+  font-size: 1em;
+}
+
+.dog-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.dog-age-value {
+  min-width: 4.2em;
+  text-align: center;
+  font-size: 1.3em;
+  font-weight: 800;
+}
+
+.dog-popup .dog-art-box {
+  width: clamp(150px, 34vh, 250px);
+}

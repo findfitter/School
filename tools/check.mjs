@@ -71,7 +71,8 @@ const patterns = [
   [/\bconsole\.log\(/, 'console.log'],
   [/\bTODO\b|\bFIXME\b|\bXXX\b/, 'TODO/FIXME'],
   [/\bdebugger\b/, 'debugger'],
-  [/https?:\/\/(?!localhost|127\.0\.0\.1)/, 'внешний URL'],
+  // адрес пространства имён SVG (xmlns) — не обращение к сети
+  [/https?:\/\/(?!localhost|127\.0\.0\.1|www\.w3\.org\/2000\/svg)/, 'внешний URL'],
   [/localStorage|sessionStorage/, 'прямое обращение к localStorage'],
 ];
 for (const f of js) {
@@ -240,6 +241,15 @@ for (const id of ['reading-sentences', 'reading-sentences-de', 'reading-long', '
     if (!s.scene.length || s.scene.some((e) => !e)) add('ПРЕДЛОЖЕНИЯ', id, `у «${s.key}» нет картинки`);
   }
   notes.push(`${id}: предложений ${SENTENCES.length}`);
+}
+
+// 7г. Правило кругов: у каждого модуля любого раздела, кроме английского, должен быть cycle
+// (пройденный модуль закрывается, пока не пройдены все; потом супер-наклейка и круг заново)
+for (const id of registry) {
+  const manifestPath = `${ROOT}/modules/${id}/manifest.json`;
+  if (!existsSync(manifestPath)) continue;
+  const manifest = JSON.parse(read(manifestPath));
+  if (manifest.subject !== 'english' && !manifest.cycle) add('КРУГ', id, 'у модуля нет cycle — он не закрывается после серии и не участвует в супер-наклейках');
 }
 
 // 8. Классы в CSS и JS: быстрый поиск мёртвых стилей и неопределённых переменных

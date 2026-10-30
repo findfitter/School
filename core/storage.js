@@ -1,6 +1,7 @@
 // Настройки и прогресс в localStorage. Данные никуда не отправляются.
 
 import { legacyUnlocked, stickerById } from './rewards.js';
+import { cleanDog, dogPrice } from './dogs.js';
 
 const KEY = 'school-app-v1';
 const APP_ID = 'school-app';
@@ -36,6 +37,9 @@ function fresh() {
     usage: {}, // время в приложении по дням: { 'ГГГГ-ММ-ДД': секунды }
     bonus: {}, // дополнительные минуты к лимиту на конкретный день: { 'ГГГГ-ММ-ДД': минуты }
     supers: 0, // сколько супер-наклеек получено
+    bones: 0, // косточек заработано (за особое сложное задание), прототип
+    bonesSpent: 0, // косточек потрачено на собак
+    dogs: [], // купленные собаки: { id, name, breed, color, age }
     cycles: {}, // круги: { <id круга>: [id модулей, пройденных в текущем круге] }
     progress: {},
   };
@@ -81,6 +85,9 @@ function normalize(data) {
   }
   s.stars = Math.round(num(data.stars, 0, 1e6, 0));
   s.supers = Math.round(num(data.supers, 0, 1e6, 0));
+  s.bones = Math.round(num(data.bones, 0, 1e6, 0));
+  s.bonesSpent = Math.round(num(data.bonesSpent, 0, 1e6, 0));
+  s.dogs = (Array.isArray(data.dogs) ? data.dogs : []).map(cleanDog).filter(Boolean).slice(0, 12);
   const oldest = dayKey(new Date(Date.now() - USAGE_KEEP_DAYS * 86400000));
   for (const [day, minutes] of Object.entries(data.bonus || {})) {
     if (/^\d{4}-\d{2}-\d{2}$/.test(day) && day >= oldest) s.bonus[day] = Math.round(num(minutes, 0, 1440, 0));
@@ -206,6 +213,44 @@ export function buySticker(id) {
   state.spent += sticker.price;
   save();
   return true;
+}
+
+// ---------- Косточки и собаки (прототип) ----------
+export function bones() {
+  return state.bones;
+}
+
+export function addBones(n = 1) {
+  state.bones = Math.min(1e6, state.bones + Math.max(0, Math.round(n)));
+  save();
+}
+
+// Косточек на счету: заработано минус потрачено на собак.
+export function bonesBalance() {
+  return Math.max(0, state.bones - state.bonesSpent);
+}
+
+export function dogs() {
+  return state.dogs.map((d) => ({ ...d }));
+}
+
+// Покупка собаки: цена зависит от того, сколько собак уже есть. Возвращает купленную собаку или null.
+export function buyDog(raw) {
+  const price = dogPrice(state.dogs.length);
+  const dog = cleanDog({ ...raw, id: `dog-${Date.now().toString(36)}` });
+  if (price == null || !dog || bonesBalance() < price) return null;
+  state.dogs.push(dog);
+  state.bonesSpent += price;
+  save();
+  return { ...dog };
+}
+
+// Только для прототипа: вернуть косточки и собак в начальное состояние.
+export function resetDogs() {
+  state.bones = 0;
+  state.bonesSpent = 0;
+  state.dogs = [];
+  save();
 }
 
 export function supers() {
