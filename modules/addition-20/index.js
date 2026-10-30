@@ -1,6 +1,7 @@
 // Сложение до 20. Задания генерируются кодом.
 // Сложность: после ошибки уровень падает, после двух верных подряд — растёт.
-// Ошибочные примеры повторяются в конце серии.
+// Ошибочные примеры повторяются в конце серии. Картинок для пересчёта изначально нет: подсказка
+// с предметами появляется только после первой ошибки в примере.
 
 import { TEXT } from './texts.js';
 
@@ -99,7 +100,7 @@ export function start(ctx) {
   const equation = el('div', 'a20-eq');
   equation.append(eqA, el('span', 'a20-op', '+'), eqB, el('span', 'a20-op', '='), slot);
 
-  const things = el('div', 'a20-things');
+  const things = el('div', 'a20-things'); // место под подсказку: пусто, пока ребёнок не ошибся
   const answersBox = el('div', 'a20-answers');
   root.append(top, equation, things, answersBox);
   ctx.container.append(root);
@@ -121,26 +122,18 @@ export function start(ctx) {
       const icon = pick(OBJECTS);
       let wrong = 0;
       let locked = false;
+      let hintShown = false;
       let hintRun = 0;
+      const objects = [];
 
       eqA.textContent = task.a;
       eqB.textContent = task.b;
       slot.textContent = '?';
       slot.className = 'a20-slot';
 
-      const objects = [];
-      const makeGroup = (count) => {
-        const group = el('div', 'a20-group');
-        for (let i = 0; i < count; i++) {
-          const thing = el('span', 'a20-thing', icon);
-          group.append(thing);
-          objects.push(thing);
-        }
-        return group;
-      };
-      things.classList.toggle('many', answer > 10);
-      things.replaceChildren(makeGroup(task.a), el('span', 'a20-op', '+'), makeGroup(task.b));
       answersBox.replaceChildren();
+      things.className = 'a20-things';
+      things.replaceChildren();
 
       const sayTask = () =>
         ctx.speak(
@@ -150,14 +143,25 @@ export function start(ctx) {
         );
       repeatBtn.onclick = () => sayTask();
 
-      async function hint() {
+      // Подсказка после первой ошибки: предметы по числам из примера, считаем вместе.
+      async function showHint() {
         const mine = ++hintRun;
-        objects.forEach((o) => o.querySelector('.a20-badge')?.remove());
+        const makeGroup = (count) => {
+          const group = el('div', 'a20-group');
+          for (let i = 0; i < count; i++) {
+            const thing = el('span', 'a20-thing', icon);
+            group.append(thing);
+            objects.push(thing);
+          }
+          return group;
+        };
+        things.classList.toggle('many', answer > 10);
+        things.replaceChildren(makeGroup(task.a), el('span', 'a20-op', '+'), makeGroup(task.b));
+        things.classList.add('show');
         await ctx.speak(TEXT.hint, 'ru', 'hint-count-together');
         for (let n = 1; n <= objects.length; n++) {
           if (!alive || mine !== hintRun) return;
-          const badge = el('i', 'a20-badge', n);
-          objects[n - 1].append(badge);
+          objects[n - 1].append(el('i', 'a20-badge', n));
           ctx.speak(TEXT.numbers[n], 'ru');
           await wait(600);
         }
@@ -169,15 +173,18 @@ export function start(ctx) {
           wrong += 1;
           button.disabled = true;
           button.classList.add('faded');
-          ctx.sound('hint');
-          hint();
+          ctx.sound('hint'); // мягкий сигнал, неверный ответ тускнеет, можно ответить ещё раз
+          if (!hintShown) {
+            hintShown = true;
+            showHint();
+          }
           return;
         }
         locked = true;
-        hintRun += 1;
+        hintRun += 1; // останавливает счёт предметов
+        objects.forEach((o) => o.classList.add('hop'));
         slot.textContent = answer;
         slot.className = 'a20-slot ok';
-        objects.forEach((o) => o.classList.add('hop'));
         ctx.sound('correct');
         ctx.speak(TEXT.numbers[answer], 'ru');
         await wait(1400);

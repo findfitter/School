@@ -58,12 +58,13 @@
 
 /* Пример */
 .a20-eq {
-  flex: none;
+  flex: 1;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2vw;
-  font-size: clamp(56px, 15vh, 130px);
+  gap: 2.4vw;
+  font-size: clamp(72px, 22vh, 190px);
   font-weight: 800;
   line-height: 1;
 }
@@ -94,15 +95,24 @@
   color: var(--ink, #2b2d42);
 }
 
-/* Предметы для пересчёта */
+/* Подсказка после первой ошибки: предметы для пересчёта. Место зарезервировано, чтобы пример не прыгал. */
 .a20-things {
-  flex: 1;
-  min-height: 0;
+  flex: none;
+  height: clamp(96px, 24vh, 200px);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 3vw;
   font-size: clamp(36px, 9vh, 72px);
+  visibility: hidden;
+}
+
+.a20-things.show {
+  visibility: visible;
+}
+
+.a20-things.many {
+  font-size: clamp(24px, 5.2vh, 44px);
 }
 
 .a20-group {
@@ -196,11 +206,3 @@
   box-shadow: none;
 }
 
-/* Больше десяти предметов — делаем их мельче */
-.a20-things.many {
-  font-size: clamp(26px, 5.5vh, 46px);
-}
-
-.a20-things.many .a20-group {
-  max-width: 40vw;
-}

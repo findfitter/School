@@ -1,17 +1,15 @@
 // Сложение до 10. Задания генерируются кодом.
 // Сложность: после ошибки уровень падает, после двух верных подряд — растёт.
-// Ошибочные примеры повторяются в конце серии.
+// Ошибочные примеры повторяются в конце серии. Картинок для пересчёта нет: только пример и ответы.
 
 import { TEXT } from './texts.js';
 
-const OBJECTS = ['🍎', '🍓', '⭐', '🐟', '🐥', '🚗', '🌸', '🎈', '🍪', '🐞'];
 const LEVEL_MAX_SUM = [5, 7, 9, 10]; // наибольшая сумма на каждом уровне
 const START_LEVEL = 1;
 const CLEAN_TO_LEVEL_UP = 2;
 const DRAG_THRESHOLD = 14; // px, после которого касание считается перетаскиванием
 
 const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-const pick = (list) => list[rnd(0, list.length - 1)];
 const keyOf = (a, b) => `${a}+${b}`;
 const labelOf = (a, b) => `${a} + ${b}`;
 
@@ -97,9 +95,8 @@ export function start(ctx) {
   const equation = el('div', 'a10-eq');
   equation.append(eqA, el('span', 'a10-op', '+'), eqB, el('span', 'a10-op', '='), slot);
 
-  const things = el('div', 'a10-things');
   const answersBox = el('div', 'a10-answers');
-  root.append(top, equation, things, answersBox);
+  root.append(top, equation, answersBox);
   ctx.container.append(root);
 
   const dots = [];
@@ -116,27 +113,14 @@ export function start(ctx) {
   function playTask(task) {
     return new Promise((resolve) => {
       const answer = task.a + task.b;
-      const icon = pick(OBJECTS);
       let wrong = 0;
       let locked = false;
-      let hintRun = 0;
 
       eqA.textContent = task.a;
       eqB.textContent = task.b;
       slot.textContent = '?';
       slot.className = 'a10-slot';
 
-      const objects = [];
-      const makeGroup = (count) => {
-        const group = el('div', 'a10-group');
-        for (let i = 0; i < count; i++) {
-          const thing = el('span', 'a10-thing', icon);
-          group.append(thing);
-          objects.push(thing);
-        }
-        return group;
-      };
-      things.replaceChildren(makeGroup(task.a), el('span', 'a10-op', '+'), makeGroup(task.b));
       answersBox.replaceChildren();
 
       const sayTask = () =>
@@ -147,34 +131,18 @@ export function start(ctx) {
         );
       repeatBtn.onclick = () => sayTask();
 
-      async function hint() {
-        const mine = ++hintRun;
-        objects.forEach((o) => o.querySelector('.a10-badge')?.remove());
-        await ctx.speak(TEXT.hint, 'ru', 'hint-count-together');
-        for (let n = 1; n <= objects.length; n++) {
-          if (!alive || mine !== hintRun) return;
-          const badge = el('i', 'a10-badge', n);
-          objects[n - 1].append(badge);
-          ctx.speak(TEXT.numbers[n], 'ru');
-          await wait(750);
-        }
-      }
-
       async function choose(value, button) {
         if (locked || !alive) return;
         if (value !== answer) {
           wrong += 1;
           button.disabled = true;
           button.classList.add('faded');
-          ctx.sound('hint');
-          hint();
+          ctx.sound('hint'); // мягкий сигнал, неверный ответ тускнеет, можно ответить ещё раз
           return;
         }
         locked = true;
-        hintRun += 1;
         slot.textContent = answer;
         slot.className = 'a10-slot ok';
-        objects.forEach((o) => o.classList.add('hop'));
         ctx.sound('correct');
         ctx.speak(TEXT.numbers[answer], 'ru');
         await wait(1400);
