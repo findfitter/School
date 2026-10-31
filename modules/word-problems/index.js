@@ -9,7 +9,7 @@ import { NAMES, NOUNS, counted } from './data.js';
 
 const LEVEL_KINDS = [['add', 'sub'], ['add', 'sub', 'total'], ['add', 'sub', 'total'], ['add', 'sub', 'total', 'diff']];
 const LEVEL_MAX = [10, 10, 20, 20]; // наибольшее число (в том числе ответ)
-const CLEAN_TO_LEVEL_UP = 2;
+const CLEAN_TO_LEVEL_UP = 3; // верных подряд до повышения уровня
 const MAX_ANSWER = 20;
 
 const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -253,7 +253,7 @@ export function start(ctx) {
 
   // ---------- серия ----------
   async function run() {
-    let level = 0;
+    let level = Math.min(ctx.level ?? 0, LEVEL_KINDS.length - 1); // уровень помнится между сериями (core: ctx.level)
     let clean = 0;
     let correct = 0;
     const used = new Set();
@@ -292,6 +292,7 @@ export function start(ctx) {
 
     ctx.finish({
       correct,
+      level,
       total,
       mistakes: again.map((t) => {
         const info = describe(t);

@@ -17,6 +17,15 @@ Salz 🧂|Wasser 💧|Stuhl 🪑|Sofa 🛋️|Lampe 💡|Computer 💻|Bleistift
 Mantel 🧥|Ring 💍|Tasche 👜|Schiff 🚢|Taxi 🚕|Hammer 🔨|Magnet 🧲|Geige 🎻|Klavier 🎹|Trompete 🎺|Mikrofon 🎤|Kamera 📷|Fahne 🚩|Pokal 🏆
 Medaille 🏅|Schnee ❄️|Berg ⛰️|Welle 🌊|Insel 🏝️|Strand 🏖️|Tulpe 🌷|Kaktus 🌵|Palme 🌴|Blatt 🍃|Gras 🌿|Kleeblatt 🍀|Auge 👁️|Zunge 👅
 Gehirn 🧠|Knochen 🦴|Hand ✋|Schule 🏫|Brücke 🌉|Zelt ⛺|Brunnen ⛲|Karte 🗺️|Kompass 🧭|Lupe 🔍|Waage ⚖️|Anker ⚓|Muschel 🐚
+Hummer 🦞|Garnele 🦐|Kugelfisch 🐡|Seehund 🦭|Otter 🦦|Faultier 🦥|Stinktier 🦨|Dachs 🦡|Biber 🦫|Eidechse 🦎|Bison 🦬|Büffel 🐃|Leopard 🐆|Pudel 🐩
+Einhorn 🦄|Drache 🐉|Mücke 🦟|Fliege 🪰|Käfer 🪲|Truthahn 🦃|Gans 🪿|Baguette 🥖|Brezel 🥨|Waffel 🧇|Speck 🥓|Steak 🥩|Würstchen 🌭|Sandwich 🥪
+Taco 🌮|Salat 🥗|Popcorn 🍿|Butter 🧈|Donut 🍩|Keks 🍪|Lutscher 🍭|Pudding 🍮|Blaubeere 🫐|Olive 🫒|Kohl 🥬|Spiegelei 🍳|Sushi 🍣|Drachen 🪁
+Würfel 🎲|Puzzle 🧩|Pinsel 🖌️|Faden 🧵|Nadel 🪡|Besen 🧹|Korb 🧺|Eimer 🪣|Seife 🧼|Dusche 🚿|Badewanne 🛁|Spiegel 🪞|Fenster 🪟|Glocke 🔔
+Kiste 📦|Brief ✉️|Kalender 📅|Batterie 🔋|Pflaster 🩹|Tablette 💊|Teleskop 🔭|Mikroskop 🔬|Satellit 🛰️|Basketball 🏀|Volleyball 🏐|Ski 🎿|Schlitten 🛷|Bowling 🎳
+Lokomotive 🚂|Lastwagen 🚛|Moped 🛵|Motorrad 🏍️|Kanu 🛶|Roller 🛴|Skateboard 🛹|Karussell 🎠|Achterbahn 🎢|Schneemann ⛄|Tornado 🌪️|Blitz ⚡|Vulkan 🌋|Wüste 🏜️
+Planet 🪐|Stein 🪨|Ähre 🌾|Spuren 👣|Baby 👶|Zauberer 🧙|Fee 🧚|Clown 🤡|Prinzessin 👸|Prinz 🤴|Roboter 🤖|Alien 👽|Gespenst 👻|Bikini 👙
+Stiefel 👢|Shorts 🩳|Schleife 🎀|Saxophon 🎷|Turm 🗼|Kirche ⛪|Fabrik 🏭|Ampel 🚦|Zirkus 🎪|Joystick 🎮|Fernseher 📺|Radio 📻|Eiswürfel 🧊|Axt 🪓
+Säge 🪚|Klingel 🛎️|Wasserhahn 🚰|Ziegel 🧱|Leiter 🪜|Tor 🥅|Akkordeon 🪗|Koffer 🧳|Abakus 🧮|Heft 📓|Ordner 🗂️
 `;
 
 const seen = new Set();

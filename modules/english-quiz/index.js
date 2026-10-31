@@ -8,7 +8,7 @@ import { TEXT } from './texts.js';
 
 const OPTIONS_BY_LEVEL = [3, 3, 4, 4]; // сколько картинок на выбор
 const SAME_TOPIC_FROM_LEVEL = 1; // с этого уровня лишние картинки берутся из той же темы
-const CLEAN_TO_LEVEL_UP = 2;
+const CLEAN_TO_LEVEL_UP = 3; // верных подряд до повышения уровня
 const WRONG_BEFORE_POINTING = 2; // после стольких ошибок верная картинка подсвечивается
 
 const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -84,6 +84,7 @@ export async function start(ctx) {
   const all = topics.flatMap((t) => t.words.map((w) => ({ ...w, topic: t.id })));
   const byKey = new Map(all.map((w) => [w.en, w]));
   const total = ctx.settings.seriesLength;
+  ctx.words.size('en', all.length);
   const showTranslation = Boolean(ctx.settings.translation);
   let alive = true;
   const timers = new Set();
@@ -192,7 +193,7 @@ export async function start(ctx) {
     let current = null;
     const ui = buildSeries(() => current && ctx.speak(current.en, 'en'));
 
-    let level = 0;
+    let level = Math.min(ctx.level ?? 0, OPTIONS_BY_LEVEL.length - 1); // уровень помнится между сериями (core: ctx.level)
     let clean = 0;
     let correct = 0;
     const used = new Set();
@@ -209,11 +210,11 @@ export async function start(ctx) {
 
     for (let i = 0; i < count; i++) {
       const fresh = pool.filter((w) => !used.has(w.en));
-      const word = planned.get(i) || pick(fresh.length ? fresh : pool);
+      const word = planned.get(i) || ctx.words.pick(fresh.length ? fresh : pool, (w) => `en:${w.en}`); // выученные слова реже
       used.add(word.en);
       current = word;
       const firstTry = await playTask(ui, word, level);
-      ctx.task({ ok: firstTry, level });
+      ctx.task({ ok: firstTry, level, key: `en:${word.en}` });
       if (!alive) return;
       ui.dots[i].classList.add('done');
       if (firstTry) {
@@ -242,6 +243,7 @@ export async function start(ctx) {
 
     ctx.finish({
       correct,
+      level,
       total: count,
       mistakes: again.map((w) => ({ key: w.en, label: `${iconOf(w)} ${w.en}` })),
     });

@@ -10,7 +10,7 @@ import { SENTENCES } from './data.js';
 
 const LEVEL_KINDS = [['short'], ['act'], ['pair'], ['short', 'act', 'pair', 'place']];
 const EXTRA_CHIP_LEVEL = 3; // с этого уровня добавляется лишнее слово
-const CLEAN_TO_LEVEL_UP = 2;
+const CLEAN_TO_LEVEL_UP = 3; // верных подряд до повышения уровня
 const GHOST_AFTER_WRONG = 2; // после стольких ошибок на слоте показываем первую букву
 const DRAG_THRESHOLD = 14; // px, после которого касание считается перетаскиванием
 
@@ -234,7 +234,7 @@ export function start(ctx) {
 
   // ---------- серия ----------
   async function run() {
-    let level = 0;
+    let level = Math.min(ctx.level ?? 0, LEVEL_KINDS.length - 1); // уровень помнится между сериями (core: ctx.level)
     let clean = 0;
     let correct = 0;
     const used = new Set();
@@ -273,6 +273,7 @@ export function start(ctx) {
 
     ctx.finish({
       correct,
+      level,
       total,
       mistakes: again.map((t) => ({ key: t.key, label: `${t.scene.join('')} ${t.key}` })),
     });

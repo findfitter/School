@@ -229,6 +229,19 @@ for (const id of ['reading-phrases', 'reading-phrases-de']) {
   }
   notes.push(`${id}: предметов ${NOUNS.length}`);
 }
+// Артикли в немецком: у каждого существительного артикль der/die/das, нет повторов слова и картинки
+if (existsSync(`${ROOT}/modules/german-articles/data.js`)) {
+  const { NOUNS: artNouns, ARTICLES } = await import(bankUrl('german-articles/data.js'));
+  const seenWord = new Set(); const seenEmoji = new Set();
+  for (const n of artNouns) {
+    if (!ARTICLES.includes(n.art)) add('СЛОВАРЬ', 'german-articles', `у «${n.word}» неверный артикль «${n.art}»`);
+    if (seenWord.has(n.word)) add('СЛОВАРЬ', 'german-articles', `слово «${n.word}» повторяется`);
+    if (seenEmoji.has(n.emoji)) add('СЛОВАРЬ', 'german-articles', `картинка ${n.emoji} («${n.word}») повторяется`);
+    seenWord.add(n.word); seenEmoji.add(n.emoji);
+  }
+  const perArticle = ARTICLES.map((a) => `${a}: ${artNouns.filter((n) => n.art === a).length}`).join(', ');
+  notes.push(`german-articles: существительных ${artNouns.length} (${perArticle}), лёгких ${artNouns.filter((n) => n.easy).length}`);
+}
 for (const id of ['reading-sentences', 'reading-sentences-de', 'reading-long', 'reading-long-de']) {
   const path = `${ROOT}/modules/${id}/data.js`;
   if (!existsSync(path)) continue;

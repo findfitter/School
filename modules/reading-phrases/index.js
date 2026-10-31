@@ -10,7 +10,7 @@ import { COLORS, NOUNS } from './data.js';
 
 const LEVEL_MAX_LEN = [5, 5, 7, 10]; // самое длинное слово-предмет на каждом уровне
 const LEVEL_MODES = [['all'], ['cc-n', 'c-nn'], ['cc-n', 'c-nn'], ['cc-n', 'c-nn', 'ccc', 'nnn']];
-const CLEAN_TO_LEVEL_UP = 2;
+const CLEAN_TO_LEVEL_UP = 3; // верных подряд до повышения уровня
 const DRAG_THRESHOLD = 14; // px, после которого касание считается перетаскиванием
 
 const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -281,7 +281,7 @@ export function start(ctx) {
 
   // ---------- серия ----------
   async function run() {
-    let level = 0;
+    let level = Math.min(ctx.level ?? 0, LEVEL_MAX_LEN.length - 1); // уровень помнится между сериями (core: ctx.level)
     let clean = 0;
     let correct = 0;
     const used = new Set();
@@ -320,6 +320,7 @@ export function start(ctx) {
 
     ctx.finish({
       correct,
+      level,
       total,
       mistakes: again.map((t) => ({
         key: keyOf(t.color, t.noun),

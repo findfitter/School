@@ -9,7 +9,7 @@ const OBJECTS = ['🍎', '🍓', '⭐', '🐟', '🐥', '🚗', '🌸', '🎈', 
 const LEVEL_MAX = [10, 20, 20, 20]; // наибольшее число на каждом уровне
 const LEVEL_MIN = [1, 0, 0, 0];
 const START_LEVEL = 0;
-const CLEAN_TO_LEVEL_UP = 2;
+const CLEAN_TO_LEVEL_UP = 3; // верных подряд до повышения уровня
 const DRAG_THRESHOLD = 14; // px, после которого касание считается перетаскиванием
 const SIGNS = ['<', '=', '>'];
 
@@ -276,7 +276,7 @@ export function start(ctx) {
 
   // ---------- серия ----------
   async function run() {
-    let level = START_LEVEL;
+    let level = Math.min(ctx.level ?? START_LEVEL, LEVEL_MAX.length - 1); // уровень помнится между сериями (core: ctx.level)
     let clean = 0;
     let correct = 0;
     const used = new Set();
@@ -315,6 +315,7 @@ export function start(ctx) {
 
     ctx.finish({
       correct,
+      level,
       total,
       mistakes: again.map((t) => ({ key: keyOf(t), label: `${show(t.l)} ? ${show(t.r)}` })),
     });

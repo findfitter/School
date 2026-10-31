@@ -16,7 +16,7 @@ const LEVELS = [
   { type: 'phrase', count: 4 },
   { type: 'sentence', count: 4 },
 ];
-const CLEAN_TO_LEVEL_UP = 2;
+const CLEAN_TO_LEVEL_UP = 3; // верных подряд до повышения уровня
 const WRONG_BEFORE_POINTING = 2; // после стольких ошибок верная картинка подсвечивается
 
 const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -75,12 +75,12 @@ function similarity(a, b) {
   return score;
 }
 
-function makeTask(level, used) {
+function makeTask(level, used, choose = pick) {
   const { type, maxLen } = LEVELS[level];
   if (type === 'word') {
     const pool = WORDS.filter((w) => w.word.length <= maxLen && !used.has(`w:${w.word}`));
     const longest = pool.filter((w) => w.word.length >= maxLen - 1);
-    return { ...wordTask(pick(longest.length && Math.random() < 0.6 ? longest : pool.length ? pool : WORDS)), level };
+    return { ...wordTask(choose(longest.length && Math.random() < 0.6 ? longest : pool.length ? pool : WORDS)), level };
   }
   if (type === 'phrase') {
     let noun;
@@ -214,6 +214,9 @@ function pictureOf(view) {
 
 export function start(ctx) {
   const total = ctx.settings.seriesLength;
+  // Выученные слова (учёт в ядре) выпадают реже, новые и непрочные — чаще.
+  ctx.words.size('ru', WORDS.length);
+  const chooseWord = (list) => ctx.words.pick(list, (item) => 'ru:' + item.word);
   let alive = true;
   const timers = new Set();
 
@@ -305,7 +308,7 @@ export function start(ctx) {
 
   // ---------- серия ----------
   async function run() {
-    let level = 0;
+    let level = Math.min(ctx.level ?? 0, LEVELS.length - 1); // уровень помнится между сериями (core: ctx.level)
     let clean = 0;
     let correct = 0;
     const used = new Set();
@@ -313,10 +316,10 @@ export function start(ctx) {
     const planned = planHardTasks();
 
     for (let i = 0; i < total; i++) {
-      const task = planned.get(i) || makeTask(level, used);
+      const task = planned.get(i) || makeTask(level, used, chooseWord);
       used.add(task.key);
       const firstTry = await playTask(task);
-      ctx.task({ ok: firstTry, level });
+      ctx.task({ ok: firstTry, level, key: task.key.startsWith('w:') ? 'ru:' + task.text : undefined });
       if (!alive) return;
       dots[i].classList.add('done');
       if (firstTry) {
@@ -344,6 +347,7 @@ export function start(ctx) {
 
     ctx.finish({
       correct,
+      level,
       total,
       mistakes: again.map((task) => ({ key: task.key, label: task.text })),
     });

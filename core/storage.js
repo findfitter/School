@@ -59,6 +59,8 @@ function fresh() {
     challenges: { ready: false, milestone: 0, owed: 0, pending: {}, used: {} }, // сложные задания (core/challenges.js)
     cycles: {}, // круги: { <id круга>: [id модулей, пройденных в текущем круге] }
     progress: {},
+    words: {}, // что ребёнок знает по словам: { 'ru:кот': { s: верных подряд, n: попыток, ok: верных, t: когда последний раз } }
+    vocab: {}, // сколько слов в банке языка: { ru: 219 } (сообщают модули)
   };
 }
 
@@ -81,6 +83,7 @@ function normalizeProgress(p = {}) {
     correct: Math.round(num(p.correct, 0, 1e7, 0)),
     total: Math.round(num(p.total, 0, 1e7, 0)),
     hard,
+    level: Number.isFinite(Number(p.level)) && p.level !== null ? Math.round(num(p.level, 0, 20, 0)) : null, // уровень в конце последней серии
   };
 }
 
@@ -169,6 +172,13 @@ function normalize(data) {
     s.cycles[id] = [...new Set([...(s.cycles[id] || []), ...modules])];
   }
   for (const [id, p] of Object.entries(data.progress || {})) s.progress[id] = normalizeProgress(p);
+  for (const [key, w] of Object.entries(data.words || {})) {
+    if (typeof key !== 'string' || key.length > 80 || !w || typeof w !== 'object') continue;
+    s.words[key] = { s: Math.round(num(w.s, 0, 99, 0)), n: Math.round(num(w.n, 0, 9999, 0)), ok: Math.round(num(w.ok, 0, 9999, 0)), t: Math.round(num(w.t, 0, 4e12, 0)) };
+  }
+  for (const [ns, size] of Object.entries(data.vocab || {})) {
+    if (typeof ns === 'string' && ns.length < 20) s.vocab[ns] = Math.round(num(size, 0, 99999, 0));
+  }
   return s;
 }
 
@@ -553,6 +563,65 @@ export function hardKeys(id) {
   return Object.keys(moduleProgress(id).hard);
 }
 
+// ---------- Слова: что ребёнок знает, а что нет ----------
+// Каждое слово (ключ вида «ru:кот», «de:Hund», «en:cat») помнит, сколько раз подряд оно решено верно с первой попытки (s).
+// Ошибка обнуляет серию. Слово «знает» (known), когда верных подряд не меньше KNOWN_STREAK; пока не пришла пора
+// повторить (через REVIEW_DAYS[s] дней), его в заданиях нет — вместо него идут новые и ещё не выученные слова.
+export const KNOWN_STREAK = 2;
+const REVIEW_DAYS = [0, 0, 14, 30, 60, 120];
+const WORD_WEIGHT = { new: 3, learning: 4, due: 1.5, known: 0 };
+
+export function wordInfo(key, now = Date.now()) {
+  const w = state.words[key];
+  if (!w || !w.n) return { status: 'new', streak: 0, n: 0, ok: 0 };
+  if (w.s < KNOWN_STREAK) return { status: 'learning', streak: w.s, n: w.n, ok: w.ok };
+  const due = now - w.t >= REVIEW_DAYS[Math.min(w.s, REVIEW_DAYS.length - 1)] * 86400000;
+  return { status: due ? 'due' : 'known', streak: w.s, n: w.n, ok: w.ok };
+}
+
+export const wordWeight = (key, now = Date.now()) => WORD_WEIGHT[wordInfo(key, now).status];
+
+export function recordWord(key, ok, now = Date.now()) {
+  if (typeof key !== 'string' || !key || key.length > 80) return;
+  const w = (state.words[key] ||= { s: 0, n: 0, ok: 0, t: 0 });
+  w.n += 1;
+  if (ok) {
+    w.ok += 1;
+    w.s = Math.min(99, w.s + 1);
+  } else {
+    w.s = 0;
+  }
+  w.t = now;
+  save();
+}
+
+export function setVocabSize(ns, size) {
+  if (state.vocab[ns] === size) return;
+  state.vocab[ns] = size;
+  save();
+}
+
+// Сводка по языку (префикс ключа «ru:»): сколько слов знает, на повторе, учит; total — размер банка (если известен).
+export function wordSummary(ns, now = Date.now()) {
+  const out = { known: 0, due: 0, learning: 0, seen: 0, total: state.vocab[ns] || 0 };
+  for (const key of Object.keys(state.words)) {
+    if (!key.startsWith(`${ns}:`)) continue;
+    const { status } = wordInfo(key, now);
+    if (status === 'new') continue;
+    out.seen += 1;
+    out[status] += 1;
+  }
+  return out;
+}
+
+// Все изученные слова языка: [{ word, status, n, ok }] — для отчёта.
+export function wordList(ns, now = Date.now()) {
+  return Object.keys(state.words)
+    .filter((key) => key.startsWith(`${ns}:`))
+    .map((key) => ({ word: key.slice(ns.length + 1), ...wordInfo(key, now) }))
+    .filter((w) => w.status !== 'new');
+}
+
 // Трудные задания, которые стоит дать в этой серии: сначала самые частые ошибки.
 export function hardToPractice(id, count = 2) {
   return Object.entries(moduleProgress(id).hard)
@@ -563,8 +632,9 @@ export function hardToPractice(id, count = 2) {
 
 // offered — какие трудные задания модуль получил на эту серию: «чистой» серией считается только
 // серия, в которой такое задание было предложено и решено без ошибки.
-export function recordSeries(id, { correct, total, mistakes, offered }) {
+export function recordSeries(id, { correct, total, mistakes, offered, level }) {
   const p = (state.progress[id] ||= normalizeProgress());
+  if (Number.isFinite(level)) p.level = level;
   p.series += 1;
   p.correct += correct;
   p.total += total;

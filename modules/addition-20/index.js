@@ -4,13 +4,15 @@
 // с предметами появляется только после первой ошибки в примере.
 
 import { TEXT } from './texts.js';
+import { createKeypad } from '../addition-10/keypad.js';
 
 const OBJECTS = ['🍎', '🍓', '⭐', '🐟', '🐥', '🚗', '🌸', '🎈', '🍪', '🐞'];
 const MIN_SUM = 11; // всегда через десяток: сумма больше 10
 const MAX = 20;
 const LEVEL_MAX_SUM = [13, 15, 17, 20]; // наибольшая сумма на каждом уровне
 const START_LEVEL = 1;
-const CLEAN_TO_LEVEL_UP = 2;
+const CLEAN_TO_LEVEL_UP = 3; // верных подряд до повышения уровня
+const INPUT_FROM_LEVEL = 2; // с этого уровня ответ вводится цифрами (клавиатура), ниже — выбор из трёх
 const DRAG_THRESHOLD = 14; // px, после которого касание считается перетаскиванием
 
 const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -116,12 +118,26 @@ export function start(ctx) {
 
   // ---------- одно задание ----------
   // Возвращает true, если ребёнок ответил верно с первой попытки.
-  function playTask(task) {
+  function playTask(task, level = 0) {
     return new Promise((resolve) => {
       const answer = task.a + task.b;
       const icon = pick(OBJECTS);
       let wrong = 0;
       let locked = false;
+      let pad = null; // цифровая клавиатура (на высоких уровнях)
+
+      // Неверно набрано: «?» вздрагивает, поле очищается, можно набрать ещё раз.
+      function wrongInput() {
+        pad.lock(true);
+        slot.classList.add('kp-wobble');
+        const t = setTimeout(() => {
+          timers.delete(t);
+          slot.classList.remove('kp-wobble');
+          pad.clear();
+          pad.lock(false);
+        }, 500);
+        timers.add(t);
+      }
       let hintShown = false;
       let hintRun = 0;
       const objects = [];
@@ -171,8 +187,12 @@ export function start(ctx) {
         if (locked || !alive) return;
         if (value !== answer) {
           wrong += 1;
-          button.disabled = true;
-          button.classList.add('faded');
+          if (button) {
+            button.disabled = true;
+            button.classList.add('faded');
+          } else {
+            wrongInput();
+          }
           ctx.sound('hint'); // мягкий сигнал, неверный ответ тускнеет, можно ответить ещё раз
           if (!hintShown) {
             hintShown = true;
@@ -191,11 +211,22 @@ export function start(ctx) {
         resolve(wrong === 0);
       }
 
-      for (const value of makeChoices(answer)) {
-        const button = el('button', 'a20-answer', value);
-        button.type = 'button';
-        makeDraggable(button, slot, () => choose(value, button));
-        answersBox.append(button);
+      if (level >= INPUT_FROM_LEVEL) {
+        pad = createKeypad({
+          digits: String(answer).length,
+          onInput: (text) => {
+            slot.textContent = text || '?';
+          },
+          onComplete: (text) => choose(Number(text), null),
+        });
+        answersBox.append(pad.el);
+      } else {
+        for (const value of makeChoices(answer)) {
+          const button = el('button', 'a20-answer', value);
+          button.type = 'button';
+          makeDraggable(button, slot, () => choose(value, button));
+          answersBox.append(button);
+        }
       }
 
       sayTask();
@@ -255,7 +286,7 @@ export function start(ctx) {
 
   // ---------- серия ----------
   async function run() {
-    let level = START_LEVEL;
+    let level = Math.min(ctx.level ?? START_LEVEL, LEVEL_MAX_SUM.length - 1); // уровень помнится между сериями (core: ctx.level)
     let clean = 0;
     let correct = 0;
     const used = new Set();
@@ -265,7 +296,7 @@ export function start(ctx) {
     for (let i = 0; i < total; i++) {
       const task = hardPlan.get(i) || makeTask(level, used);
       used.add(keyOf(task.a, task.b));
-      const firstTry = await playTask(task);
+      const firstTry = await playTask(task, level);
       ctx.task({ ok: firstTry, level });
       if (!alive) return;
       dots[i].classList.add('done');
@@ -287,13 +318,14 @@ export function start(ctx) {
     const again = [...mistakes.values()];
     again.forEach(() => addDot(true));
     for (let i = 0; i < again.length; i++) {
-      await playTask(again[i].task);
+      await playTask(again[i].task, level);
       if (!alive) return;
       dots[total + i].classList.add('done');
     }
 
     ctx.finish({
       correct,
+      level,
       total,
       mistakes: again.map(({ key, label }) => ({ key, label })),
     });

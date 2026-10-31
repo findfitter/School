@@ -11,7 +11,7 @@ import { TEXT } from './texts.js';
 const COINS = [1, 2, 5, 10];
 const ITEMS = ['🍬', '🍦', '🎈', '🍎', '🚗', '🧸', '📖', '🍪'];
 const LEVEL_KINDS = [['count'], ['count'], ['count', 'pay'], ['pay', 'change']];
-const CLEAN_TO_LEVEL_UP = 2;
+const CLEAN_TO_LEVEL_UP = 3; // верных подряд до повышения уровня
 const MAX_ANSWER = 20;
 const DRAG_THRESHOLD = 14; // px, после которого касание считается перетаскиванием
 
@@ -376,7 +376,7 @@ export function start(ctx) {
 
   // ---------- серия ----------
   async function run() {
-    let level = 0;
+    let level = Math.min(ctx.level ?? 0, LEVEL_KINDS.length - 1); // уровень помнится между сериями (core: ctx.level)
     let clean = 0;
     let correct = 0;
     const used = new Set();
@@ -415,6 +415,7 @@ export function start(ctx) {
 
     ctx.finish({
       correct,
+      level,
       total,
       mistakes: again.map((t) => ({ key: JSON.stringify(t), label: labelOf(t) })),
     });

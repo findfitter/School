@@ -9,7 +9,7 @@
 
 import { TEXT } from './texts.js';
 
-const CLEAN_TO_LEVEL_UP = 2;
+const CLEAN_TO_LEVEL_UP = 3; // верных подряд до повышения уровня
 const WRONG_BEFORE_POINTING = 2; // после стольких ошибок верный ответ подсвечивается
 
 // Какие типы заданий бывают на каждом уровне (вес — как часто).
@@ -220,7 +220,7 @@ export function start(ctx) {
 
   // ---------- серия ----------
   async function run() {
-    let level = 0;
+    let level = Math.min(ctx.level ?? 0, LEVELS.length - 1); // уровень помнится между сериями (core: ctx.level)
     let clean = 0;
     let correct = 0;
     let previous = null;
@@ -261,7 +261,7 @@ export function start(ctx) {
       dots[total + i].classList.add('done');
     }
 
-    ctx.finish({ correct, total, mistakes: again });
+    ctx.finish({ correct, total, mistakes: again, level });
   }
 
   run();

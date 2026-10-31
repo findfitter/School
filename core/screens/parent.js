@@ -16,6 +16,7 @@ export function renderParent(app) {
     todayCard(app),
     dogTestCard(app),
     statsCard(app),
+    wordsCard(),
     usageCard(),
     modulesCard(app),
     settingsCard(app),
@@ -32,6 +33,19 @@ export function renderParent(app) {
 
 function card(title, ...children) {
   return h('section', { class: 'card' }, h('h2', { text: title }), children);
+}
+
+// Слова, которые ребёнок знает (учёт в ядре: storage.wordSummary).
+function wordsCard() {
+  const rows = Object.entries(P.vocabSets).map(([ns, name]) => {
+    const s = storage.wordSummary(ns);
+    if (!s.seen) return null;
+    const fresh = s.total ? Math.max(0, s.total - s.seen) : P.statsNone;
+    return h('p', {}, h('strong', { text: `${name}: ` }), format(P.vocabLine, { known: s.known, due: s.due, learning: s.learning, fresh }));
+  }).filter(Boolean);
+  return card(P.vocabTitle,
+    h('p', { class: 'hint-line', text: P.vocabHint }),
+    rows.length ? rows : h('p', { class: 'status', text: P.vocabNone }));
 }
 
 // Тестовый экран собаки: свои собаки и косточки, рабочие данные ребёнка не затрагиваются.

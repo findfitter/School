@@ -6,10 +6,12 @@
   "description": "Считаем и складываем",
   "version": "1.0.0",
   "styles": [
-    "style.css"
+    "style.css",
+    "keypad.css"
   ],
   "files": [
-    "texts.js"
+    "texts.js",
+    "keypad.js"
   ],
   "cycle": "math"
 }

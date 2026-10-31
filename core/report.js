@@ -191,6 +191,22 @@ export function buildReport(app, now = Date.now()) {
     out.push('');
   }
 
+  // ---------- Слова ----------
+  const vocab = Object.entries(STR.parent.vocabSets).map(([ns, name]) => [ns, name, storage.wordSummary(ns)]).filter(([, , s]) => s.seen);
+  if (vocab.length) {
+    out.push(`## ${R.vocabTitle}`, '', R.vocabNote, '');
+    for (const [ns, name, s] of vocab) {
+      out.push(`### ${name}`);
+      out.push(format(R.vocabRow, { name, known: s.known, due: s.due, learning: s.learning, fresh: s.total ? Math.max(0, s.total - s.seen) : '—', total: s.total || '—' }));
+      const words = storage.wordList(ns);
+      const hard = words.filter((w) => w.status === 'learning' && w.n - w.ok >= 1).sort((a, b) => (b.n - b.ok) - (a.n - a.ok)).slice(0, 30);
+      if (hard.length) out.push(`- ${R.vocabHard}: ${hard.map((w) => `${w.word} (${w.ok}/${w.n})`).join(' · ')}`);
+      const known = words.filter((w) => w.status !== 'learning').map((w) => w.word).sort().slice(0, 120);
+      if (known.length) out.push(`- ${R.vocabKnown}: ${known.join(', ')}`);
+      out.push('');
+    }
+  }
+
   // ---------- Время по дням ----------
   out.push(`## ${R.timeTitle}`, '');
   const days = storage.usageDays(RAW_DAYS);

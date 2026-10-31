@@ -6,10 +6,12 @@
   "description": "Складываем через десяток",
   "version": "1.0.0",
   "styles": [
-    "style.css"
+    "style.css",
+    "../addition-10/keypad.css"
   ],
   "files": [
-    "texts.js"
+    "texts.js",
+    "../addition-10/keypad.js"
   ],
   "cycle": "math"
 }

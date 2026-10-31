@@ -13,7 +13,7 @@ const LEVELS = [
   { kinds: ['place'], count: 4, near: true },
   { kinds: ['do', 'act', 'place', 'feel'], count: 4, near: true },
 ];
-const CLEAN_TO_LEVEL_UP = 2;
+const CLEAN_TO_LEVEL_UP = 3; // верных подряд до повышения уровня
 const WRONG_BEFORE_POINTING = 2; // после стольких ошибок верная картинка подсвечивается
 
 const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -191,7 +191,7 @@ export async function start(ctx) {
 
   // ---------- серия ----------
   async function run() {
-    let level = 0;
+    let level = Math.min(ctx.level ?? 0, LEVELS.length - 1); // уровень помнится между сериями (core: ctx.level)
     let clean = 0;
     let correct = 0;
     const used = new Set();
@@ -232,6 +232,7 @@ export async function start(ctx) {
 
     ctx.finish({
       correct,
+      level,
       total,
       mistakes: again.map((s) => ({ key: s.en, label: `${s.scene.join('')} ${s.en}` })),
     });

@@ -7,7 +7,7 @@ import { TEXT } from './texts.js';
 
 const BEE = '🐝';
 const GRID = 3;
-const CLEAN_TO_LEVEL_UP = 2;
+const CLEAN_TO_LEVEL_UP = 3; // верных подряд до повышения уровня
 const STEPS_BY_LEVEL = [[5, 5], [5, 6], [6, 7]]; // сколько команд на каждом уровне: от и до
 const MOVES = { L: [0, -1], R: [0, 1], U: [-1, 0], D: [1, 0] };
 
@@ -227,7 +227,7 @@ export function start(ctx) {
 
   // ---------- серия ----------
   async function run() {
-    let level = 0;
+    let level = Math.min(ctx.level ?? 0, STEPS_BY_LEVEL.length - 1); // уровень помнится между сериями (core: ctx.level)
     let clean = 0;
     let correct = 0;
     const used = new Set();
@@ -274,6 +274,7 @@ export function start(ctx) {
 
     ctx.finish({
       correct,
+      level,
       total,
       mistakes: again.map((t) => ({ key: t.key, label: `${BEE} ${t.steps.map((s) => TEXT.arrows[s]).join(' ')}` })),
     });

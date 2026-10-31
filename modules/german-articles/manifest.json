@@ -1,0 +1,11 @@
+{
+  "id": "german-articles",
+  "title": "Der, die oder das?",
+  "subject": "german",
+  "icon": "🏷️",
+  "description": "Welcher Artikel passt zum Wort?",
+  "version": "1.0.0",
+  "styles": ["style.css"],
+  "files": ["texts.js", "data.js"],
+  "cycle": "german"
+}

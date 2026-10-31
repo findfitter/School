@@ -1,0 +1,45 @@
+/* Цифровая клавиатура для ввода ответа (модули арифметики). */
+
+.kp {
+  display: grid;
+  grid-template-columns: repeat(6, clamp(64px, 11vw, 120px));
+  gap: clamp(8px, 1.4vw, 14px);
+  justify-content: center;
+  touch-action: none;
+}
+
+.kp-key {
+  height: clamp(64px, 12vh, 92px);
+  border-radius: 22px;
+  background: var(--card, #fff);
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  font-size: clamp(30px, 6.4vh, 46px);
+  font-weight: 800;
+  color: var(--ink, #2b2d42);
+}
+
+.kp-key.pressed {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.kp-back {
+  background: #ffe9d6;
+}
+
+/* Неверный ответ: «?» мягко вздрагивает */
+.kp-wobble {
+  animation: kp-wobble 0.45s ease-in-out;
+}
+
+@keyframes kp-wobble {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kp-wobble {
+    animation: none;
+  }
+}
