@@ -8,6 +8,7 @@ import { createSpeech } from './speech.js';
 import { createSounds } from './sounds.js';
 import { loadRegistry, loadModule, attachStyles, warmCache } from './registry.js';
 import { createContext } from './context.js';
+import * as journal from './journal.js';
 import { starsFor, CATALOG } from './rewards.js';
 import { completeSeries, healCycles, isLocked, superSticker } from './cycles.js';
 import { renderMenu } from './screens/menu.js';
@@ -131,9 +132,11 @@ async function play(manifest, opts = {}) {
   home.setAttribute('aria-label', STR.common.home);
   const styles = attachStyles(manifest);
   let stopModule = null;
+  let session = null; // запись в журнале серий (core/journal.js)
   show(h('div', { class: 'screen game-screen' }, container, home), () => {
     if (typeof stopModule === 'function') stopModule();
     styles.detach();
+    journal.abandon(session); // вышли, не закончив серию (после finish — ничего не делает)
   }, 'game');
   const mine = runToken;
 
@@ -145,12 +148,15 @@ async function play(manifest, opts = {}) {
       manifest,
       services,
       challenge,
+      onTask: (info) => journal.task(session, info),
       onFinish: (result) => {
         if (mine !== runToken) return;
+        journal.finish(session, result);
         if (challenge) finishChallenge(challenge.subject, result);
         else finishSeries(manifest, result);
       },
     });
+    session = journal.begin({ id: manifest.id, subject: challenge ? challenge.subject : manifest.subject, challenge: Boolean(challenge) });
     const stop = await mod.start(ctx);
     if (mine !== runToken) {
       if (typeof stop === 'function') stop();

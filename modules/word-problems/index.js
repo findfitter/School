@@ -264,6 +264,7 @@ export function start(ctx) {
       const task = hardPlan.get(i) || makeTask(level, used);
       used.add(JSON.stringify(task));
       const firstTry = await playTask(task);
+      ctx.task({ ok: firstTry, level });
       if (!alive) return;
       dots[i].classList.add('done');
       if (firstTry) {

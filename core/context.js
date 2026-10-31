@@ -13,7 +13,7 @@ function cleanResult(result = {}) {
   return { correct, total, mistakes };
 }
 
-export function createContext({ container, manifest, services, onFinish, challenge = null }) {
+export function createContext({ container, manifest, services, onFinish, onTask = () => {}, challenge = null }) {
   const s = storage.settings();
   // озвучка: везде, только в этом модуле или только в сложном задании этого раздела (английский)
   const voice = VOICE_ENABLED || Boolean(manifest.voice) || Boolean(challenge?.voice);
@@ -32,6 +32,11 @@ export function createContext({ container, manifest, services, onFinish, challen
     }),
     hard: Object.freeze(hard),
     challenge: challenge ? Object.freeze({ ...challenge, used: Object.freeze([...(challenge.used || [])]) }) : null,
+    // Задание закончено (первый заход, не повтор в конце серии): { ok — верно с первой попытки, level — уровень сложности }.
+    // Нужно только для журнала серий (core/journal.js → отчёт для родителя); время на задание считает ядро.
+    task(info) {
+      if (!finished) onTask({ ok: Boolean(info?.ok), level: Number.isFinite(info?.level) ? info.level : null });
+    },
     finish(result) {
       if (finished) return;
       finished = true;

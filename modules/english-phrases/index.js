@@ -253,6 +253,7 @@ export async function start(ctx) {
       used.add(keyOf(task));
       current = task;
       const firstTry = await playTask(task, level);
+      ctx.task({ ok: firstTry, level });
       if (!alive) return;
       dots[i].classList.add('done');
       if (firstTry) {

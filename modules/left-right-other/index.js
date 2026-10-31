@@ -235,6 +235,7 @@ export function start(ctx) {
       const variant = hardPlan.get(i) || pickVariant(LEVELS[level], previous);
       previous = variant;
       const firstTry = await playTask(makeTask(variant));
+      ctx.task({ ok: firstTry, level });
       if (!alive) return;
       dots[i].classList.add('done');
       if (firstTry) {

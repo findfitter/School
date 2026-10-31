@@ -594,6 +594,26 @@ export function reset() {
   save();
 }
 
+// Журнал серий (core/journal.js) хранится отдельным ключом, чтобы не раздувать основное сохранение
+// и не стираться кнопкой «Сбросить прогресс». Здесь только чтение и запись текста.
+const JOURNAL_KEY = 'school-app-journal-v1';
+
+export function readJournalText() {
+  try {
+    return localStorage.getItem(JOURNAL_KEY) || '[]';
+  } catch {
+    return '[]';
+  }
+}
+
+export function writeJournalText(text) {
+  try {
+    localStorage.setItem(JOURNAL_KEY, text);
+  } catch (err) {
+    console.warn('Не удалось сохранить журнал', err);
+  }
+}
+
 export function exportJson() {
   return JSON.stringify({ app: APP_ID, version: 1, exportedAt: new Date().toISOString(), data: state }, null, 2);
 }

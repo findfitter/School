@@ -4,6 +4,7 @@ import { h, onTap, button, format } from '../dom.js';
 import { STR } from '../strings.js';
 import * as storage from '../storage.js';
 import { moduleIcon } from '../registry.js';
+import { buildReport, reportFileName, hasData } from '../report.js';
 
 const P = STR.parent;
 
@@ -287,6 +288,22 @@ function dataCard(app, screen, status) {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
+  // Отчёт для анализа (core/report.js): markdown-файл, который можно отдать Claude Code.
+  const saveReport = () => {
+    if (!hasData()) {
+      status.textContent = P.reportEmpty;
+      return;
+    }
+    const blob = new Blob([buildReport(app)], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = h('a', { href: url, download: reportFileName() });
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    status.textContent = P.reportSaved;
+  };
+
   const resetData = async () => {
     if (!(await confirmDialog(screen, P.resetConfirm, P.resetYes))) return;
     storage.reset();
@@ -297,7 +314,9 @@ function dataCard(app, screen, status) {
     h('div', { class: 'row-wrap' },
       button('btn', `💾 ${P.export}`, exportData),
       button('btn', `📂 ${P.import}`, () => fileInput.click()),
+      button('btn', `📋 ${P.reportButton}`, saveReport),
       button('btn danger', `🗑 ${P.reset}`, resetData)),
+    h('p', { class: 'hint-line', text: P.reportHint }),
     fileInput,
     status);
 }

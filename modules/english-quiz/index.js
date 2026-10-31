@@ -213,6 +213,7 @@ export async function start(ctx) {
       used.add(word.en);
       current = word;
       const firstTry = await playTask(ui, word, level);
+      ctx.task({ ok: firstTry, level });
       if (!alive) return;
       ui.dots[i].classList.add('done');
       if (firstTry) {

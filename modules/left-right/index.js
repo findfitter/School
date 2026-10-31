@@ -246,6 +246,7 @@ export function start(ctx) {
       }
       used.add(task.key);
       const firstTry = await playTask(task);
+      ctx.task({ ok: firstTry, level });
       if (!alive) return;
       dots[i].classList.add('done');
       if (firstTry) {
