@@ -1,0 +1,129 @@
+/* Кубики. Размеры в vh/vw, чтобы всё помещалось на экране Хромбука без прокрутки. */
+
+.cb {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2vh;
+  touch-action: none;
+}
+
+.cb-top {
+  flex: none;
+  width: 100%;
+  height: 72px;
+  display: flex;
+  align-items: center;
+}
+
+.cb-dots {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.cb-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #d8dcee;
+}
+
+.cb-dot.done {
+  background: var(--good, #52c47a);
+}
+
+.cb-dot.again {
+  border: 3px solid var(--primary, #4f8cff);
+  background: transparent;
+}
+
+.cb-dot.again.done {
+  background: var(--primary, #4f8cff);
+}
+
+.cb-prompt {
+  flex: none;
+  font-size: clamp(20px, 4vh, 32px);
+  font-weight: 800;
+  text-align: center;
+}
+
+.cb-stage {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cb-svg {
+  max-width: 100%;
+  max-height: 100%;
+  height: clamp(110px, 30vh, 260px);
+  overflow: visible;
+}
+
+.cb-badge {
+  animation: cb-pop 0.3s ease-out;
+}
+
+@keyframes cb-pop {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.cb-slot {
+  flex: none;
+  min-width: 2.4em;
+  padding: 0 0.5em;
+  border: 6px dashed #b9c3e6;
+  border-radius: 24px;
+  background: var(--card, #fff);
+  font-size: clamp(36px, 8vh, 64px);
+  font-weight: 800;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.cb-slot.ok {
+  border-style: solid;
+  border-color: var(--good, #52c47a);
+  background: #e8f8ee;
+}
+
+.cb-answers {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  gap: 2.4vw;
+  padding-bottom: 1.2vh;
+}
+
+.cb-answer {
+  min-width: clamp(100px, 18vw, 180px);
+  height: clamp(70px, 13vh, 110px);
+  border-radius: 26px;
+  background: var(--card, #fff);
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  font-size: clamp(36px, 8vh, 60px);
+  font-weight: 800;
+  color: var(--ink, #2b2d42);
+}
+
+.cb-answer.pressed {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.cb-answer.faded {
+  opacity: 0.3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-badge {
+    animation: none;
+  }
+}

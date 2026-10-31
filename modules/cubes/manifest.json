@@ -1,0 +1,11 @@
+{
+  "id": "cubes",
+  "title": "Кубики",
+  "subject": "orientation",
+  "icon": "🧊",
+  "description": "Сколько кубиков в постройке?",
+  "version": "0.1.0",
+  "styles": ["style.css", "../addition-10/keypad.css"],
+  "files": ["texts.js", "../addition-10/keypad.js"],
+  "cycle": "orientation"
+}

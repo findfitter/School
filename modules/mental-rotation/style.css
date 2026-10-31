@@ -1,0 +1,117 @@
+/* Повороты. Размеры в vh/vw, чтобы всё помещалось на экране Хромбука без прокрутки. */
+
+.mr {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4vh;
+  touch-action: none;
+}
+
+.mr-top {
+  flex: none;
+  width: 100%;
+  height: 72px;
+  display: flex;
+  align-items: center;
+}
+
+.mr-dots {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.mr-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #d8dcee;
+}
+
+.mr-dot.done {
+  background: var(--good, #52c47a);
+}
+
+.mr-dot.again {
+  border: 3px solid var(--primary, #4f8cff);
+  background: transparent;
+}
+
+.mr-dot.again.done {
+  background: var(--primary, #4f8cff);
+}
+
+.mr-prompt {
+  flex: none;
+  font-size: clamp(20px, 4vh, 32px);
+  font-weight: 800;
+  text-align: center;
+}
+
+.mr-target {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mr-shape {
+  display: block;
+  width: clamp(90px, 20vh, 180px);
+  height: clamp(90px, 20vh, 180px);
+}
+
+.mr-shape.big {
+  width: clamp(130px, 33vh, 270px);
+  height: clamp(130px, 33vh, 270px);
+  transition: transform 1.2s ease-in-out;
+}
+
+.mr-options {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  gap: clamp(10px, 2.4vw, 28px);
+  margin-top: auto;
+  padding-bottom: 1.5vh;
+}
+
+.mr-option {
+  padding: 8px;
+  border-radius: 28px;
+  background: var(--card, #fff);
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+}
+
+.mr-option.pressed {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.mr-option.faded {
+  opacity: 0.3;
+}
+
+.mr-option.right {
+  outline: 6px solid var(--good, #52c47a);
+}
+
+.mr-option.point {
+  animation: mr-point 0.7s ease-in-out infinite;
+}
+
+@keyframes mr-point {
+  50% { transform: scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mr-option.point {
+    animation: none;
+  }
+
+  .mr-shape.big {
+    transition: none;
+  }
+}

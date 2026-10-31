@@ -1,0 +1,11 @@
+{
+  "id": "mental-rotation",
+  "title": "Повороты",
+  "subject": "orientation",
+  "icon": "🔄",
+  "description": "Какая фигура такая же, только повёрнутая?",
+  "version": "0.1.0",
+  "styles": ["style.css"],
+  "files": ["texts.js"],
+  "cycle": "orientation"
+}
