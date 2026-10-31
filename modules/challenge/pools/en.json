@@ -1,0 +1,124 @@
+{
+  "stories": [
+    {
+      "id": "en-black-cat",
+      "sentences": ["Anna has a cat.", "The cat is black.", "The cat likes milk."],
+      "tr": ["У Анны есть кошка.", "Кошка чёрная.", "Кошка любит молоко."],
+      "question": "What colour is the cat?",
+      "questionTr": "Какого цвета кошка?",
+      "options": [{"c": "#222222"}, {"c": "#ffffff"}, {"c": "#8d5524"}, {"c": "#fb8c00"}],
+      "answer": 0,
+      "clue": 1
+    },
+    {
+      "id": "en-tom-juice",
+      "sentences": ["Tom is hungry.", "He eats a big pizza.", "Then he drinks juice."],
+      "tr": ["Том голоден.", "Он ест большую пиццу.", "Потом он пьёт сок."],
+      "question": "What does Tom drink?",
+      "questionTr": "Что пьёт Том?",
+      "options": [{"e": "🧃"}, {"e": "🥛"}, {"e": "☕"}, {"e": "💧"}],
+      "answer": 0,
+      "clue": 2
+    },
+    {
+      "id": "en-two-dogs",
+      "sentences": ["I have two dogs and one cat.", "The dogs are brown.", "The cat is white."],
+      "tr": ["У меня две собаки и одна кошка.", "Собаки коричневые.", "Кошка белая."],
+      "question": "How many dogs do I have?",
+      "questionTr": "Сколько у меня собак?",
+      "options": [{"n": 1}, {"n": 2}, {"n": 3}, {"n": 4}],
+      "answer": 1,
+      "clue": 0
+    },
+    {
+      "id": "en-mum-shop",
+      "sentences": ["Mum goes to the shop.", "She buys an apple, then a banana, then cheese.", "Then she goes home."],
+      "tr": ["Мама идёт в магазин.", "Она покупает яблоко, потом банан, потом сыр.", "Потом идёт домой."],
+      "question": "What does Mum buy first?",
+      "questionTr": "Что мама покупает первым?",
+      "options": [{"e": "🍎"}, {"e": "🍌"}, {"e": "🧀"}, {"e": "🍰"}],
+      "answer": 0,
+      "clue": 1
+    },
+    {
+      "id": "en-pink-dress",
+      "sentences": ["It is a sunny day.", "Lisa wears a pink dress and a white hat.", "She plays in the garden."],
+      "tr": ["Солнечный день.", "На Лизе розовое платье и белая шляпа.", "Она играет в саду."],
+      "question": "What colour is Lisa's dress?",
+      "questionTr": "Какого цвета платье у Лизы?",
+      "options": [{"c": "#ff8fc7"}, {"c": "#ffffff"}, {"c": "#fb8c00"}, {"c": "#1e66f5"}],
+      "answer": 0,
+      "clue": 1
+    },
+    {
+      "id": "en-bike-school",
+      "sentences": ["The boy has a blue bike.", "In the morning he rides to school.", "After school he plays with a ball."],
+      "tr": ["У мальчика синий велосипед.", "Утром он едет в школу.", "После школы он играет с мячом."],
+      "question": "Where does the boy ride in the morning?",
+      "questionTr": "Куда мальчик едет утром?",
+      "options": [{"e": "🏫"}, {"e": "🏖️"}, {"e": "🏠"}, {"e": "⛰️"}],
+      "answer": 0,
+      "clue": 1
+    },
+    {
+      "id": "en-in-the-tree",
+      "sentences": ["A frog is on a leaf.", "A fish is in the water.", "A bird is in the tree."],
+      "tr": ["Лягушка на листе.", "Рыба в воде.", "Птица на дереве."],
+      "question": "Who is in the tree?",
+      "questionTr": "Кто на дереве?",
+      "options": [{"e": "🐸"}, {"e": "🐟"}, {"e": "🐦"}, {"e": "🐱"}],
+      "answer": 2,
+      "clue": 2
+    },
+    {
+      "id": "en-dad-guitar",
+      "sentences": ["Dad likes music.", "He plays the guitar.", "His son sings."],
+      "tr": ["Папа любит музыку.", "Он играет на гитаре.", "Его сын поёт."],
+      "question": "What does Dad play?",
+      "questionTr": "На чём играет папа?",
+      "options": [{"e": "🎸"}, {"e": "🥁"}, {"e": "⚽"}, {"e": "🪁"}],
+      "answer": 0,
+      "clue": 1
+    },
+    {
+      "id": "en-snow",
+      "sentences": ["It is cold today.", "It snows.", "The kids wear coats and gloves."],
+      "tr": ["Сегодня холодно.", "Идёт снег.", "Дети в пальто и перчатках."],
+      "question": "What is the weather?",
+      "questionTr": "Какая погода?",
+      "options": [{"e": "❄️"}, {"e": "🌧️"}, {"e": "☀️"}, {"e": "💨"}],
+      "answer": 0,
+      "clue": 1
+    },
+    {
+      "id": "en-grandma-soup",
+      "sentences": ["Grandma makes soup.", "She puts carrots and potatoes in the soup.", "The soup is hot."],
+      "tr": ["Бабушка варит суп.", "Она кладёт в суп морковь и картошку.", "Суп горячий."],
+      "question": "What does Grandma make?",
+      "questionTr": "Что готовит бабушка?",
+      "options": [{"e": "🍲"}, {"e": "🍰"}, {"e": "🍕"}, {"e": "🍦"}],
+      "answer": 0,
+      "clue": 0
+    },
+    {
+      "id": "en-green-birds",
+      "sentences": ["Sam sees three birds.", "One bird is yellow.", "Two birds are green."],
+      "tr": ["Сэм видит трёх птиц.", "Одна птица жёлтая.", "Две птицы зелёные."],
+      "question": "How many birds are green?",
+      "questionTr": "Сколько птиц зелёных?",
+      "options": [{"n": 1}, {"n": 2}, {"n": 3}, {"n": 4}],
+      "answer": 1,
+      "clue": 2
+    },
+    {
+      "id": "en-mia-teddy",
+      "sentences": ["Mia is sleepy.", "She goes to bed.", "She sleeps with her teddy bear."],
+      "tr": ["Мия хочет спать.", "Она идёт в кровать.", "Она спит с плюшевым мишкой."],
+      "question": "Who sleeps with Mia?",
+      "questionTr": "Кто спит вместе с Мией?",
+      "options": [{"e": "🧸"}, {"e": "🐶"}, {"e": "🐱"}, {"e": "👩"}],
+      "answer": 0,
+      "clue": 2
+    }
+  ]
+}

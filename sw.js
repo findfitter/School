@@ -23,6 +23,7 @@ const CORE_FILES = [
   'core/sounds.js',
   'core/rewards.js',
   'core/dogs.js',
+  'core/challenges.js',
   'core/registry.js',
   'core/context.js',
   'core/screens/menu.js',

@@ -11,7 +11,8 @@ import { createContext } from './context.js';
 import { starsFor, CATALOG } from './rewards.js';
 import { completeSeries, healCycles, isLocked, superSticker } from './cycles.js';
 import { renderMenu } from './screens/menu.js';
-import { renderResult } from './screens/result.js';
+import { renderResult, renderChallengeResult } from './screens/result.js';
+import { syncChallenges, challengeInfo, completeChallenge } from './challenges.js';
 import { renderStickers } from './screens/stickers.js';
 import { renderDog } from './screens/dog.js';
 import { renderParent } from './screens/parent.js';
@@ -27,6 +28,7 @@ const services = {
   sounds: createSounds(() => storage.settings()),
 };
 
+let allManifests = []; // все манифесты, включая модуль сложных заданий (для офлайн-кэша)
 let cleanup = null;
 let runToken = 0;
 
@@ -69,8 +71,9 @@ function tick() {
 const app = {
   root,
   services,
-  manifests: [],
-  go: { menu: showMenu, stickers: showStickers, dog: showDog, parent: showParent, play },
+  manifests: [], // обычные модули
+  challenge: null, // модуль сложных заданий (modules/challenge), в обычные списки не входит
+  go: { menu: showMenu, stickers: showStickers, dog: () => showDog('real'), dogTest: () => showDog('test'), parent: showParent, play },
 };
 
 function show(screen, onLeave = null, kind = 'menu') {
@@ -85,6 +88,7 @@ function show(screen, onLeave = null, kind = 'menu') {
 function showMenu() {
   if (limitReached()) return showLimit();
   healCycles(app.manifests);
+  syncChallenges(app);
   show(renderMenu(app), null, 'menu');
 }
 
@@ -93,12 +97,12 @@ function showStickers() {
   show(renderStickers(app), null, 'stickers');
 }
 
-// Раздел собаки пока открывается из экрана для родителя (from = 'parent'): «Назад» возвращает туда
-// без повторной проверки для взрослых.
-function showDog(from = 'parent') {
+// Рабочий экран собаки (для ребёнка) и тестовый (из раздела для родителя): «Назад» с тестового возвращает на
+// экран родителя без повторной проверки для взрослых.
+function showDog(scope = 'real') {
   if (limitReached()) return showLimit();
-  const onBack = from === 'parent' ? () => show(renderParent(app), null, 'parent') : showMenu;
-  show(renderDog(app, { onBack }), null, 'dog');
+  const onBack = scope === 'test' ? () => show(renderParent(app), null, 'parent') : showMenu;
+  show(renderDog(app, { scope, onBack }), null, 'dog');
 }
 
 // Вход на экран родителя: сначала проверка «только для взрослых».
@@ -116,9 +120,12 @@ function showLimit() {
   show(renderLimit(app), null, 'limit');
 }
 
-async function play(manifest) {
+// opts.subject — раздел сложного задания (для модуля сложных заданий).
+async function play(manifest, opts = {}) {
   if (isLocked(manifest)) return showMenu();
   if (limitReached()) return showLimit();
+  const challenge = manifest.challenge ? challengeInfo(app, opts.subject) : null;
+  if (manifest.challenge && !challenge) return showMenu(); // задания уже нет (например, пройдено в другом окне)
   const container = h('div', { class: 'game-container' });
   const home = button('btn home-btn', '🏠', () => showMenu());
   home.setAttribute('aria-label', STR.common.home);
@@ -137,8 +144,11 @@ async function play(manifest) {
       container,
       manifest,
       services,
+      challenge,
       onFinish: (result) => {
-        if (mine === runToken) finishSeries(manifest, result);
+        if (mine !== runToken) return;
+        if (challenge) finishChallenge(challenge.subject, result);
+        else finishSeries(manifest, result);
       },
     });
     const stop = await mod.start(ctx);
@@ -158,11 +168,19 @@ async function play(manifest) {
   }
 }
 
+// Сложное задание пройдено: косточка вместо звёзд, задание исчезает из раздела.
+function finishChallenge(subject, result) {
+  const { bones } = completeChallenge(app, subject, result.challengeId);
+  const screen = renderChallengeResult(app, { subject, bones });
+  show(screen.el, screen.onLeave, 'result');
+}
+
 function finishSeries(manifest, result) {
   const stars = starsFor(result.correct, result.total);
   storage.recordSeries(manifest.id, result);
   storage.addStars(stars);
   const cycle = completeSeries(app.manifests, manifest);
+  const newChallenges = syncChallenges(app); // каждые 25 звёзд — новое сложное задание
   const screen = renderResult(app, {
     manifest,
     result,
@@ -171,6 +189,7 @@ function finishSeries(manifest, result) {
     canBuy: CATALOG.some((s) => !storage.owned().includes(s.id) && s.price <= storage.balance()),
     locked: cycle.locked,
     superSticker: cycle.superEarned ? superSticker(storage.supers()) : null,
+    newChallenges,
   });
   show(screen.el, screen.onLeave, 'result');
 }
@@ -193,12 +212,15 @@ async function init() {
     navigator.serviceWorker.register('sw.js').catch((err) => console.warn('Service worker не запущен', err));
   }
   try {
-    app.manifests = await loadRegistry();
+    const all = await loadRegistry();
+    app.challenge = all.find((m) => m.challenge) || null;
+    app.manifests = all.filter((m) => !m.challenge);
+    allManifests = all;
   } catch (err) {
     console.error('Не удалось прочитать реестр модулей', err);
   }
   showMenu();
-  warmCache(app.manifests);
+  warmCache(allManifests);
   setInterval(tick, TICK_MS);
 }
 

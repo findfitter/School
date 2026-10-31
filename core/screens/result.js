@@ -1,7 +1,7 @@
 import { h, button, format } from '../dom.js';
 import { STR } from '../strings.js';
 
-export function renderResult(app, { manifest, result, stars, canBuy, locked, superSticker }) {
+export function renderResult(app, { manifest, result, stars, canBuy, locked, superSticker, newChallenges = [] }) {
   const lang = (STR.subjects[manifest.subject] || STR.subjects.other).lang;
   const t = STR.result[lang];
   const praise = t.praise[stars];
@@ -27,6 +27,9 @@ export function renderResult(app, { manifest, result, stars, canBuy, locked, sup
     h('p', { class: 'score', text: format(t.score, result) }),
     shop,
     locked ? h('p', { class: 'score', text: t.nextTask }) : null,
+    newChallenges.length
+      ? h('div', { class: 'shop-hint' }, '🦴 ', format(t.newChallenge, { subject: newChallenges.map((s) => STR.subjects[s]?.title || s).join(', ') }))
+      : null,
     h('div', { class: 'row' }, buttons)
   );
 
@@ -45,6 +48,25 @@ export function renderResult(app, { manifest, result, stars, canBuy, locked, sup
   }
   // Таймеры не должны сработать после ухода с экрана.
   return { el: screen, onLeave: () => timers.forEach(clearTimeout) };
+}
+
+// Экран после сложного задания: косточка и кнопки «К собаке» / «В меню».
+export function renderChallengeResult(app, { subject, bones }) {
+  const lang = (STR.subjects[subject] || STR.subjects.other).lang;
+  const t = STR.result[lang].challenge;
+  const screen = h('div', { class: 'screen result-screen' },
+    h('div', { class: 'bone-flyer', text: '🦴' }),
+    h('h1', { text: t.title }),
+    h('p', { class: 'score', text: t.text }),
+    h('p', { class: 'score', text: format(t.bonesNow, { n: bones }) }),
+    h('div', { class: 'row' },
+      button('btn primary big', `🐶 ${t.toDog}`, () => app.go.dog()),
+      button('btn big', t.toMenu, () => app.go.menu())));
+  const timer = setTimeout(() => {
+    app.services.sounds('done');
+    app.services.speech.speak(`${t.title} ${t.text}`, lang);
+  }, 500);
+  return { el: screen, onLeave: () => clearTimeout(timer) };
 }
 
 const SPARKLES = ['✨', '💖', '⭐', '🌸', '💫'];

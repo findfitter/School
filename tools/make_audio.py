@@ -3,7 +3,9 @@
 Что озвучивается:
   * слова из modules/english-words/words.json (модули english-words и english-quiz);
   * сочетания «цвет + предмет» из modules/english-phrases/phrases.json (красный кот -> «red cat»);
-  * предложения из modules/english-sentences/sentences.json.
+  * предложения из modules/english-sentences/sentences.json;
+  * рассказы для сложного задания из modules/challenge/pools/en.json (рассказ целиком и вопрос к нему,
+    файлы audio/en/ch-<id>-story.mp3 и audio/en/ch-<id>-q.mp3).
 Файлы кладутся в audio/en/<текст>.mp3, имя файла строится так же, как ключ в приложении
 (core/speech.js): «ice cream» -> ice-cream.mp3, «The cat sleeps.» -> the-cat-sleeps.mp3.
 Уже созданные файлы пропускаются, поэтому после добавления слов достаточно запустить скрипт снова.
@@ -43,6 +45,7 @@ MODULES = ROOT / "modules"
 WORDS = MODULES / "english-words" / "words.json"
 PHRASES = MODULES / "english-phrases" / "phrases.json"
 SENTENCES = MODULES / "english-sentences" / "sentences.json"
+CHALLENGE = MODULES / "challenge" / "pools" / "en.json"
 OUT = ROOT / "audio" / "en"
 
 
@@ -65,17 +68,30 @@ def sentences() -> list[str]:
     return [s["en"] for s in json.loads(SENTENCES.read_text(encoding="utf-8"))["sentences"]]
 
 
-# Манифест модуля -> (его собственные файлы, какие тексты он озвучивает). Озвучка добавляется после файлов.
+def challenge() -> dict[str, str]:
+    """Рассказы сложного задания: имя файла (без .mp3) -> что произносится."""
+    out = {}
+    for story in json.loads(CHALLENGE.read_text(encoding="utf-8"))["stories"]:
+        out[slug(f"ch-{story['id']}-story")] = " ".join(story["sentences"])
+        out[slug(f"ch-{story['id']}-q")] = story["question"]
+    return out
+
+
+# Манифест модуля -> (его собственные файлы, имена озвучки, которые он использует). Озвучка добавляется после файлов.
 MANIFESTS = {
-    MODULES / "english-words" / "manifest.json": (["texts.js", "words.json"], words),
-    MODULES / "english-quiz" / "manifest.json": (["texts.js", "../english-words/words.json"], words),
-    MODULES / "english-phrases" / "manifest.json": (["texts.js", "phrases.json", "../english-words/words.json"], phrases),
-    MODULES / "english-sentences" / "manifest.json": (["texts.js", "sentences.json"], sentences),
+    MODULES / "english-words" / "manifest.json": (["texts.js", "words.json"], lambda: [slug(t) for t in words()]),
+    MODULES / "english-quiz" / "manifest.json": (["texts.js", "../english-words/words.json"], lambda: [slug(t) for t in words()]),
+    MODULES / "english-phrases" / "manifest.json": (["texts.js", "phrases.json", "../english-words/words.json"], lambda: [slug(t) for t in phrases()]),
+    MODULES / "english-sentences" / "manifest.json": (["texts.js", "sentences.json"], lambda: [slug(t) for t in sentences()]),
+    MODULES / "challenge" / "manifest.json": (
+        ["texts.js", "pools/ru.js", "pools/de.js", "pools/math.js", "pools/orientation.js", "pools/en.json"],
+        lambda: list(challenge()),
+    ),
 }
 
 
-async def make(text: str) -> str:
-    target = OUT / f"{slug(text)}.mp3"
+async def make(name: str, text: str) -> str:
+    target = OUT / f"{name}.mp3"
     if target.exists():
         return "есть"
     OUT.mkdir(parents=True, exist_ok=True)
@@ -85,30 +101,32 @@ async def make(text: str) -> str:
 
 def update_manifests() -> None:
     """Списки файлов в манифестах: по ним приложение сохраняет озвучку для работы без интернета."""
-    for path, (base, texts) in MANIFESTS.items():
+    for path, (base, names) in MANIFESTS.items():
         if not path.exists():
             continue
-        audio = [f"../../audio/en/{slug(t)}.mp3" for t in texts() if (OUT / f"{slug(t)}.mp3").exists()]
+        audio = [f"../../audio/en/{n}.mp3" for n in names() if (OUT / f"{n}.mp3").exists()]
         manifest = json.loads(path.read_text(encoding="utf-8"))
         manifest["files"] = base + audio
         path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 async def main() -> int:
-    texts = list(dict.fromkeys([*words(), *phrases(), *sentences()]))  # без повторов, порядок сохраняется
+    items = {slug(t): t for t in [*words(), *phrases(), *sentences()]}  # без повторов, порядок сохраняется
+    items.update(challenge())
+    texts = list(items)
     failed = 0
     gate = asyncio.Semaphore(PARALLEL)
 
-    async def one(text: str) -> None:
+    async def one(name: str) -> None:
         nonlocal failed
         async with gate:
             try:
-                result = await make(text)
+                result = await make(name, items[name])
                 if result != "есть":
-                    print(f"{text:34} {result}")
+                    print(f"{name:40} {result}")
             except Exception as err:  # сеть, голос недоступен и т. п.
                 failed += 1
-                print(f"{text:34} ОШИБКА: {err}")
+                print(f"{name:40} ОШИБКА: {err}")
 
     await asyncio.gather(*(one(t) for t in texts))
     update_manifests()

@@ -112,7 +112,8 @@ for (const id of registry) {
   const m = JSON.parse(read(`${dir}/manifest.json`));
   if (m.id !== id) add('МАНИФЕСТ', id, `id «${m.id}» не совпадает с папкой`);
   for (const k of ['title', 'subject', 'icon', 'description', 'version']) if (!m[k]) add('МАНИФЕСТ', id, `нет поля ${k}`);
-  if (!knownSubjects.includes(m.subject)) add('МАНИФЕСТ', id, `неизвестный раздел ${m.subject}`);
+  if (!m.challenge && !knownSubjects.includes(m.subject)) add('МАНИФЕСТ', id, `неизвестный раздел ${m.subject}`);
+  if (m.challenge) for (const subject of Object.keys(m.challenge.subjects || {})) if (!knownSubjects.includes(subject)) add('МАНИФЕСТ', id, `сложное задание: неизвестный раздел ${subject}`);
   if (!existsSync(`${dir}/index.js`)) add('МАНИФЕСТ', id, 'нет index.js');
   const listed = new Set([...(m.styles || []), ...(m.files || [])].map((f) => resolve(dir, f).replace(/\\/g, '/')));
   for (const f of listed) if (!existsSync(f)) add('МАНИФЕСТ', id, `в манифесте нет файла на диске: ${rel(f)}`);
@@ -249,7 +250,65 @@ for (const id of registry) {
   const manifestPath = `${ROOT}/modules/${id}/manifest.json`;
   if (!existsSync(manifestPath)) continue;
   const manifest = JSON.parse(read(manifestPath));
-  if (manifest.subject !== 'english' && !manifest.cycle) add('КРУГ', id, 'у модуля нет cycle — он не закрывается после серии и не участвует в супер-наклейках');
+  if (!manifest.challenge && manifest.subject !== 'english' && !manifest.cycle) add('КРУГ', id, 'у модуля нет cycle — он не закрывается после серии и не участвует в супер-наклейках');
+}
+
+// 7д. Сложные задания (modules/challenge): рассказы русского, немецкого и английского, задания математики и
+// «право и лево» из генераторов, озвучка английских рассказов
+const challengeDir = `${ROOT}/modules/challenge`;
+if (existsSync(`${challengeDir}/manifest.json`)) {
+  const slugOf = (t) => t.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-+|-+$/g, '');
+  const manifest = JSON.parse(read(`${challengeDir}/manifest.json`));
+  const listed = new Set(manifest.files || []);
+  const checkItem = (where, item, { sentencesMin = 3, sentencesMax = 4 } = {}) => {
+    const label = `${where} ${item.id}`;
+    if (!item.sentences || item.sentences.length < sentencesMin || item.sentences.length > sentencesMax) add('ЗАДАНИЕ', label, `в тексте должно быть ${sentencesMin}–${sentencesMax} предложения`);
+    if (!item.question) add('ЗАДАНИЕ', label, 'нет вопроса');
+    const options = item.options || [];
+    if (options.length < 3 || options.length > 4) add('ЗАДАНИЕ', label, `вариантов ответа ${options.length}, нужно 3–4`);
+    const keys = options.map((o) => JSON.stringify(typeof o === 'string' ? { t: o } : o));
+    if (new Set(keys).size !== keys.length) add('ЗАДАНИЕ', label, 'есть одинаковые варианты ответа');
+    if (!(item.answer >= 0 && item.answer < options.length)) add('ЗАДАНИЕ', label, 'номер верного ответа вне списка вариантов');
+    if (item.clue != null && !(item.clue >= 0 && item.clue < (item.sentences || []).length)) add('ЗАДАНИЕ', label, 'подсвечиваемое предложение вне текста');
+  };
+  const pools = [['ru', 'ru.js'], ['de', 'de.js']];
+  let storyCount = 0;
+  for (const [lang, file] of pools) {
+    const { STORIES } = await import(bankUrl(`challenge/pools/${file}`));
+    const ids = new Set();
+    for (const story of STORIES) {
+      checkItem(lang, story);
+      if (ids.has(story.id)) add('ЗАДАНИЕ', story.id, 'id повторяется');
+      ids.add(story.id);
+      storyCount++;
+    }
+  }
+  const { stories } = JSON.parse(read(`${challengeDir}/pools/en.json`));
+  const enIds = new Set();
+  for (const story of stories) {
+    checkItem('en', story);
+    if (enIds.has(story.id)) add('ЗАДАНИЕ', story.id, 'id повторяется');
+    enIds.add(story.id);
+    if (!story.tr || story.tr.length !== story.sentences.length) add('ЗАДАНИЕ', story.id, 'нужен перевод каждого предложения (tr)');
+    for (const key of [`ch-${story.id}-story`, `ch-${story.id}-q`]) {
+      const audio = `audio/en/${slugOf(key)}.mp3`;
+      if (!existsSync(`${ROOT}/${audio}`)) add('АУДИО', story.id, `нет озвучки ${audio} — запустите tools/make_audio.py`);
+      else if (!listed.has(`../../${audio}`)) add('ОФЛАЙН', 'challenge', `озвучка ${key} не в списке files манифеста — запустите tools/make_audio.py`);
+    }
+    storyCount++;
+  }
+  // Генераторы: много случайных заданий, у каждого верный ответ среди вариантов, числа в пределах 0–20
+  const { makeMathTask } = await import(bankUrl('challenge/pools/math.js'));
+  const { makeOrientationTask } = await import(bankUrl('challenge/pools/orientation.js'));
+  const lcg = (seed) => () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  for (let i = 1; i <= 400; i++) {
+    const math = makeMathTask(lcg(i));
+    checkItem('math', math, { sentencesMin: 3, sentencesMax: 3 });
+    for (const o of math.options) if (!(o.n >= 0 && o.n <= 40)) add('ЗАДАНИЕ', 'math', `число ${o.n} вне разумных пределов (${math.sentences.join(' ')})`);
+    const orient = makeOrientationTask(lcg(i * 7919));
+    checkItem('orientation', orient, { sentencesMin: 4, sentencesMax: 4 });
+  }
+  notes.push(`сложные задания: рассказов ${storyCount} (ru, de, en), математика и право-лево — генераторы`);
 }
 
 // 8. Классы в CSS и JS: быстрый поиск мёртвых стилей и неопределённых переменных

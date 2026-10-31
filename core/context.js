@@ -13,9 +13,10 @@ function cleanResult(result = {}) {
   return { correct, total, mistakes };
 }
 
-export function createContext({ container, manifest, services, onFinish }) {
+export function createContext({ container, manifest, services, onFinish, challenge = null }) {
   const s = storage.settings();
-  const voice = VOICE_ENABLED || Boolean(manifest.voice); // озвучка: везде или только в этом модуле
+  // озвучка: везде, только в этом модуле или только в сложном задании этого раздела (английский)
+  const voice = VOICE_ENABLED || Boolean(manifest.voice) || Boolean(challenge?.voice);
   const hard = storage.hardToPractice(manifest.id);
   let finished = false;
   return Object.freeze({
@@ -30,10 +31,11 @@ export function createContext({ container, manifest, services, onFinish }) {
       translation: s.translation,
     }),
     hard: Object.freeze(hard),
+    challenge: challenge ? Object.freeze({ ...challenge, used: Object.freeze([...(challenge.used || [])]) }) : null,
     finish(result) {
       if (finished) return;
       finished = true;
-      onFinish({ ...cleanResult(result), offered: hard });
+      onFinish({ ...cleanResult(result), offered: hard, challengeId: typeof result?.challengeId === 'string' ? result.challengeId : null });
     },
   });
 }

@@ -1,10 +1,10 @@
-// Раздел собаки (ПРОТОТИП): косточки, двор с собаками, корм и уборка, покупка собаки.
+// Раздел собаки: косточки, двор с собаками, корм и уборка, покупка собаки.
 // Экран без прокрутки: слева двор, справа косточки, кнопки и магазин. Все купленные собаки стоят во дворе
 // вместе (новая добавляется к прежним); собака выбирается касанием — корм и уборка относятся к выбранной.
 // Собаки живые (моргают, виляют хвостом, дышат), по касанию радуются. Корм покупается за косточки
 // (1 🦴 — 5 банок), собаку можно покормить: она ест, потом какает. Какашки убираются пакетиками
 // (1 🦴 — 5 штук). При покупке собаки ребёнок выбирает породу и цвет, придумывает имя и возраст.
-// Косточки пока выдаются кнопкой для просмотра; настоящая схема появления особого задания — позже.
+// Косточки даются за сложные задания в разделах (core/challenges.js).
 
 import { h, button, format } from '../dom.js';
 import { STR } from '../strings.js';
@@ -24,7 +24,11 @@ const SUGGESTED_NAMES = NAMES.slice(0, 6); // готовые имена в вы�
 // Где стоят собаки во дворе (в % ширины сцены) в зависимости от их числа.
 const SLOTS = { 1: [50], 2: [30, 70], 3: [18, 50, 82] };
 
-export function renderDog(app, { onBack = () => app.go.menu() } = {}) {
+// scope: 'real' — рабочий экран ребёнка; 'test' — тестовый экран в разделе для родителя (свои собаки и косточки,
+// сверху панель «+1 🦴» и сброс), чтобы проверять новые возможности, не трогая рабочие данные.
+export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } = {}) {
+  const store = storage.dogApi(scope);
+  const testing = scope === 'test';
   let draft = null; // собака, которую выбирают сейчас (пока не куплена), или null
   let selectedId = null; // какая собака выбрана во дворе
   let busy = false; // идёт кормление
@@ -33,24 +37,36 @@ export function renderDog(app, { onBack = () => app.go.menu() } = {}) {
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const chip = h('div', { class: 'chip' });
-  const proto = protoBox();
   const main = h('main', { class: 'content dog-content' });
   const footer = h('footer', { class: 'buy-bar dog-footer' });
   const screen = h('div', { class: 'screen dog-screen' },
     h('header', { class: 'bar' },
       button('btn', `⬅ ${STR.common.back}`, () => (draft ? closeCreator() : onBack())),
-      h('h1', { text: D.title }),
-      proto,
+      h('h1', { text: testing ? D.testTitle : D.title }),
+      testing ? testTools() : null,
       chip),
     main,
     footer);
 
-  const price = () => dogPrice(storage.dogs().length);
-  const missing = () => (price() ?? 0) - storage.bonesBalance();
+  // Тестовый экран: выдать косточки и начать сначала (только для проверки новых возможностей).
+  function testTools() {
+    return h('div', { class: 'dog-test-tools' },
+      h('span', { text: `🧪 ${D.testBadge}` }),
+      button('btn', D.testBone1, () => { store.addBones(1); app.services.sounds('star'); refresh(); }),
+      button('btn', D.testBone5, () => { store.addBones(5); app.services.sounds('star'); refresh(); }),
+      button('btn quiet', D.testReset, () => {
+        if (busy) return;
+        store.reset();
+        selectedId = null;
+        refresh();
+      }));
+  }
+
+  const price = () => dogPrice(store.dogs().length);
+  const missing = () => (price() ?? 0) - store.bonesBalance();
 
   function refresh() {
-    chip.textContent = format(D.bonesChip, { n: storage.bonesBalance() });
-    proto.hidden = Boolean(draft);
+    chip.textContent = format(D.bonesChip, { n: store.bonesBalance() });
     if (draft) return;
     footer.hidden = true;
     footer.replaceChildren();
@@ -59,7 +75,7 @@ export function renderDog(app, { onBack = () => app.go.menu() } = {}) {
 
   // ---------- Главный экран раздела ----------
   function homeView() {
-    const dogs = storage.dogs();
+    const dogs = store.dogs();
     if (!dogs.some((d) => d.id === selectedId)) selectedId = dogs[0]?.id ?? null;
     if (!dogs.length) {
       const ghost = drawDog({ breed: 'labrador', color: 'grey', age: 3 });
@@ -68,34 +84,17 @@ export function renderDog(app, { onBack = () => app.go.menu() } = {}) {
         h('div', { class: 'dog-art-box' }, ghost, h('span', { class: 'dog-question', text: '?' })),
         h('h2', { text: D.emptyTitle }),
         h('p', { text: `${D.emptyText} ${D.howTo}` }),
-        h('p', { class: 'dog-earned-line', text: `${format(D.earned, { n: storage.bones() })} · ${format(D.spent, { n: storage.bones() - storage.bonesBalance() })}` }),
+        h('p', { class: 'dog-earned-line', text: `${format(D.earned, { n: store.bones() })} · ${format(D.spent, { n: store.bones() - store.bonesBalance() })}` }),
         buyDogButton(D.buyFirst));
     }
     const side = h('div', { class: 'dog-side' },
       h('div', { class: 'dog-earned' },
         h('span', { class: 'dog-earned-bone', text: '🦴' }),
         h('div', {},
-          h('strong', { text: format(D.earned, { n: storage.bones() }) }),
-          h('small', { text: `${format(D.spent, { n: storage.bones() - storage.bonesBalance() })} · ${D.howTo}` }))));
+          h('strong', { text: format(D.earned, { n: store.bones() }) }),
+          h('small', { text: `${format(D.spent, { n: store.bones() - store.bonesBalance() })} · ${D.howTo}` }))));
     const yard = yardView(dogs, side);
     return h('div', { class: 'dog-home' }, yard, side);
-  }
-
-  // Только для прототипа: кнопки в шапке, чтобы можно было посмотреть, как всё выглядит.
-  function protoBox() {
-    return h('div', { class: 'dog-proto', title: D.proto },
-      h('span', { text: '🧪' }),
-      button('btn', D.protoBone, () => {
-        storage.addBones(1);
-        app.services.sounds('star');
-        refresh();
-      }),
-      button('btn quiet', D.protoReset, () => {
-        if (busy) return;
-        storage.resetDogs();
-        selectedId = null;
-        refresh();
-      }));
   }
 
   // ---------- Двор: живые собаки, кормление, уборка ----------
@@ -142,7 +141,7 @@ export function renderDog(app, { onBack = () => app.go.menu() } = {}) {
       shopView(),
       price() != null ? buyDogButton(D.buyNext) : h('p', { class: 'hint-line', text: D.maxDogs }));
 
-    const selected = () => storage.dogs().find((d) => d.id === selectedId);
+    const selected = () => store.dogs().find((d) => d.id === selectedId);
 
     function select(id) {
       selectedId = id;
@@ -163,10 +162,10 @@ export function renderDog(app, { onBack = () => app.go.menu() } = {}) {
 
     // Рисует какашки всех собак; у кормящейся последняя пока скрыта (появится после «дел»).
     function drawPoops(hideFor = null) {
-      foodLabel.textContent = format(D.feedLeft, { n: storage.food() });
-      bagsLabel.textContent = format(D.cleanLeft, { n: storage.bags() });
+      foodLabel.textContent = format(D.feedLeft, { n: store.food() });
+      bagsLabel.textContent = format(D.cleanLeft, { n: store.bags() });
       const items = [];
-      for (const dog of storage.dogs()) {
+      for (const dog of store.dogs()) {
         const part = parts.get(dog.id);
         if (!part) continue;
         const count = Math.max(0, dog.poops - (hideFor === dog.id ? 1 : 0));
@@ -195,9 +194,9 @@ export function renderDog(app, { onBack = () => app.go.menu() } = {}) {
       if (busy) return;
       const dog = selected();
       if (!dog) return;
-      if (storage.food() < 1) return say(D.noFood, 2600);
+      if (store.food() < 1) return say(D.noFood, 2600);
       if (dog.poops >= MAX_POOPS) return say(D.yardFull, 2600);
-      if (!storage.feedDog(dog.id)) return;
+      if (!store.feedDog(dog.id)) return;
       const { wrap, bowl, bubble, slot } = parts.get(dog.id);
       busy = true;
       feedBtn.disabled = true;
@@ -238,11 +237,11 @@ export function renderDog(app, { onBack = () => app.go.menu() } = {}) {
     // Тратится пакетик.
     function clean(dogId = null, poopEl = null) {
       if (busy) return;
-      const all = storage.dogs();
+      const all = store.dogs();
       const dog = all.find((d) => d.id === (dogId ?? selectedId) && d.poops > 0) || all.find((d) => d.poops > 0);
       if (!dog) return;
-      if (storage.bags() < 1) return say(D.noBags, 2600);
-      storage.cleanPoop(dog.id);
+      if (store.bags() < 1) return say(D.noBags, 2600);
+      store.cleanPoop(dog.id);
       const target = poopEl || [...poopLayer.children].reverse().find((p) => p.dataset.dog === dog.id);
       if (target) {
         target.disabled = true;
@@ -265,17 +264,17 @@ export function renderDog(app, { onBack = () => app.go.menu() } = {}) {
   function shopView() {
     const make = (template, buyFn) => {
       const btn = button('btn dog-shop-btn', format(template, { price: PACK_PRICE }), () => {
-        if (storage.bonesBalance() < PACK_PRICE || !buyFn()) return;
+        if (store.bonesBalance() < PACK_PRICE || !buyFn()) return;
         app.services.sounds('star');
         refresh();
       });
-      btn.disabled = storage.bonesBalance() < PACK_PRICE;
+      btn.disabled = store.bonesBalance() < PACK_PRICE;
       return btn;
     };
     return h('div', { class: 'dog-shop' },
       h('h2', { class: 'section-title', text: D.shopTitle }),
-      make(D.buyFood, storage.buyFood),
-      make(D.buyBags, storage.buyBags));
+      make(D.buyFood, store.buyFood),
+      make(D.buyBags, store.buyBags));
   }
 
   function buyDogButton(template) {
@@ -301,7 +300,6 @@ export function renderDog(app, { onBack = () => app.go.menu() } = {}) {
   }
 
   function renderCreator() {
-    proto.hidden = true;
     const preview = h('div', { class: 'dog-art-box' });
     const previewName = h('strong', { class: 'dog-name' });
     const previewMeta = h('span', { class: 'dog-meta' });
@@ -367,7 +365,7 @@ export function renderDog(app, { onBack = () => app.go.menu() } = {}) {
   }
 
   function onBuy() {
-    const dog = storage.buyDog({ ...draft, name: draft.name.trim() });
+    const dog = store.buyDog({ ...draft, name: draft.name.trim() });
     if (!dog) return;
     app.services.sounds('star');
     draft = null;

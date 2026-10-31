@@ -1,0 +1,68 @@
+{
+  "id": "challenge",
+  "title": "Сложное задание",
+  "subject": "other",
+  "icon": "🦴",
+  "description": "Прочитай и ответь — получишь косточку",
+  "version": "1.0.0",
+  "styles": [
+    "style.css"
+  ],
+  "files": [
+    "texts.js",
+    "pools/ru.js",
+    "pools/de.js",
+    "pools/math.js",
+    "pools/orientation.js",
+    "pools/en.json",
+    "../../audio/en/ch-en-black-cat-story.mp3",
+    "../../audio/en/ch-en-black-cat-q.mp3",
+    "../../audio/en/ch-en-tom-juice-story.mp3",
+    "../../audio/en/ch-en-tom-juice-q.mp3",
+    "../../audio/en/ch-en-two-dogs-story.mp3",
+    "../../audio/en/ch-en-two-dogs-q.mp3",
+    "../../audio/en/ch-en-mum-shop-story.mp3",
+    "../../audio/en/ch-en-mum-shop-q.mp3",
+    "../../audio/en/ch-en-pink-dress-story.mp3",
+    "../../audio/en/ch-en-pink-dress-q.mp3",
+    "../../audio/en/ch-en-bike-school-story.mp3",
+    "../../audio/en/ch-en-bike-school-q.mp3",
+    "../../audio/en/ch-en-in-the-tree-story.mp3",
+    "../../audio/en/ch-en-in-the-tree-q.mp3",
+    "../../audio/en/ch-en-dad-guitar-story.mp3",
+    "../../audio/en/ch-en-dad-guitar-q.mp3",
+    "../../audio/en/ch-en-snow-story.mp3",
+    "../../audio/en/ch-en-snow-q.mp3",
+    "../../audio/en/ch-en-grandma-soup-story.mp3",
+    "../../audio/en/ch-en-grandma-soup-q.mp3",
+    "../../audio/en/ch-en-green-birds-story.mp3",
+    "../../audio/en/ch-en-green-birds-q.mp3",
+    "../../audio/en/ch-en-mia-teddy-story.mp3",
+    "../../audio/en/ch-en-mia-teddy-q.mp3"
+  ],
+  "challenge": {
+    "subjects": {
+      "math": {
+        "title": "Сложная задача",
+        "icon": "🧮"
+      },
+      "orientation": {
+        "title": "Сложное задание",
+        "icon": "🧭"
+      },
+      "russian": {
+        "title": "Читаем рассказ",
+        "icon": "📜"
+      },
+      "german": {
+        "title": "Knifflige Aufgabe",
+        "icon": "📖"
+      },
+      "english": {
+        "title": "Hello! Story time",
+        "icon": "🎧",
+        "voice": true
+      }
+    }
+  }
+}

@@ -8,6 +8,14 @@ const APP_ID = 'school-app';
 // Прежние id кругов -> новый id (математика раньше была двумя кругами).
 const CYCLE_ALIASES = { arithmetic: 'math', numbers: 'math' };
 const USAGE_KEEP_DAYS = 400; // сколько дней хранить статистику времени
+// Версия данных о собаках: тестовые собаки, оставшиеся от прототипа (без этой версии), при чтении
+// обнуляются один раз — рабочий экран собаки для ребёнка начинается с нуля.
+const DOGS_VERSION = 2;
+
+// «Сумка» собак: косточки, собаки и запасы. Одна — рабочая (в корне состояния, для ребёнка), другая — тестовая
+// (state.test, для проверки новых возможностей в разделе для родителя); друг с другом они не связаны.
+const emptyDogBag = () => ({ bones: 0, bonesSpent: 0, dogs: [], food: 0, bags: 0 });
+
 const CLEAN_SERIES_TO_FORGET = 3; // трудное задание забывается после стольких серий без ошибки в нём
 
 const DEFAULT_SETTINGS = {
@@ -37,11 +45,14 @@ function fresh() {
     usage: {}, // время в приложении по дням: { 'ГГГГ-ММ-ДД': секунды }
     bonus: {}, // дополнительные минуты к лимиту на конкретный день: { 'ГГГГ-ММ-ДД': минуты }
     supers: 0, // сколько супер-наклеек получено
+    dogsVersion: DOGS_VERSION,
+    test: emptyDogBag(), // тестовые косточки и собаки (раздел для родителя)
     bones: 0, // косточек заработано (за особое сложное задание), прототип
     bonesSpent: 0, // косточек потрачено на собак
     dogs: [], // купленные собаки: { id, name, breed, color, age, poops }
     food: 0, // банок корма в запасе
     bags: 0, // пакетиков для уборки в запасе
+    challenges: { ready: false, milestone: 0, owed: 0, pending: {}, used: {} }, // сложные задания (core/challenges.js)
     cycles: {}, // круги: { <id круга>: [id модулей, пройденных в текущем круге] }
     progress: {},
   };
@@ -69,6 +80,30 @@ function normalizeProgress(p = {}) {
   };
 }
 
+// Сложные задания: ready — выданы ли первые; milestone — на какой «каждые 25 звёзд» уже посмотрели;
+// owed — сколько заданий ещё должно появиться (когда нет свободного раздела); pending — ждущие задания
+// по разделам { <предмет>: { seed } }; used — уже пройденные тексты по разделам.
+function normalizeChallenges(c = {}) {
+  const out = { ready: Boolean(c.ready), milestone: Math.round(num(c.milestone, 0, 1e5, 0)), owed: Math.round(num(c.owed, 0, 50, 0)), pending: {}, used: {} };
+  for (const [subject, item] of Object.entries(c.pending || {})) {
+    if (typeof subject === 'string' && item && Number.isFinite(Number(item.seed))) out.pending[subject] = { seed: Math.round(Number(item.seed)) };
+  }
+  for (const [subject, ids] of Object.entries(c.used || {})) {
+    if (typeof subject === 'string' && Array.isArray(ids)) out.used[subject] = ids.filter((id) => typeof id === 'string').slice(-100);
+  }
+  return out;
+}
+
+function normalizeDogBag(c = {}) {
+  return {
+    bones: Math.round(num(c.bones, 0, 1e6, 0)),
+    bonesSpent: Math.round(num(c.bonesSpent, 0, 1e6, 0)),
+    food: Math.round(num(c.food, 0, 9999, 0)),
+    bags: Math.round(num(c.bags, 0, 9999, 0)),
+    dogs: (Array.isArray(c.dogs) ? c.dogs : []).map(cleanDog).filter(Boolean).slice(0, 12),
+  };
+}
+
 function normalize(data) {
   const s = fresh();
   if (!data || typeof data !== 'object') return s;
@@ -87,11 +122,10 @@ function normalize(data) {
   }
   s.stars = Math.round(num(data.stars, 0, 1e6, 0));
   s.supers = Math.round(num(data.supers, 0, 1e6, 0));
-  s.bones = Math.round(num(data.bones, 0, 1e6, 0));
-  s.bonesSpent = Math.round(num(data.bonesSpent, 0, 1e6, 0));
-  s.food = Math.round(num(data.food, 0, 9999, 0));
-  s.bags = Math.round(num(data.bags, 0, 9999, 0));
-  s.dogs = (Array.isArray(data.dogs) ? data.dogs : []).map(cleanDog).filter(Boolean).slice(0, 12);
+  Object.assign(s, data.dogsVersion === DOGS_VERSION ? normalizeDogBag(data) : emptyDogBag());
+  s.test = normalizeDogBag(data.test);
+  s.dogsVersion = DOGS_VERSION;
+  s.challenges = normalizeChallenges(data.dogsVersion === DOGS_VERSION ? data.challenges : {});
   const oldest = dayKey(new Date(Date.now() - USAGE_KEEP_DAYS * 86400000));
   for (const [day, minutes] of Object.entries(data.bonus || {})) {
     if (/^\d{4}-\d{2}-\d{2}$/.test(day) && day >= oldest) s.bonus[day] = Math.round(num(minutes, 0, 1440, 0));
@@ -219,88 +253,90 @@ export function buySticker(id) {
   return true;
 }
 
-// ---------- Косточки и собаки (прототип) ----------
-export function bones() {
-  return state.bones;
+// ---------- Косточки и собаки ----------
+// dogApi('real') — рабочие (для ребёнка), dogApi('test') — тестовые (раздел для родителя, core/screens/dog.js).
+const bagOf = (scope) => (scope === 'test' ? state.test : state);
+
+export function dogApi(scope = 'real') {
+  const bag = () => bagOf(scope);
+  const balance = () => Math.max(0, bag().bones - bag().bonesSpent); // заработано минус потрачено
+
+  // Упаковка корма (5 банок) или пакетиков (5 штук) за косточку. Возвращает true, если хватило косточек.
+  const buyPack = (field, amount) => {
+    if (balance() < PACK_PRICE) return false;
+    bag().bonesSpent += PACK_PRICE;
+    bag()[field] += amount;
+    save();
+    return true;
+  };
+
+  return {
+    bones: () => bag().bones,
+    bonesBalance: balance,
+    addBones(n = 1) {
+      bag().bones = Math.min(1e6, bag().bones + Math.max(0, Math.round(n)));
+      save();
+    },
+    dogs: () => bag().dogs.map((d) => ({ ...d })),
+    // Покупка собаки: цена зависит от того, сколько собак уже есть. Возвращает купленную собаку или null.
+    buyDog(raw) {
+      const price = dogPrice(bag().dogs.length);
+      // id уникален, даже если две покупки случились в одну миллисекунду
+      let id = '';
+      do id = `dog-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+      while (bag().dogs.some((d) => d.id === id));
+      const dog = cleanDog({ ...raw, id });
+      if (price == null || !dog || balance() < price) return null;
+      bag().dogs.push(dog);
+      bag().bonesSpent += price;
+      save();
+      return { ...dog };
+    },
+    food: () => bag().food,
+    bags: () => bag().bags,
+    buyFood: () => buyPack('food', FOOD_PACK),
+    buyBags: () => buyPack('bags', BAG_PACK),
+    // Покормить собаку: тратится банка корма, во дворе прибавляется одна какашка.
+    // Возвращает false, если корма нет, собаки нет или двор не убран.
+    feedDog(id) {
+      const dog = bag().dogs.find((d) => d.id === id);
+      if (!dog || bag().food < 1 || dog.poops >= MAX_POOPS) return false;
+      bag().food -= 1;
+      dog.poops += 1;
+      save();
+      return true;
+    },
+    // Убрать одну какашку: тратится один пакетик.
+    cleanPoop(id) {
+      const dog = bag().dogs.find((d) => d.id === id);
+      if (!dog || bag().bags < 1 || dog.poops < 1) return false;
+      bag().bags -= 1;
+      dog.poops -= 1;
+      save();
+      return true;
+    },
+    // Начать сначала — только для тестовой «сумки»; рабочая так не сбрасывается.
+    reset() {
+      if (scope !== 'test') return;
+      state.test = emptyDogBag();
+      save();
+    },
+  };
 }
 
-export function addBones(n = 1) {
-  state.bones = Math.min(1e6, state.bones + Math.max(0, Math.round(n)));
-  save();
+// Рабочие косточки и собаки (для ребёнка) — короткие имена для меню и сложных заданий.
+const real = dogApi('real');
+export const bones = real.bones;
+export const addBones = real.addBones;
+export const bonesBalance = real.bonesBalance;
+
+// ---------- Сложные задания ----------
+export function challenges() {
+  return normalizeChallenges(state.challenges);
 }
 
-// Косточек на счету: заработано минус потрачено на собак.
-export function bonesBalance() {
-  return Math.max(0, state.bones - state.bonesSpent);
-}
-
-export function dogs() {
-  return state.dogs.map((d) => ({ ...d }));
-}
-
-// Покупка собаки: цена зависит от того, сколько собак уже есть. Возвращает купленную собаку или null.
-export function buyDog(raw) {
-  const price = dogPrice(state.dogs.length);
-  // id уникален, даже если две покупки случились в одну миллисекунду
-  let id = '';
-  do id = `dog-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
-  while (state.dogs.some((d) => d.id === id));
-  const dog = cleanDog({ ...raw, id });
-  if (price == null || !dog || bonesBalance() < price) return null;
-  state.dogs.push(dog);
-  state.bonesSpent += price;
-  save();
-  return { ...dog };
-}
-
-export function food() {
-  return state.food;
-}
-
-export function bags() {
-  return state.bags;
-}
-
-// Упаковка корма (5 банок) или пакетиков (5 штук) за косточку. Возвращает true, если хватило косточек.
-function buyPack(field, amount) {
-  if (bonesBalance() < PACK_PRICE) return false;
-  state.bonesSpent += PACK_PRICE;
-  state[field] += amount;
-  save();
-  return true;
-}
-
-export const buyFood = () => buyPack('food', FOOD_PACK);
-export const buyBags = () => buyPack('bags', BAG_PACK);
-
-// Покормить собаку: тратится банка корма, во дворе прибавляется одна какашка.
-// Возвращает false, если корма нет, собаки нет или двор не убран.
-export function feedDog(id) {
-  const dog = state.dogs.find((d) => d.id === id);
-  if (!dog || state.food < 1 || dog.poops >= MAX_POOPS) return false;
-  state.food -= 1;
-  dog.poops += 1;
-  save();
-  return true;
-}
-
-// Убрать одну какашку: тратится один пакетик.
-export function cleanPoop(id) {
-  const dog = state.dogs.find((d) => d.id === id);
-  if (!dog || state.bags < 1 || dog.poops < 1) return false;
-  state.bags -= 1;
-  dog.poops -= 1;
-  save();
-  return true;
-}
-
-// Только для прототипа: вернуть косточки, запасы и собак в начальное состояние.
-export function resetDogs() {
-  state.bones = 0;
-  state.bonesSpent = 0;
-  state.dogs = [];
-  state.food = 0;
-  state.bags = 0;
+export function setChallenges(next) {
+  state.challenges = normalizeChallenges(next);
   save();
 }
 
@@ -371,8 +407,10 @@ export function recordSeries(id, { correct, total, mistakes, offered }) {
 // громкость, выключенные модули…) сохраняются.
 export function reset() {
   const keep = state.settings;
+  const keepTest = state.test;
   state = fresh();
   state.settings = keep;
+  state.test = keepTest; // тестовые собаки родителя не сбрасываются вместе с прогрессом ребёнка
   save();
 }
 

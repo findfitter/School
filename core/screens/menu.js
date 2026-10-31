@@ -21,7 +21,7 @@ export function renderMenu(app) {
         h('h2', {},
           h('span', { class: 'subject-icon', text: STR.subjects[subject].icon }),
           STR.subjects[subject].title),
-        h('div', { class: 'tiles' }, groups.get(subject).map((m) => tile(app, m))))
+        h('div', { class: 'tiles' }, [challengeTile(app, subject), ...groups.get(subject).map((m) => tile(app, m))]))
     );
 
   return h('div', { class: 'screen menu-screen' },
@@ -30,10 +30,38 @@ export function renderMenu(app) {
       h('div', { class: 'bar-actions' },
         h('div', { class: 'chip' }, `⭐ ${storage.balance()}`),
         button('btn', `🎁 ${STR.menu.stickers}`, () => app.go.stickers()),
-        button('btn quiet', `⚙️ ${STR.menu.parent}`, () => app.go.parent()))),
+        button('btn quiet', `⚙️ ${STR.menu.parent}`, () => app.go.parent()),
+        dogButton(app))),
     h('main', { class: 'scroll content' },
       sections.length ? sections : h('p', { class: 'empty', text: STR.menu.empty }))
   );
+}
+
+// Значок собаки справа вверху: открывает раздел собаки, рядом — сколько косточек на счету.
+function dogButton(app) {
+  const el = button('btn dog-btn', [h('span', { text: '🐶' }), h('small', { text: `🦴 ${storage.bonesBalance()}` })], () => {
+    app.services.sounds('tap');
+    app.go.dog();
+  });
+  el.setAttribute('aria-label', STR.menu.dog);
+  el.title = STR.menu.dog;
+  return el;
+}
+
+// Сложное задание раздела: особая плитка с косточкой, пока задание не пройдено (core/challenges.js).
+function challengeTile(app, subject) {
+  const info = app.challenge?.challenge?.subjects?.[subject];
+  if (!info || !storage.challenges().pending[subject]) return null;
+  const el = button('tile challenge', [
+    h('span', { class: 'tile-icon' }, h('span', { class: 'icon-emoji', text: info.icon })),
+    h('span', { class: 'tile-title', text: info.title }),
+    h('span', { class: 'tile-bone', text: '🦴' }),
+  ], () => {
+    app.services.sounds('tap');
+    app.go.play(app.challenge, { subject });
+  });
+  if (app.challenge.description) el.title = app.challenge.description;
+  return el;
 }
 
 function tile(app, manifest) {

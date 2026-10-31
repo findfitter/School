@@ -1,5 +1,18 @@
-/* Раздел собаки (прототип): двор с собаками, корм и уборка, выбор собаки. Без :hover — экран сенсорный.
+/* Раздел собаки: двор с собаками, корм и уборка, выбор собаки. Без :hover — экран сенсорный.
    Экран без прокрутки: слева двор, справа косточки, кнопки и магазин. */
+
+/* Кнопка собаки в меню (справа вверху) */
+.dog-btn {
+  min-width: var(--tap);
+  padding: 0 18px;
+  font-size: 1.4em;
+  background: #ffe9d1;
+}
+
+.dog-btn small {
+  font-size: 0.6em;
+  font-weight: 800;
+}
 
 .dog-art {
   display: block;
@@ -168,26 +181,6 @@
 .dog-meta {
   color: var(--ink-soft);
   font-size: 0.8em;
-}
-
-/* Кнопки для просмотра прототипа (в шапке) */
-.dog-proto {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 10px;
-  border: 3px dashed #c9cfe6;
-  border-radius: var(--radius);
-  font-size: 0.7em;
-}
-
-.dog-proto[hidden] {
-  display: none;
-}
-
-.dog-proto .btn {
-  min-height: 48px;
-  padding: 0 14px;
 }
 
 /* ---------- Выбор собаки: слева картинка, справа выбор; без прокрутки ---------- */
@@ -692,4 +685,21 @@
   .dog-pointer {
     animation: none !important;
   }
+}
+
+/* Панель тестового экрана собаки (раздел для родителя) */
+.dog-test-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border: 3px dashed #c9cfe6;
+  border-radius: var(--radius);
+  font-size: 0.7em;
+  font-weight: 800;
+}
+
+.dog-test-tools .btn {
+  min-height: 48px;
+  padding: 0 14px;
 }
