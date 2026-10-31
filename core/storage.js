@@ -1,7 +1,11 @@
 // Настройки и прогресс в localStorage. Данные никуда не отправляются.
 
 import { legacyUnlocked, stickerById } from './rewards.js';
-import { cleanDog, dogPrice, PACK_PRICE, FOOD_PACK, BAG_PACK, MAX_POOPS } from './dogs.js';
+import { cleanDecor, itemById, DECOR_SLOTS } from './dog-items.js';
+import {
+  cleanDog, dogPrice, applyDecay, clamp100, PACK_PRICE, FOOD_PACK, BAG_PACK, SHAMPOO_PACK, MAX_POOPS, FULL_AT, MAX_SKILL,
+  ADULT_AGE, PUPPY_AFTER_MS, HAPPY_AT, SLEEP_FROM, SLEEP_MOOD, NAMES,
+} from './dogs.js';
 
 const KEY = 'school-app-v1';
 const APP_ID = 'school-app';
@@ -14,7 +18,7 @@ const DOGS_VERSION = 2;
 
 // «Сумка» собак: косточки, собаки и запасы. Одна — рабочая (в корне состояния, для ребёнка), другая — тестовая
 // (state.test, для проверки новых возможностей в разделе для родителя); друг с другом они не связаны.
-const emptyDogBag = () => ({ bones: 0, bonesSpent: 0, dogs: [], food: 0, bags: 0 });
+const emptyDogBag = () => ({ bones: 0, bonesSpent: 0, dogs: [], food: 0, bags: 0, shampoo: 0, items: [], decor: cleanDecor(), photos: [], together: 0, news: [] });
 
 const CLEAN_SERIES_TO_FORGET = 3; // трудное задание забывается после стольких серий без ошибки в нём
 
@@ -94,12 +98,28 @@ function normalizeChallenges(c = {}) {
   return out;
 }
 
+// Фото двора: снимок собак (порода, цвет, возраст, наряд) и обстановки; рисуется заново, картинок не хранится.
+function cleanPhoto(raw) {
+  if (!raw || typeof raw !== 'object' || !Array.isArray(raw.dogs)) return null;
+  const dogs = raw.dogs.map(cleanDog).filter(Boolean).slice(0, 3);
+  if (!dogs.length) return null;
+  return { at: Number.isFinite(Number(raw.at)) ? Number(raw.at) : Date.now(), dogs, decor: cleanDecor(raw.decor) };
+}
+
 function normalizeDogBag(c = {}) {
   return {
     bones: Math.round(num(c.bones, 0, 1e6, 0)),
     bonesSpent: Math.round(num(c.bonesSpent, 0, 1e6, 0)),
     food: Math.round(num(c.food, 0, 9999, 0)),
     bags: Math.round(num(c.bags, 0, 9999, 0)),
+    shampoo: Math.round(num(c.shampoo, 0, 9999, 0)),
+    items: [...new Set((Array.isArray(c.items) ? c.items : []).filter((id) => itemById.has(id)))], // купленные вещи и обстановка
+    decor: cleanDecor(c.decor), // что стоит во дворе: { house, bed, toy, plant, fun }
+    photos: (Array.isArray(c.photos) ? c.photos : []).map(cleanPhoto).filter(Boolean).slice(-12), // фотоальбом
+    together: Math.max(0, Number(c.together)) || 0, // с какого момента две взрослые собаки живут вдвоём (для щенка), 0 — нет
+    news: (Array.isArray(c.news) ? c.news : []) // события, о которых ещё не сказали ребёнку (родился щенок)
+      .filter((n) => n && n.type === 'puppy' && typeof n.dogId === 'string')
+      .map((n) => ({ type: 'puppy', dogId: n.dogId, name: String(n.name ?? '').slice(0, 12) })).slice(-5),
     dogs: (Array.isArray(c.dogs) ? c.dogs : []).map(cleanDog).filter(Boolean).slice(0, 12),
   };
 }
@@ -270,6 +290,41 @@ export function dogApi(scope = 'real') {
     return true;
   };
 
+  const newId = () => {
+    let id = '';
+    do id = `dog-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+    while (bag().dogs.some((d) => d.id === id));
+    return id;
+  };
+
+  // Раз в обращение: пересчёт показателей, дни рождения и щенок.
+  // Щенок рождается, когда двое взрослых живут вдвоём дольше PUPPY_AFTER_MS и оба в хорошем настроении.
+  function tick() {
+    const b = bag();
+    const now = Date.now();
+    const parties = b.dogs.map((d) => d.party).join();
+    for (const d of b.dogs) applyDecay(d, now);
+    let changed = parties !== b.dogs.map((d) => d.party).join();
+    const pair = b.dogs.length === 2 && b.dogs.every((d) => d.age >= ADULT_AGE);
+    if (!pair) {
+      if (b.together) { b.together = 0; changed = true; }
+    } else if (!b.together) {
+      b.together = now;
+      changed = true;
+    } else if (now - b.together >= PUPPY_AFTER_MS && b.dogs.every((d) => d.mood >= HAPPY_AT)) {
+      const [a, c] = b.dogs;
+      const taken = new Set(b.dogs.map((d) => d.name));
+      const id = newId();
+      const name = NAMES.find((n) => !taken.has(n)) || 'Малыш';
+      const puppy = cleanDog({ id, name, breed: Math.random() < 0.5 ? a.breed : c.breed, color: Math.random() < 0.5 ? a.color : c.color, age: 0, fed: 70, mood: 90, dirt: 0, energy: 90 });
+      b.dogs.push(puppy);
+      b.together = 0;
+      b.news.push({ type: 'puppy', dogId: id, name });
+      changed = true;
+    }
+    if (changed) save();
+  }
+
   return {
     bones: () => bag().bones,
     bonesBalance: balance,
@@ -277,14 +332,13 @@ export function dogApi(scope = 'real') {
       bag().bones = Math.min(1e6, bag().bones + Math.max(0, Math.round(n)));
       save();
     },
-    dogs: () => bag().dogs.map((d) => ({ ...d })),
+    // Собаки с пересчитанными за прошедшее время сытостью, настроением и чистотой.
+    dogs: () => { tick(); return bag().dogs.map((d) => ({ ...applyDecay(d) })); },
     // Покупка собаки: цена зависит от того, сколько собак уже есть. Возвращает купленную собаку или null.
     buyDog(raw) {
       const price = dogPrice(bag().dogs.length);
       // id уникален, даже если две покупки случились в одну миллисекунду
-      let id = '';
-      do id = `dog-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
-      while (bag().dogs.some((d) => d.id === id));
+      const id = newId();
       const dog = cleanDog({ ...raw, id });
       if (price == null || !dog || balance() < price) return null;
       bag().dogs.push(dog);
@@ -300,9 +354,13 @@ export function dogApi(scope = 'real') {
     // Возвращает false, если корма нет, собаки нет или двор не убран.
     feedDog(id) {
       const dog = bag().dogs.find((d) => d.id === id);
-      if (!dog || bag().food < 1 || dog.poops >= MAX_POOPS) return false;
+      if (!dog) return false;
+      applyDecay(dog);
+      if (bag().food < 1 || dog.poops >= MAX_POOPS || dog.fed >= FULL_AT) return false;
       bag().food -= 1;
       dog.poops += 1;
+      dog.fed = clamp100(dog.fed + 45);
+      dog.mood = clamp100(dog.mood + 8);
       save();
       return true;
     },
@@ -312,6 +370,115 @@ export function dogApi(scope = 'real') {
       if (!dog || bag().bags < 1 || dog.poops < 1) return false;
       bag().bags -= 1;
       dog.poops -= 1;
+      save();
+      return true;
+    },
+    shampoo: () => bag().shampoo,
+    buyShampoo: () => buyPack('shampoo', SHAMPOO_PACK),
+    // Изменить показатели собаки: delta = { fed, mood, dirt } (можно отрицательные), значения держатся в 0–100.
+    // save = false — для частых мелочей (поглаживание), чтобы не писать на диск каждое касание.
+    adjust(id, delta = {}, save_ = true) {
+      const dog = bag().dogs.find((d) => d.id === id);
+      if (!dog) return false;
+      applyDecay(dog);
+      for (const key of ['fed', 'mood', 'dirt', 'energy']) if (delta[key]) dog[key] = clamp100(dog[key] + delta[key]);
+      if (save_) save();
+      return true;
+    },
+    // Повторить трюк: навык растёт до MAX_SKILL; возвращает новый уровень (или -1, если собаки нет).
+    practiceTrick(id, trick) {
+      const dog = bag().dogs.find((d) => d.id === id);
+      if (!dog || !(trick in dog.tricks)) return -1;
+      dog.tricks[trick] = Math.min(MAX_SKILL, dog.tricks[trick] + 1);
+      save();
+      return dog.tricks[trick];
+    },
+    // Вещи и обстановка: покупка за косточки, надевание/расстановка бесплатно.
+    items: () => [...bag().items],
+    decor: () => ({ ...bag().decor }),
+    buyItem(itemId) {
+      const item = itemById.get(itemId);
+      if (!item || bag().items.includes(itemId) || balance() < item.price) return false;
+      bag().items.push(itemId);
+      bag().bonesSpent += item.price;
+      save();
+      return true;
+    },
+    // Надеть вещь на собаку (id пустой — снять). Надеть можно только купленное.
+    equip(dogId, slot, itemId) {
+      const dog = bag().dogs.find((d) => d.id === dogId);
+      const item = itemById.get(itemId);
+      if (!dog || !(slot in dog.outfit)) return false;
+      if (itemId && !(item && item.kind === 'outfit' && item.slot === slot && bag().items.includes(itemId))) return false;
+      dog.outfit[slot] = itemId || '';
+      save();
+      return true;
+    },
+    // Поставить предмет во двор на его место (id пустой — убрать).
+    place(slot, itemId) {
+      const item = itemById.get(itemId);
+      if (!DECOR_SLOTS.includes(slot)) return false;
+      if (itemId && !(item && item.kind === 'decor' && item.slot === slot && bag().items.includes(itemId))) return false;
+      bag().decor[slot] = itemId || '';
+      save();
+      return true;
+    },
+    // Фотоальбом.
+    photos: () => bag().photos.map((p) => ({ ...p })),
+    addPhoto(photo) {
+      const clean = cleanPhoto({ ...photo, at: Date.now() });
+      if (!clean) return false;
+      bag().photos = [...bag().photos, clean].slice(-12);
+      save();
+      return true;
+    },
+    deletePhoto(index) {
+      if (!(index >= 0 && index < bag().photos.length)) return false;
+      bag().photos.splice(index, 1);
+      save();
+      return true;
+    },
+    // Уложить спать: бодрость восстанавливается, настроение растёт (в лежанке — сильнее).
+    // false — собака не хочет спать (бодрости достаточно).
+    sleepDog(id) {
+      const dog = bag().dogs.find((d) => d.id === id);
+      if (!dog) return false;
+      applyDecay(dog);
+      if (dog.energy >= SLEEP_FROM) return false;
+      dog.energy = 100;
+      dog.mood = clamp100(dog.mood + (bag().decor.bed ? SLEEP_MOOD.bed : SLEEP_MOOD.plain));
+      save();
+      return true;
+    },
+    // События для ребёнка (один раз): дни рождения и рождение щенка. Возвращает [{ type, dogId, name, age? }].
+    takeNews() {
+      tick();
+      const b = bag();
+      const out = [];
+      for (const d of b.dogs) {
+        if (d.party) { out.push({ type: 'birthday', dogId: d.id, name: d.name, age: d.party }); d.party = 0; }
+      }
+      out.push(...b.news);
+      b.news = [];
+      if (out.length) save();
+      return out;
+    },
+    // Только для теста: «перематывает» время на несколько дней вперёд (дни рождения, щенок).
+    shiftTime(days) {
+      if (scope !== 'test') return;
+      const ms = Math.max(0, days) * 86400000;
+      for (const d of bag().dogs) d.grew -= ms;
+      if (bag().together) bag().together -= ms;
+      save();
+    },
+    // Помыть: тратится шампунь, собака чистая и довольная.
+    washDog(id) {
+      const dog = bag().dogs.find((d) => d.id === id);
+      if (!dog || bag().shampoo < 1) return false;
+      applyDecay(dog);
+      bag().shampoo -= 1;
+      dog.dirt = 0;
+      dog.mood = clamp100(dog.mood + 15);
       save();
       return true;
     },

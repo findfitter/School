@@ -31,7 +31,7 @@
 /* ---------- Главный экран: слева двор, справа косточки, кнопки и магазин ---------- */
 .dog-home {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(250px, 1fr);
+  grid-template-columns: minmax(0, 1.1fr) minmax(430px, 1fr);
   gap: 16px;
   height: 100%;
 }
@@ -702,4 +702,1216 @@
 .dog-test-tools .btn {
   min-height: 48px;
   padding: 0 14px;
+}
+
+/* ---------- Правая колонка: показатели, вкладки ---------- */
+.dog-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 14px 10px;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.dog-stats-name {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.dog-stats-name strong {
+  font-size: 1.15em;
+}
+
+.dog-stats-name small {
+  color: var(--ink-soft);
+  font-size: 0.7em;
+}
+
+.dog-bars {
+  display: flex;
+  gap: 12px;
+}
+
+.dog-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1em;
+}
+
+.dog-bar-track {
+  flex: 1;
+  height: 14px;
+  border-radius: 7px;
+  background: #e8eefc;
+  overflow: hidden;
+}
+
+.dog-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 7px;
+  transition: width 0.4s;
+}
+
+.dog-bar-fill.low {
+  background: #ef6f6c;
+}
+
+.dog-bar-fill.mid {
+  background: #ffb703;
+}
+
+.dog-bar-fill.high {
+  background: var(--good, #52c47a);
+}
+
+.dog-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.dog-tab {
+  flex: 1;
+  min-width: var(--tap);
+  height: var(--tap);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  background: var(--soft, #e8eefc);
+  line-height: 1.05;
+}
+
+.dog-tab-icon {
+  font-size: 1.5em;
+}
+
+.dog-tab-title {
+  font-size: 0.55em;
+  font-weight: 800;
+}
+
+.dog-tab.active {
+  background: var(--primary, #4f8cff);
+  color: #fff;
+}
+
+.dog-tab.pressed {
+  transform: translateY(3px);
+}
+
+.dog-tab-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.dog-earned-note {
+  color: var(--ink-soft);
+  font-size: 0.65em;
+  text-align: center;
+}
+
+.dog-status {
+  margin-left: 4px;
+  font-size: 0.8em;
+}
+
+.dog-status:empty {
+  display: none;
+}
+
+/* Грустная собака: хвост опущен и еле шевелится */
+.dog-art.mood-sad .dog-tail {
+  animation-duration: 3.4s;
+  transform: rotate(18deg);
+}
+
+.dog-art.mood-sad .dog-eyes {
+  animation-duration: 3s;
+}
+
+/* ---------- Игра «Принеси мяч» ---------- */
+.ball-game {
+  height: 100%;
+}
+
+.ball-field {
+  position: relative;
+  height: 100%;
+  border-radius: var(--radius);
+  overflow: hidden;
+  touch-action: none;
+  box-shadow: var(--shadow);
+  outline: none;
+  cursor: pointer;
+}
+
+.ball-sky {
+  position: absolute;
+  inset: 0 0 45% 0;
+  background: linear-gradient(180deg, #bfe3ff 0%, #e4f4ff 100%);
+}
+
+.ball-lawn {
+  position: absolute;
+  inset: 38% 0 0 0;
+  background: linear-gradient(180deg, #b7ec9c, #7fd08a);
+  border-radius: 50% 50% 0 0 / 10% 10% 0 0;
+}
+
+.ball-dog {
+  position: absolute;
+  width: clamp(110px, 25vh, 210px);
+  translate: -50% -100%;
+  transition: left 0.95s ease-in-out, top 0.95s ease-in-out;
+  pointer-events: none;
+}
+
+.ball {
+  position: absolute;
+  translate: -50% -50%;
+  font-size: clamp(32px, 6.5vh, 54px);
+  line-height: 1;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.25));
+}
+
+.ball[hidden],
+.ball-carried[hidden] {
+  display: none;
+}
+
+.ball-carried {
+  position: absolute;
+  left: 58%;
+  top: 46%;
+  font-size: 2.4em;
+  line-height: 1;
+}
+
+.ball-counter {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  translate: -50% 0;
+  padding: 4px 22px;
+  border-radius: 999px;
+  background: var(--accent, #ffd23f);
+  font-size: 1.3em;
+  font-weight: 800;
+}
+
+.ball-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  translate: -50% 0;
+  padding: 6px 20px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  font-size: 0.85em;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.ball-hint[hidden] {
+  display: none;
+}
+
+/* Бежит: тело подпрыгивает, хвост виляет быстро */
+.dog-wrap.running .dog-body {
+  animation: dog-run 0.28s ease-in-out infinite;
+}
+
+.dog-wrap.running .dog-tail {
+  animation-duration: 0.3s;
+}
+
+.dog-wrap.running .dog-tongue {
+  animation-duration: 0.25s;
+}
+
+@keyframes dog-run {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50% { transform: translateY(-7px) scaleY(1.03); }
+}
+
+/* ---------- Мытьё ---------- */
+.wash-game {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.wash-hint {
+  flex: none;
+  min-height: 1.3em;
+  padding: 4px 22px;
+  border-radius: 999px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  font-size: 1.05em;
+  font-weight: 800;
+  text-align: center;
+}
+
+.wash-hint:empty {
+  visibility: hidden;
+}
+
+.wash-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  overflow: hidden;
+  touch-action: none;
+  background: linear-gradient(180deg, #d8f0ff, #f2fbff);
+  box-shadow: var(--shadow);
+  outline: none;
+}
+
+.wash-art {
+  position: relative;
+  height: 96%;
+  aspect-ratio: 240 / 270;
+}
+
+.wash-svg,
+.wash-svg .dog-art {
+  width: 100%;
+  height: 100%;
+}
+
+.wash-art.shiny {
+  animation: wash-shine 0.9s ease-out;
+}
+
+@keyframes wash-shine {
+  0% { filter: brightness(1); }
+  40% { filter: brightness(1.25) saturate(1.2); }
+  100% { filter: brightness(1); }
+}
+
+.wash-spots,
+.wash-foam,
+.wash-water,
+.wash-sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.wash-spot {
+  position: absolute;
+  translate: -50% -50%;
+  scale: var(--s, 1);
+  font-size: 2.6em;
+  line-height: 1;
+  transition: opacity 0.2s, scale 0.3s;
+}
+
+.wash-spot.gone {
+  scale: 0;
+}
+
+.wash-bubble {
+  position: absolute;
+  translate: -50% -50%;
+  font-size: 1.8em;
+  animation: bubble-up 0.9s ease-out both;
+}
+
+@keyframes bubble-up {
+  from { opacity: 1; transform: translateY(0) scale(0.7); }
+  to { opacity: 0; transform: translateY(-40px) scale(1.3); }
+}
+
+.wash-drop {
+  position: absolute;
+  top: -8%;
+  font-size: 1.8em;
+  animation: drop-fall 0.9s linear both;
+}
+
+@keyframes drop-fall {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(520px); opacity: 0.4; }
+}
+
+.wash-shine {
+  position: absolute;
+  font-size: 2em;
+  animation: fx-float 1.2s ease-out both;
+}
+
+.wash-rinse {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  translate: -50% 0;
+  z-index: 5;
+}
+
+.wash-rinse[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dog-wrap.running .dog-body,
+  .wash-drop,
+  .wash-bubble,
+  .wash-shine,
+  .dog-tag.selected .dog-pointer {
+    animation: none !important;
+  }
+}
+
+/* ---------- Трюки ---------- */
+.trick-game {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(300px, 1fr);
+  gap: 16px;
+  height: 100%;
+}
+
+.trick-stage {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: linear-gradient(180deg, #bfe3ff 0%, #e4f4ff 58%);
+  box-shadow: var(--shadow);
+  perspective: 800px;
+}
+
+.trick-center {
+  position: absolute;
+  left: 50%;
+  bottom: 9%;
+  translate: -50% 0;
+}
+
+.trick-dog {
+  width: clamp(150px, 42vh, 320px);
+  aspect-ratio: 240 / 270;
+}
+
+.trick-bubble {
+  position: absolute;
+  top: 12%;
+  left: 54%;
+  padding: 8px 20px;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: var(--shadow);
+  font-size: 1.1em;
+  font-weight: 800;
+  animation: bubble-pop 0.3s both;
+}
+
+.trick-bubble[hidden] {
+  display: none;
+}
+
+.trick-side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+
+.trick-hint {
+  color: var(--ink-soft);
+  font-size: 0.85em;
+}
+
+.trick-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.trick-btn {
+  justify-content: flex-start;
+  gap: 14px;
+  min-height: 68px;
+  padding: 0 18px;
+}
+
+.trick-icon {
+  font-size: 1.8em;
+}
+
+.trick-name {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.15;
+}
+
+.trick-name small {
+  color: var(--ink-soft);
+  font-size: 0.8em;
+  font-weight: 700;
+}
+
+.trick-btn.known {
+  background: #fff8dc;
+}
+
+.trick-btn.locked {
+  opacity: 0.55;
+}
+
+.trick-name small {
+  letter-spacing: 1px;
+}
+
+.dog-wrap.do-sit .dog-body {
+  animation: trick-sit 1.7s ease-in-out both;
+  transform-origin: 120px 256px;
+}
+
+.dog-wrap.do-sit .dog-head {
+  animation: trick-sit-head 1.7s ease-in-out both;
+}
+
+.dog-wrap.do-paw .dog-paw-r {
+  animation: trick-paw 1.7s ease-in-out both;
+  transform-origin: 142px 214px;
+}
+
+.dog-wrap.do-paw {
+  animation: trick-lean 1.7s ease-in-out both;
+}
+
+.dog-wrap.do-speak .dog-head {
+  animation: trick-speak 0.3s ease-in-out 5;
+}
+
+.dog-wrap.do-spin {
+  animation: trick-spin 1.5s ease-in-out both;
+}
+
+.dog-wrap.do-dance {
+  animation: trick-dance 2.6s ease-in-out both;
+}
+
+@keyframes trick-sit {
+  0%, 100% { transform: scaleY(1); }
+  25%, 75% { transform: scaleY(0.9) translateY(4px); }
+}
+
+@keyframes trick-sit-head {
+  0%, 100% { transform: translateY(0); }
+  25%, 75% { transform: translateY(-6px) rotate(-3deg); }
+}
+
+@keyframes trick-paw {
+  0%, 100% { transform: rotate(0deg); }
+  25%, 75% { transform: rotate(-38deg); }
+}
+
+@keyframes trick-lean {
+  0%, 100% { transform: rotate(0deg); }
+  25%, 75% { transform: rotate(-5deg); }
+}
+
+@keyframes trick-speak {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(-6deg); }
+}
+
+@keyframes trick-spin {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(720deg); }
+}
+
+@keyframes trick-dance {
+  0% { transform: translateX(0) rotate(0deg); }
+  12% { transform: translateX(-12px) rotate(-8deg) translateY(-10px); }
+  25% { transform: translateX(12px) rotate(8deg); }
+  37% { transform: translateX(-12px) rotate(-8deg) translateY(-10px); }
+  50% { transform: translateX(12px) rotate(8deg); }
+  62% { transform: translateX(-12px) rotate(-8deg) translateY(-10px); }
+  75% { transform: translateX(12px) rotate(8deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+/* ---------- Прятки ---------- */
+.hide-field {
+  position: relative;
+  height: 100%;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.hide-dog {
+  position: absolute;
+  width: clamp(80px, 17vh, 150px);
+  translate: -50% -100%;
+  transition: left 1.2s ease-in-out, top 1.2s ease-in-out;
+  pointer-events: none;
+}
+
+.hide-dog[hidden] {
+  display: none;
+}
+
+.hide-spot {
+  position: absolute;
+  translate: -50% -50%;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  padding: 0;
+  line-height: 1;
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.2));
+  transition: transform 0.2s;
+  z-index: 3;
+}
+
+.hide-spot.big {
+  font-size: clamp(70px, 17vh, 140px);
+}
+
+.hide-spot.mid {
+  font-size: clamp(52px, 12vh, 96px);
+}
+
+.hide-spot.empty {
+  animation: spot-shake 0.5s;
+}
+
+.hide-spot.open {
+  transform: translateY(-14px) rotate(-8deg);
+}
+
+@keyframes spot-shake {
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+
+/* ---------- Прогулка ---------- */
+.walk-field {
+  position: relative;
+  height: 100%;
+  border-radius: var(--radius);
+  overflow: hidden;
+  touch-action: none;
+  box-shadow: var(--shadow);
+  background: linear-gradient(180deg, #bfe3ff 0%, #e4f4ff 55%, #b7ec9c 55%, #7fd08a 100%);
+}
+
+.walk-trees {
+  position: absolute;
+  left: 0;
+  top: 30%;
+  width: max-content;
+  font-size: clamp(50px, 11vh, 90px);
+  line-height: 1;
+  white-space: pre;
+  word-spacing: 0.6em;
+  animation: walk-scroll 28s linear infinite;
+}
+
+@keyframes walk-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-60%); }
+}
+
+.walk-ground {
+  position: absolute;
+  inset: 70% 0 0 0;
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.18) 0 40px, transparent 40px 120px);
+  animation: walk-ground 1.4s linear infinite;
+}
+
+@keyframes walk-ground {
+  from { background-position-x: 0; }
+  to { background-position-x: -120px; }
+}
+
+.walk-dog {
+  position: absolute;
+  left: 20%;
+  bottom: 8%;
+  width: clamp(120px, 28vh, 230px);
+  translate: -50% 0;
+}
+
+.walk-enc {
+  position: absolute;
+  left: 100%;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  padding: 0;
+  font-size: clamp(50px, 11vh, 90px);
+  line-height: 1;
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.2));
+  animation: walk-pass linear both;
+  z-index: 4;
+}
+
+@keyframes walk-pass {
+  from { left: 104%; }
+  to { left: -16%; }
+}
+
+.walk-enc.caught {
+  animation: walk-caught 0.5s ease-out both;
+  pointer-events: none;
+}
+
+@keyframes walk-caught {
+  to { transform: scale(1.6); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .walk-trees,
+  .walk-ground,
+  .hide-spot.empty {
+    animation: none !important;
+  }
+}
+
+/* ---------- «Собака спрашивает» и «Читаем вместе» ---------- */
+.quiz-game {
+  display: grid;
+  grid-template-columns: minmax(200px, 0.7fr) minmax(0, 1.5fr);
+  gap: 16px;
+  height: 100%;
+}
+
+.quiz-dog-side {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 6%;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: linear-gradient(180deg, #bfe3ff 0%, #e4f4ff 55%, #b7ec9c 55%, #7fd08a 100%);
+  box-shadow: var(--shadow);
+}
+
+.quiz-dog {
+  width: clamp(130px, 36vh, 270px);
+  aspect-ratio: 240 / 270;
+}
+
+.quiz-main {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+
+.quiz-progress {
+  color: var(--ink-soft);
+  font-size: 0.8em;
+  font-weight: 800;
+}
+
+.quiz-bubble {
+  padding: 10px 22px;
+  border-radius: 24px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  font-size: 1.15em;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.quiz-view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: clamp(70px, 17vh, 130px);
+  font-size: clamp(40px, 9vh, 76px);
+  line-height: 1.1;
+}
+
+.quiz-emoji {
+  text-align: center;
+  white-space: pre-wrap;
+}
+
+.quiz-swatch {
+  width: clamp(70px, 15vh, 120px);
+  height: clamp(70px, 15vh, 120px);
+  border-radius: 50%;
+  border: 5px solid rgba(43, 45, 66, 0.2);
+}
+
+.quiz-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.quiz-option {
+  flex: 1 1 28%;
+  min-height: clamp(64px, 11vh, 84px);
+  font-size: 1.2em;
+  background: var(--primary, #4f8cff);
+  color: #fff;
+}
+
+.quiz-option:nth-child(2) {
+  background: #8b6cf0;
+}
+
+.quiz-option:nth-child(3) {
+  background: #f08c4f;
+}
+
+.quiz-option.faded {
+  opacity: 0.3;
+}
+
+.quiz-option.right {
+  background: var(--good, #52c47a);
+}
+
+.quiz-hint {
+  min-height: 2.4em;
+  color: var(--ink-soft);
+  font-size: 0.85em;
+}
+
+.quiz-result {
+  align-self: center;
+  margin: auto;
+}
+
+.read-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  min-height: clamp(110px, 24vh, 190px);
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.read-emoji {
+  font-size: clamp(50px, 12vh, 96px);
+  line-height: 1;
+}
+
+.read-text {
+  font-size: clamp(40px, 10vh, 84px);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.read-text.long {
+  font-size: clamp(26px, 6vh, 48px);
+}
+
+.read-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.read-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.read-actions .btn {
+  flex: 1;
+  min-height: 72px;
+  font-size: 1.1em;
+}
+
+/* Слушает: голова наклонена, хвост виляет медленно */
+.dog-wrap.listening .dog-head {
+  animation: dog-listen 1.2s ease-in-out infinite;
+}
+
+@keyframes dog-listen {
+  0%, 100% { transform: rotate(-7deg); }
+  50% { transform: rotate(7deg) translateY(-3px); }
+}
+
+/* ---------- Наряды, обстановка, фотоальбом ---------- */
+.dog-slot-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dog-slot-chips .chip-btn.small {
+  min-height: 48px;
+  padding: 0 10px;
+  font-size: 0.75em;
+}
+
+.dog-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dog-tile {
+  position: relative;
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: 18px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  font-size: 1.9em;
+  line-height: 1;
+}
+
+.dog-tile.on {
+  outline: 4px solid var(--accent, #ffd23f);
+  background: #fff8dc;
+}
+
+.dog-tile.locked {
+  background: var(--soft, #e8eefc);
+}
+
+.dog-tile.pressed {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+.dog-tile-badge {
+  position: absolute;
+  right: 3px;
+  bottom: 1px;
+  font-size: 0.34em;
+  font-style: normal;
+  font-weight: 800;
+  color: var(--ink-soft, #6b6f85);
+}
+
+.dog-photo-row {
+  display: flex;
+  gap: 8px;
+}
+
+.dog-photo-row .dog-action {
+  flex: 1;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Обстановка во дворе: стоит позади собак */
+.dog-decor-layer {
+  position: absolute;
+  inset: 0;
+  container-type: inline-size;
+  pointer-events: none;
+}
+
+.dog-decor {
+  position: absolute;
+  translate: -50% -50%;
+  line-height: 1;
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.18));
+}
+
+/* Вспышка при съёмке */
+.dog-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  background: #fff;
+  pointer-events: none;
+  animation: flash 0.7s ease-out both;
+}
+
+@keyframes flash {
+  from { opacity: 0.95; }
+  to { opacity: 0; }
+}
+
+/* Снимок: тот же двор, но неподвижный */
+.photo-scene {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  container-type: inline-size;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #cfe9ff;
+}
+
+.photo-sky {
+  position: absolute;
+  inset: 0 0 50% 0;
+  background: linear-gradient(180deg, #bfe3ff 0%, #e4f4ff 100%);
+}
+
+.photo-lawn {
+  position: absolute;
+  inset: 40% -5% -30% -5%;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #b7ec9c, #7fd08a);
+}
+
+.photo-decor {
+  position: absolute;
+  translate: -50% -50%;
+  line-height: 1;
+}
+
+.photo-dog {
+  position: absolute;
+  bottom: 6%;
+  width: 26cqw;
+  translate: -50% 0;
+}
+
+.photo-dog.dogs-1 {
+  width: 34cqw;
+}
+
+.photo-dog.dogs-3 {
+  width: 22cqw;
+}
+
+.photo-dog .dog-art,
+.photo-dog .dog-art * {
+  animation: none !important;
+}
+
+/* Экран альбома: сетка снимков без прокрутки */
+.album {
+  position: relative;
+  height: 100%;
+}
+
+.album-grid {
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-auto-rows: min-content;
+  gap: 10px;
+  align-content: start;
+}
+
+.album-thumb {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  border-radius: 18px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.album-thumb small {
+  color: var(--ink-soft);
+  font-size: 0.6em;
+}
+
+.album-empty {
+  grid-column: 1 / -1;
+  align-self: center;
+  justify-self: center;
+  margin-top: 18vh;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
+.album-empty-icon {
+  font-size: 4em;
+}
+
+.album-big-card {
+  width: min(70vw, 105vh, 760px);
+  padding: 16px;
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 10px 0 rgba(120, 60, 160, 0.2);
+}
+
+.album-big-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+/* ---------- Сон, усталость ---------- */
+.dog-bars {
+  gap: 8px;
+}
+
+.dog-art .dog-eyes-shut {
+  display: none;
+}
+
+.dog-art.sleeping .dog-eyes {
+  display: none;
+}
+
+.dog-art.sleeping .dog-eyes-shut {
+  display: inline;
+}
+
+/* Уставшая собака: глаза прикрыты */
+.dog-art.tired .dog-eyes {
+  transform: scaleY(0.45);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.sleep-game {
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(260px, 1fr);
+  gap: 16px;
+}
+
+.sleep-stage {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  background: linear-gradient(180deg, #bfe3ff, #e8f6ff 60%);
+  transition: background 1.2s;
+}
+
+.sleep-game.night .sleep-stage {
+  background: linear-gradient(180deg, #14183c, #2b3070 70%);
+}
+
+.sleep-stage .dog-lawn {
+  transition: filter 1.2s;
+}
+
+.sleep-game.night .dog-lawn {
+  filter: brightness(0.45) saturate(0.7);
+}
+
+.sleep-sky {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.2s;
+  pointer-events: none;
+}
+
+.sleep-game.night .sleep-sky {
+  opacity: 1;
+}
+
+.sleep-moon {
+  position: absolute;
+  right: 8%;
+  top: 8%;
+  font-size: 3.4em;
+}
+
+.sleep-star {
+  position: absolute;
+  font-size: 1.4em;
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  50% { opacity: 0.35; transform: scale(0.8); }
+}
+
+.sleep-center {
+  position: absolute;
+  left: 50%;
+  bottom: 6%;
+  translate: -50% 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.sleep-bed {
+  position: absolute;
+  bottom: -4%;
+  font-size: clamp(100px, 30vh, 220px);
+  line-height: 1;
+  opacity: 0.9;
+}
+
+.sleep-dog {
+  position: relative;
+  z-index: 1;
+  width: clamp(130px, 34vh, 280px);
+}
+
+.sleep-zzz {
+  position: absolute;
+  right: -30%;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column-reverse;
+  font-weight: 800;
+  color: #fff;
+}
+
+.sleep-zzz span {
+  font-size: 2.2em;
+  animation: zzz 2s ease-in-out infinite;
+}
+
+.sleep-zzz span:nth-child(2) { animation-delay: 0.5s; font-size: 1.7em; }
+.sleep-zzz span:nth-child(3) { animation-delay: 1s; font-size: 1.3em; }
+
+@keyframes zzz {
+  0%, 100% { opacity: 0.2; transform: translateY(6px); }
+  50% { opacity: 1; transform: translateY(-6px); }
+}
+
+.sleep-dog .dog-head {
+  animation: dog-breathe 2.4s ease-in-out infinite;
+}
+
+.sleep-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  text-align: center;
+}
+
+.sleep-msg {
+  font-size: 1.2em;
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sleep-star,
+  .sleep-zzz span {
+    animation: none !important;
+  }
+}
+
+.sleep-zzz[hidden] {
+  display: none;
 }
