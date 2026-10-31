@@ -4,7 +4,7 @@ import { legacyUnlocked, stickerById } from './rewards.js';
 import { cleanDecor, itemById, DECOR_SLOTS } from './dog-items.js';
 import {
   cleanDog, dogPrice, applyDecay, clamp100, PACK_PRICE, FOOD_PACK, BAG_PACK, SHAMPOO_PACK, MAX_POOPS, FULL_AT, MAX_SKILL,
-  ADULT_AGE, PUPPY_AFTER_MS, HAPPY_AT, SLEEP_FROM, SLEEP_MOOD, NAMES,
+  ADULT_AGE, PUPPY_AFTER_MS, HAPPY_AT, SLEEP_FROM, SLEEP_MOOD, NAMES, PLAY_LIMIT_SEC,
 } from './dogs.js';
 
 const KEY = 'school-app-v1';
@@ -18,7 +18,7 @@ const DOGS_VERSION = 2;
 
 // «Сумка» собак: косточки, собаки и запасы. Одна — рабочая (в корне состояния, для ребёнка), другая — тестовая
 // (state.test, для проверки новых возможностей в разделе для родителя); друг с другом они не связаны.
-const emptyDogBag = () => ({ bones: 0, bonesSpent: 0, dogs: [], food: 0, bags: 0, shampoo: 0, items: [], decor: cleanDecor(), photos: [], together: 0, news: [] });
+const emptyDogBag = () => ({ bones: 0, bonesSpent: 0, dogs: [], food: 0, bags: 0, shampoo: 0, items: [], decor: cleanDecor(), photos: [], together: 0, news: [], play: { day: '', sec: 0 } });
 
 const CLEAN_SERIES_TO_FORGET = 3; // трудное задание забывается после стольких серий без ошибки в нём
 
@@ -116,6 +116,7 @@ function normalizeDogBag(c = {}) {
     items: [...new Set((Array.isArray(c.items) ? c.items : []).filter((id) => itemById.has(id)))], // купленные вещи и обстановка
     decor: cleanDecor(c.decor), // что стоит во дворе: { house, bed, toy, plant, fun }
     photos: (Array.isArray(c.photos) ? c.photos : []).map(cleanPhoto).filter(Boolean).slice(-12), // фотоальбом
+    play: { day: typeof c.play?.day === 'string' ? c.play.day : '', sec: num(c.play?.sec, 0, PLAY_LIMIT_SEC, 0) }, // сколько секунд игр потрачено в этот день
     together: Math.max(0, Number(c.together)) || 0, // с какого момента две взрослые собаки живут вдвоём (для щенка), 0 — нет
     news: (Array.isArray(c.news) ? c.news : []) // события, о которых ещё не сказали ребёнку (родился щенок)
       .filter((n) => n && n.type === 'puppy' && typeof n.dogId === 'string')
@@ -437,6 +438,18 @@ export function dogApi(scope = 'real') {
       bag().photos.splice(index, 1);
       save();
       return true;
+    },
+    // Время игр за сегодня (секунды): лимит PLAY_LIMIT_SEC в день, новый день — с нуля.
+    playUsed() {
+      const play = bag().play;
+      return play.day === dayKey() ? play.sec : 0;
+    },
+    addPlay(seconds) {
+      const play = bag().play;
+      const today = dayKey();
+      if (play.day !== today) { play.day = today; play.sec = 0; }
+      play.sec = Math.min(PLAY_LIMIT_SEC, play.sec + Math.max(0, seconds));
+      save();
     },
     // Уложить спать: бодрость восстанавливается, настроение растёт (в лежанке — сильнее).
     // false — собака не хочет спать (бодрости достаточно).

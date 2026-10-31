@@ -11,7 +11,7 @@ import { STR } from '../strings.js';
 import * as storage from '../storage.js';
 import {
   BREEDS, COLORS, NAMES, NAME_MAX, MAX_AGE, MAX_POOPS, PACK_PRICE, FULL_AT, HUNGRY_AT, SAD_AT, DIRTY_AT, WASH_FROM,
-  TIRED_AT, SLEEP_FROM, ENERGY_COST,
+  TIRED_AT, SLEEP_FROM, ENERGY_COST, PLAY_LIMIT_SEC,
   dogPrice, ageLabel, breedById, drawDog, moodState,
 } from '../dogs.js';
 import { createBallGame } from '../dog/ball.js';
@@ -40,8 +40,8 @@ const SLOTS = { 1: [50], 2: [30, 70], 3: [18, 50, 82] };
 // Вкладки справа. Каждая — список кнопок (см. tabContent).
 const TABS = [
   { id: 'care', icon: '🐾', title: D.tabCare },
-  { id: 'play', icon: '🎾', title: D.tabPlay },
-  { id: 'learn', icon: '🎓', title: D.tabLearn },
+  { id: 'play', icon: '⚽', title: D.tabPlay },
+  { id: 'learn', icon: '🎓', title: D.tabLearn, testOnly: true }, // пока только на тестовом экране
   { id: 'outfit', icon: '👕', title: D.tabOutfit },
   { id: 'home', icon: '🏡', title: D.tabHome },
   { id: 'shop', icon: '🛒', title: D.tabShop },
@@ -122,9 +122,31 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
   }
 
   // ---------- Мини-игры и занятия на весь экран ----------
-  function startGame(create) {
+  // timed — игра из вкладки «Играть»: её время считается в дневной лимит (на тестовом экране лимита нет).
+  let gameTimer = 0;
+  let gameStart = 0;
+  const playLeft = () => Math.max(0, PLAY_LIMIT_SEC - store.playUsed());
+  const playOver = () => !testing && playLeft() <= 0;
+
+  function stopGameTimer() {
+    clearInterval(gameTimer);
+    if (gameStart) store.addPlay((Date.now() - gameStart) / 1000);
+    gameStart = 0;
+  }
+
+  function startGame(create, { timed = false } = {}) {
     const dog = selected();
     if (!dog || busy || game) return;
+    if (timed && !testing) {
+      const base = store.playUsed();
+      gameStart = Date.now();
+      gameTimer = setInterval(() => {
+        if (!alive()) return stopGameTimer();
+        if (base + (Date.now() - gameStart) / 1000 < PLAY_LIMIT_SEC) return;
+        endGame();
+        showPlayOver();
+      }, 1000);
+    }
     game = create({
       app, store, dog, alive, wait,
       exit: () => endGame(),
@@ -133,8 +155,17 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
     main.replaceChildren(game.el);
   }
 
+  function showPlayOver() {
+    const popup = h('div', { class: 'overlay bought-popup' },
+      h('div', { class: 'super-card dog-popup' },
+        h('h2', { text: D.playOverPopup }),
+        button('btn primary big', D.ok, () => popup.remove())));
+    screen.append(popup);
+  }
+
   function endGame() {
     if (!game) return;
+    stopGameTimer();
     game.cleanup?.();
     game = null;
     refresh();
@@ -198,7 +229,7 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
 
   function tabStrip(side) {
     return h('div', { class: 'dog-tabs', role: 'tablist' },
-      TABS.map((t) => {
+      TABS.filter((t) => !t.testOnly || testing).map((t) => {
         const btn = button(`dog-tab${t.id === tab ? ' active' : ''}`, [h('span', { class: 'dog-tab-icon', text: t.icon }), h('span', { class: 'dog-tab-title', text: t.title })], () => {
           if (busy) return;
           tab = t.id;
@@ -238,16 +269,22 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
       // Игры, где собака бегает, требуют сил: голодная собака сначала должна поесть.
       const play = (create, cost) => () => {
         if (busy) return;
+        if (playOver()) return yard.say(D.playOver, 2600);
         if (selected().fed < HUNGRY_AT) return yard.say(D.hungryNoPlay, 2600);
         if (selected().energy < TIRED_AT) return yard.say(D.tiredNoPlay, 2600);
         store.adjust(selected().id, { energy: -cost });
-        startGame(create);
+        startGame(create, { timed: true });
       };
       box.append(
-        action(`🎾 ${D.ballTitle}`, null, play(createBallGame, ENERGY_COST.ball), { primary: true }),
-        action(`🎓 ${D.tricks.title}`, null, () => { if (!busy) startGame(createTricksGame); }),
+        action(`⚽ ${D.ballTitle}`, null, play(createBallGame, ENERGY_COST.ball), { primary: true }),
+        action(`🎓 ${D.tricks.title}`, null, () => {
+          if (busy) return;
+          if (playOver()) return yard.say(D.playOver, 2600);
+          startGame(createTricksGame, { timed: true });
+        }),
         action(`🙈 ${D.hide.title}`, null, play(createHideGame, ENERGY_COST.hide)),
-        action(`🌳 ${D.walk.title}`, null, play(createWalkGame, ENERGY_COST.walk)));
+        action(`🌳 ${D.walk.title}`, null, play(createWalkGame, ENERGY_COST.walk)),
+        h('small', { class: 'dog-earned-note', text: testing ? D.playNoLimit : format(D.playLeft, { time: `${Math.floor(playLeft() / 60)}:${String(Math.floor(playLeft() % 60)).padStart(2, '0')}` }) }));
     } else if (tab === 'learn') {
       box.append(
         action(`❓ ${D.quiz.title}`, null, () => { if (!busy) startGame(createQuizGame); }, { primary: true }),

@@ -22,9 +22,9 @@ export function createBallGame({ app, store, dog, alive, wait }) {
   const sky = h('div', { class: 'ball-sky' });
   const lawn = h('div', { class: 'ball-lawn' });
   const wrap = h('div', { class: 'dog-wrap ball-dog' }, drawDog(dog));
-  const carried = h('div', { class: 'ball-carried', text: '🎾', hidden: true });
+  const carried = h('div', { class: 'ball-art ball-carried', hidden: true });
   wrap.append(carried);
-  const ball = h('div', { class: 'ball', text: '🎾' });
+  const ball = h('div', { class: 'ball-art ball' });
   const counter = h('div', { class: 'ball-counter', text: B.ball.count.replace('{n}', '0') });
   const hint = h('div', { class: 'ball-hint', text: B.ball.hint });
   const effects = h('div', { class: 'dog-effects' });

@@ -878,9 +878,34 @@
 .ball {
   position: absolute;
   translate: -50% -50%;
-  font-size: clamp(32px, 6.5vh, 54px);
-  line-height: 1;
   filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.25));
+}
+
+/* Мяч рисуется стилями (эмодзи 🎾 на некоторых системах выглядит как ракетка с мячом) */
+.ball-art {
+  width: clamp(32px, 6.5vh, 54px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #f4ff7a 0%, #c9e53a 45%, #9cc21f 100%);
+  overflow: hidden;
+}
+
+.ball-art::before,
+.ball-art::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+}
+
+.ball-art::before {
+  left: -62%;
+}
+
+.ball-art::after {
+  left: 62%;
 }
 
 .ball[hidden],
@@ -892,8 +917,7 @@
   position: absolute;
   left: 58%;
   top: 46%;
-  font-size: 2.4em;
-  line-height: 1;
+  width: 36px;
 }
 
 .ball-counter {

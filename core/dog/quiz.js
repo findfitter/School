@@ -33,7 +33,7 @@ const WORDS = [
   { word: 'лиса', emoji: '🦊' }, { word: 'слон', emoji: '🐘' }, { word: 'яблоко', emoji: '🍎' }, { word: 'ёлка', emoji: '🌲' },
   { word: 'сова', emoji: '🦉' }, { word: 'торт', emoji: '🍰' },
 ];
-const THINGS = ['🎾', '🍎', '🦴', '⭐', '🐟', '🍪'];
+const THINGS = ['⚽', '🍎', '🦴', '⭐', '🐟', '🍪'];
 
 // Каждый вопрос: { text, view (что показать), options: [{ t, v }], answer (индекс), hint }
 const GENERATORS = [
@@ -61,7 +61,7 @@ const GENERATORS = [
   // Где мяч: слева или справа?
   () => {
     const left = Math.random() < 0.5;
-    return { text: Q.side, view: left ? '🎾  🐶' : '🐶  🎾', options: [{ t: 'Слева', ok: left }, { t: 'Справа', ok: !left }], hint: Q.hintSide };
+    return { text: Q.side, view: left ? '⚽  🐶' : '🐶  ⚽', options: [{ t: 'Слева', ok: left }, { t: 'Справа', ok: !left }], hint: Q.hintSide };
   },
   // Какое слово написано под картинкой?
   () => {

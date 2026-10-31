@@ -35,6 +35,9 @@ export const SLEEP_MOOD = { plain: 6, bed: 12 }; // сколько настро�
 export const ENERGY_COST = { ball: 8, hide: 6, walk: 12 }; // сколько бодрости забирает игра
 
 // Рост: раз в BIRTHDAY_DAYS дней собаке прибавляется год (день рождения), до GROW_MAX_AGE. Считается по реальному времени.
+// Время игр (вкладка «Играть») ограничено: не больше PLAY_LIMIT_SEC секунд в день. На тестовом экране лимита нет.
+export const PLAY_LIMIT_SEC = 180;
+
 export const BIRTHDAY_DAYS = 4;
 export const GROW_MAX_AGE = 6;
 const DAY_MS = 86400000;
@@ -96,6 +99,7 @@ export const BREEDS = [
   { id: 'poodle', name: 'Пудель' },
   { id: 'dachshund', name: 'Такса' },
   { id: 'husky', name: 'Хаски' },
+  { id: 'whippet', name: 'Уиппет' },
 ];
 
 export const COLORS = [
@@ -185,6 +189,7 @@ export function drawDog({ breed = 'labrador', color = 'ginger', age = 3, mood = 
   const husky = breed === 'husky';
   const dachshund = breed === 'dachshund';
   const poodle = breed === 'poodle';
+  const whippet = breed === 'whippet'; // стройная, с тонкими лапами и длинной мордой
   const eye = husky ? '#4aa3e0' : ink;
   const eyeR = puppy ? 9 : 7;
   const bodyScale = puppy ? 0.8 : 1;
@@ -195,11 +200,15 @@ export function drawDog({ breed = 'labrador', color = 'ginger', age = 3, mood = 
     shepherd: `<path d="M166 232 Q214 224 204 172" stroke="${base}" stroke-width="24" stroke-linecap="round" fill="none"/><path d="M204 190 Q210 176 204 172" stroke="${dark}" stroke-width="12" stroke-linecap="round" fill="none"/>`,
     poodle: `<path d="M166 232 Q196 218 192 190" stroke="${base}" stroke-width="10" stroke-linecap="round" fill="none"/><circle cx="192" cy="180" r="17" fill="${base}"/>`,
     dachshund: `<path d="M164 236 Q200 232 198 196" stroke="${base}" stroke-width="9" stroke-linecap="round" fill="none"/>`,
+    whippet: `<path d="M164 238 Q216 244 208 192" stroke="${base}" stroke-width="8" stroke-linecap="round" fill="none"/>`,
     husky: `<path d="M166 232 Q208 232 200 188 Q196 172 184 176" stroke="${base}" stroke-width="22" stroke-linecap="round" fill="none"/><path d="M200 190 Q196 176 184 176" stroke="${light}" stroke-width="10" stroke-linecap="round" fill="none"/>`,
   }[breed];
 
-  const bodyRy = dachshund ? 40 : poodle ? 44 : 48;
-  const legTop = dachshund ? 226 : 212;
+  const bodyRy = dachshund ? 40 : poodle ? 44 : whippet ? 42 : 48;
+  const bodyRx = whippet ? 46 : 54;
+  const legTop = dachshund ? 226 : whippet ? 218 : 212;
+  const legW = whippet ? 15 : 24;
+  const pawRx = whippet ? 11 : 16;
   const fluff = poodle
     ? [[84, 214, 17], [156, 214, 17], [120, 238, 17], [92, 238, 15], [148, 238, 15]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${base}"/>`).join('')
     : '';
@@ -209,6 +218,7 @@ export function drawDog({ breed = 'labrador', color = 'ginger', age = 3, mood = 
     shepherd: `<polygon points="78,80 72,16 116,64" fill="${dark}"/><polygon points="162,80 168,16 124,64" fill="${dark}"/><polygon points="84,70 82,36 106,62" fill="${light}"/><polygon points="156,70 158,36 134,62" fill="${light}"/>`,
     poodle: `<circle cx="66" cy="126" r="27" fill="${base}"/><circle cx="174" cy="126" r="27" fill="${base}"/><circle cx="50" cy="140" r="14" fill="${base}"/><circle cx="190" cy="140" r="14" fill="${base}"/>`,
     dachshund: `<ellipse cx="70" cy="136" rx="18" ry="50" transform="rotate(8 70 136)" fill="${dark}"/><ellipse cx="170" cy="136" rx="18" ry="50" transform="rotate(-8 170 136)" fill="${dark}"/>`,
+    whippet: `<ellipse cx="78" cy="96" rx="12" ry="24" transform="rotate(-42 78 96)" fill="${dark}"/><ellipse cx="162" cy="96" rx="12" ry="24" transform="rotate(42 162 96)" fill="${dark}"/><ellipse cx="79" cy="98" rx="6" ry="15" transform="rotate(-42 79 98)" fill="#f3b6bd"/><ellipse cx="161" cy="98" rx="6" ry="15" transform="rotate(42 161 98)" fill="#f3b6bd"/>`,
     husky: `<polygon points="80,78 80,24 118,62" fill="${dark}"/><polygon points="160,78 160,24 122,62" fill="${dark}"/><polygon points="86,68 88,40 106,62" fill="${light}"/><polygon points="154,68 152,40 134,62" fill="${light}"/>`,
   }[breed];
 
@@ -216,15 +226,17 @@ export function drawDog({ breed = 'labrador', color = 'ginger', age = 3, mood = 
     ? `<circle cx="120" cy="64" r="26" fill="${base}"/><circle cx="96" cy="74" r="16" fill="${base}"/><circle cx="144" cy="74" r="16" fill="${base}"/>`
     : '';
 
-  const headShape = dachshund
-    ? `<ellipse cx="120" cy="112" rx="44" ry="50" fill="${base}"${edge}/>`
+  const headShape = dachshund || whippet
+    ? `<ellipse cx="120" cy="112" rx="${whippet ? 40 : 44}" ry="${whippet ? 54 : 50}" fill="${base}"${edge}/>`
     : `<circle cx="120" cy="112" r="${poodle ? 46 : 52}" fill="${base}"${edge}/>`;
 
   const mask = husky
     ? `<ellipse cx="120" cy="132" rx="42" ry="36" fill="#ffffff"/><path d="M120 62 L108 100 L132 100 Z" fill="#ffffff"/>`
     : '';
 
-  const snout = dachshund
+  const snout = whippet
+    ? { cy: 140, rx: 20, ry: 27 }
+    : dachshund
     ? { cy: 138, rx: 22, ry: 25 }
     : breed === 'shepherd'
       ? { cy: 136, rx: 24, ry: 24 }
@@ -257,12 +269,12 @@ export function drawDog({ breed = 'labrador', color = 'ginger', age = 3, mood = 
   <g transform="translate(120 256) scale(${bodyScale}) translate(-120 -256)">
     <g class="dog-tail">${tails}</g>
     <g class="dog-body">
-    <ellipse cx="120" cy="204" rx="54" ry="${bodyRy}" fill="${base}"${edge}/>
+    <ellipse cx="120" cy="204" rx="${bodyRx}" ry="${bodyRy}" fill="${base}"${edge}/>
     ${fluff}
-    <ellipse cx="120" cy="212" rx="28" ry="${bodyRy - 12}" fill="${husky ? '#ffffff' : light}"/>
-    <rect x="86" y="${legTop}" width="24" height="${256 - legTop}" rx="12" fill="${base}"${edge}/>
-    <ellipse cx="98" cy="254" rx="16" ry="8" fill="${light}"/>
-    <g class="dog-paw-r"><rect x="130" y="${legTop}" width="24" height="${256 - legTop}" rx="12" fill="${base}"${edge}/><ellipse cx="142" cy="254" rx="16" ry="8" fill="${light}"/></g>
+    <ellipse cx="120" cy="212" rx="${whippet ? 24 : 28}" ry="${bodyRy - 12}" fill="${husky ? '#ffffff' : light}"/>
+    <rect x="${98 - legW / 2}" y="${legTop}" width="${legW}" height="${256 - legTop}" rx="${legW / 2}" fill="${base}"${edge}/>
+    <ellipse cx="98" cy="254" rx="${pawRx}" ry="8" fill="${light}"/>
+    <g class="dog-paw-r"><rect x="${142 - legW / 2}" y="${legTop}" width="${legW}" height="${256 - legTop}" rx="${legW / 2}" fill="${base}"${edge}/><ellipse cx="142" cy="254" rx="${pawRx}" ry="8" fill="${light}"/></g>
     ${bodySpots}
     </g>
     <g transform="translate(120 112) scale(${headScale}) translate(-120 -112)"><g class="dog-head">
