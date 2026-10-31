@@ -262,7 +262,7 @@
 }
 
 .chip-btn.small {
-  min-height: 52px;
+  min-height: var(--tap);
   padding: 0 16px;
   font-size: 0.85em;
   background: var(--soft);
@@ -1588,7 +1588,7 @@
 }
 
 .dog-slot-chips .chip-btn.small {
-  min-height: 48px;
+  min-height: var(--tap);
   padding: 0 10px;
   font-size: 0.75em;
 }

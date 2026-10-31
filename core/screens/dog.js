@@ -124,6 +124,7 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
   // ---------- Мини-игры и занятия на весь экран ----------
   // timed — игра из вкладки «Играть»: её время считается в дневной лимит (на тестовом экране лимита нет).
   let gameTimer = 0;
+  let gameSession = null;
   let gameStart = 0;
   const playLeft = () => Math.max(0, PLAY_LIMIT_SEC - store.playUsed());
   const playOver = () => !testing && playLeft() <= 0;
@@ -147,8 +148,12 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
         showPlayOver();
       }, 1000);
     }
+    // alive() игры ложно, как только экран закрыт или игра закончена: недоигранные ожидания (бросок мяча и т.п.) тихо обрываются.
+    const session = {};
+    gameSession = session;
     game = create({
-      app, store, dog, alive, wait,
+      app, store, dog, wait,
+      alive: () => alive() && gameSession === session,
       exit: () => endGame(),
     });
     footer.hidden = true;
@@ -166,6 +171,7 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
   function endGame() {
     if (!game) return;
     stopGameTimer();
+    gameSession = null;
     game.cleanup?.();
     game = null;
     refresh();
