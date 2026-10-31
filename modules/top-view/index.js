@@ -1,28 +1,22 @@
-// Тени и вид сверху. Два вида заданий:
-//  — тень: показана картинка, среди чёрных силуэтов нужно найти её тень;
-//  — вид сверху: показан предмет сбоку (мяч, кубик, кружка, домик…), нужно выбрать, как он выглядит сверху.
-// Уровни: 0 — тень, варианты из разных групп (животное, машина, фрукт); 1 — тень, 4 похожие картинки одной группы;
-// 2 — вид сверху, 3 заметно разных предмета; 3 — вид сверху, 4 предмета, в том числе похожие (мяч, банка, конус, кружка).
-// Подсказка после ошибки: у вида сверху картинка наклоняется («смотрим сверху»); после второй ошибки верный вариант
-// подсвечивается. Ошибочные задания повторяются в конце серии. Уровень помнится между сериями (повышение — после 3 верных).
-// Ключи заданий: «s:🐘» (тень) и «t:cube» (вид сверху).
+// Вид сверху. Показан предмет или геометрическое тело (сбоку), нужно выбрать, как оно выглядит сверху.
+// Уровни: 0 — предметы попроще (мяч, кубик, домик, пирамида), 3 варианта; 1 — все предметы, 4 варианта, в том числе
+// похожие (мяч, банка, конус, кружка); 2 — геометрические тела (куб, цилиндр, пирамида, шестигранная призма,
+// бублик, шар), 3 варианта; 3 — вся геометрия, 4 варианта: тела стоят и лежат (цилиндр или конус на боку сверху
+// выглядят иначе, чем стоя) — нужно представить предмет в пространстве.
+// Подсказка после ошибки: картинка наклоняется («смотрим сверху»); после второй ошибки верный вариант подсвечивается.
+// Ошибочные задания повторяются в конце серии. Уровень помнится между сериями (повышение — после 3 верных подряд).
+// Ключ задания — «t:id» предмета (например «t:g-cone-side»).
 
 import { TEXT } from './texts.js';
-import { SHADOW_GROUPS, SOLIDS, EASY_TOPS } from './data.js';
+import { SOLIDS, POOLS } from './data.js';
 
-const LEVELS = [
-  { type: 'shadow', count: 3, mixed: true },
-  { type: 'shadow', count: 4, mixed: false },
-  { type: 'top', count: 3, pool: EASY_TOPS },
-  { type: 'top', count: 4, pool: SOLIDS.map((s) => s.id) },
-];
+const COUNTS = [3, 4, 3, 4]; // сколько вариантов на каждом уровне
 const CLEAN_TO_LEVEL_UP = 3; // верных подряд до повышения уровня
 const WRONG_BEFORE_POINTING = 2; // после стольких ошибок верный вариант подсвечивается
 
 const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 const pick = (list) => list[rnd(0, list.length - 1)];
 const solidById = new Map(SOLIDS.map((s) => [s.id, s]));
-const groupOf = new Map(Object.entries(SHADOW_GROUPS).flatMap(([group, list]) => list.map((e) => [e, group])));
 
 function shuffle(list) {
   const out = [...list];
@@ -75,47 +69,32 @@ function onTap(button, fn) {
 }
 
 // ---------- Задания ----------
-function shadowTask(level, target) {
-  const { count, mixed } = LEVELS[level];
-  const group = groupOf.get(target);
-  let others;
-  if (mixed) {
-    const groups = shuffle(Object.keys(SHADOW_GROUPS).filter((g) => g !== group)).slice(0, count - 1);
-    others = groups.map((g) => pick(SHADOW_GROUPS[g]));
-  } else {
-    others = shuffle(SHADOW_GROUPS[group].filter((e) => e !== target)).slice(0, count - 1);
-  }
-  return { type: 'shadow', key: `s:${target}`, target, options: shuffle([target, ...others]), level };
-}
-
-function topTask(level, targetId) {
-  const { count, pool } = LEVELS[level];
+// Варианты — предметы с разным видом сверху (два варианта с одним topKey не показываются: иначе два верных ответа).
+function makeTaskFor(level, targetId) {
   const topKey = solidById.get(targetId).topKey;
-  // варианты — предметы с разным видом сверху (вид сверху у двух вариантов не должен совпадать)
-  const others = shuffle(pool.filter((id) => id !== targetId && solidById.get(id).topKey !== topKey)).slice(0, count - 1);
-  return { type: 'top', key: `t:${targetId}`, target: targetId, options: shuffle([targetId, ...others]), level };
+  const taken = new Set([topKey]);
+  const others = [];
+  for (const id of shuffle(POOLS[level])) {
+    const key = solidById.get(id).topKey;
+    if (taken.has(key) || others.length >= COUNTS[level] - 1) continue;
+    taken.add(key);
+    others.push(id);
+  }
+  return { key: `t:${targetId}`, target: targetId, options: shuffle([targetId, ...others]), level };
 }
 
 function makeTask(level, used) {
-  const cfg = LEVELS[level];
-  if (cfg.type === 'shadow') {
-    const all = Object.values(SHADOW_GROUPS).flat();
-    const fresh = all.filter((e) => !used.has(`s:${e}`));
-    return shadowTask(level, pick(fresh.length ? fresh : all));
-  }
-  const fresh = cfg.pool.filter((id) => !used.has(`t:${id}`));
-  return topTask(level, pick(fresh.length ? fresh : cfg.pool));
+  const fresh = POOLS[level].filter((id) => !used.has(`t:${id}`));
+  return makeTaskFor(level, pick(fresh.length ? fresh : POOLS[level]));
 }
 
-// Трудное задание из прошлых серий («s:🐘» или «t:cube») — на том же уровне, где оно могло встретиться.
+// Трудное задание из прошлых серий («t:cube») — на самом лёгком уровне, где оно встречается.
 function taskFromKey(key) {
-  const [kind, value] = [key.slice(0, 1), key.slice(2)];
-  if (kind === 's' && groupOf.has(value)) return shadowTask(0, value);
-  if (kind === 't' && solidById.has(value)) return topTask(LEVELS[3].pool.includes(value) ? 3 : 2, value);
-  return null;
+  const id = key.slice(2);
+  if (!key.startsWith('t:') || !solidById.has(id)) return null;
+  const level = POOLS.findIndex((pool) => pool.includes(id));
+  return level >= 0 ? makeTaskFor(level, id) : null;
 }
-
-const labelOf = (task) => (task.type === 'shadow' ? `${task.target} тень` : `🔦 ${TEXT.objects[task.target]} сверху`);
 
 export function start(ctx) {
   const total = ctx.settings.seriesLength;
@@ -156,13 +135,9 @@ export function start(ctx) {
     return new Promise((resolve) => {
       let wrong = 0;
       let locked = false;
-      const isShadow = task.type === 'shadow';
 
-      prompt.textContent = isShadow ? TEXT.promptShadow : TEXT.promptTop;
-      const picture = isShadow
-        ? el('div', 'sv-emoji', task.target)
-        : drawing(solidById.get(task.target).front, 'sv-front');
-      picture.classList.add('sv-picture');
+      prompt.textContent = TEXT.prompt;
+      const picture = drawing(solidById.get(task.target).front, 'sv-front sv-picture');
       targetBox.replaceChildren(picture);
       options.replaceChildren();
 
@@ -174,14 +149,13 @@ export function start(ctx) {
           btn.disabled = true;
           btn.classList.add('faded');
           ctx.sound('hint');
-          prompt.textContent = isShadow ? TEXT.hintShadow : TEXT.hintTop;
-          if (!isShadow) picture.classList.add('tilt'); // подсказка: смотрим на предмет сверху
+          prompt.textContent = task.target.endsWith('-side') ? TEXT.hintLying : TEXT.hint;
+          picture.classList.add('tilt'); // подсказка: смотрим на предмет сверху
           if (wrong >= WRONG_BEFORE_POINTING) correctBtn.classList.add('point');
           return;
         }
         locked = true;
         btn.classList.add('right');
-        if (isShadow) btn.classList.add('revealed'); // верная тень «оживает» цветом
         ctx.sound('correct');
         wait(1500).then(() => resolve(wrong === 0));
       }
@@ -189,11 +163,7 @@ export function start(ctx) {
       for (const value of task.options) {
         const btn = el('button', 'sv-option');
         btn.type = 'button';
-        if (isShadow) {
-          btn.append(el('span', 'sv-shadow', value));
-        } else {
-          btn.append(drawing(solidById.get(value).top, 'sv-topview'));
-        }
+        btn.append(drawing(solidById.get(value).top, 'sv-topview'));
         if (value === task.target) correctBtn = btn;
         onTap(btn, () => choose(value, btn));
         options.append(btn);
@@ -203,7 +173,7 @@ export function start(ctx) {
 
   // ---------- Серия ----------
   async function run() {
-    let level = Math.min(ctx.level ?? 0, LEVELS.length - 1); // уровень помнится между сериями (core: ctx.level)
+    let level = Math.min(ctx.level ?? 0, POOLS.length - 1); // уровень помнится между сериями (core: ctx.level)
     let clean = 0;
     let correct = 0;
     const used = new Set();
@@ -227,7 +197,7 @@ export function start(ctx) {
       if (firstTry) {
         correct += 1;
         clean += 1;
-        if (clean >= CLEAN_TO_LEVEL_UP && level < LEVELS.length - 1) {
+        if (clean >= CLEAN_TO_LEVEL_UP && level < POOLS.length - 1) {
           level += 1;
           clean = 0;
         }
@@ -251,7 +221,7 @@ export function start(ctx) {
       correct,
       level,
       total,
-      mistakes: again.map((t) => ({ key: t.key, label: labelOf(t) })),
+      mistakes: again.map((t) => ({ key: t.key, label: `🛰️ ${TEXT.objects[t.target]}` })),
     });
   }
 

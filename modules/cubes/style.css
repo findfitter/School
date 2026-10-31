@@ -127,3 +127,77 @@
     animation: none;
   }
 }
+
+/* Задания с выбором картинки: план, постройка, вид сбоку */
+.cb-stage {
+  position: relative;
+}
+
+.cb-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(140px, 27vw, 300px);
+  height: clamp(110px, 25vh, 200px);
+  padding: 8px;
+  border-radius: 26px;
+  background: var(--card, #fff);
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+}
+
+.cb-option .cb-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.cb-option.pressed {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.cb-option.faded {
+  opacity: 0.3;
+}
+
+.cb-option.right {
+  outline: 6px solid var(--good, #52c47a);
+}
+
+.cb-option.point {
+  animation: cb-point 0.7s ease-in-out infinite;
+}
+
+@keyframes cb-point {
+  50% { transform: scale(1.08); }
+}
+
+/* Глаз: с какой стороны смотрим на постройку */
+.cb-eye {
+  position: absolute;
+  bottom: 4%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: 800;
+  font-size: clamp(14px, 2.6vh, 20px);
+  color: var(--ink-soft, #6b6f85);
+}
+
+.cb-eye.left {
+  left: clamp(4%, 18%, 24%);
+}
+
+.cb-eye.right {
+  right: clamp(4%, 18%, 24%);
+}
+
+.cb-eye-icon {
+  font-size: clamp(30px, 6vh, 50px);
+  line-height: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-option.point {
+    animation: none;
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "id": "top-view",
+  "title": "Вид сверху",
+  "subject": "orientation",
+  "icon": "🛰️",
+  "description": "Как предмет выглядит сверху?",
+  "version": "0.2.0",
+  "styles": ["style.css"],
+  "files": ["texts.js", "data.js"],
+  "cycle": "orientation"
+}

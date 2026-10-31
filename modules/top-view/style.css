@@ -1,4 +1,4 @@
-/* Тени и вид сверху. Размеры в vh/vw, чтобы всё помещалось на экране Хромбука без прокрутки. */
+/* Вид сверху. Размеры в vh/vw, чтобы всё помещалось на экране Хромбука без прокрутки. */
 
 .sv {
   height: 100%;
@@ -65,11 +65,6 @@
   background: var(--card, #fff);
 }
 
-.sv-emoji {
-  font-size: clamp(80px, 19vh, 160px);
-  line-height: 1;
-}
-
 .sv-front {
   width: 80%;
   height: 80%;
@@ -123,18 +118,6 @@
 
 @keyframes sv-point {
   50% { transform: scale(1.08); }
-}
-
-/* Тень: чёрный силуэт эмодзи; верная тень после ответа получает цвет */
-.sv-shadow {
-  font-size: clamp(60px, 13vh, 110px);
-  line-height: 1;
-  filter: brightness(0);
-  transition: filter 0.4s;
-}
-
-.sv-option.revealed .sv-shadow {
-  filter: none;
 }
 
 .sv-topview {
