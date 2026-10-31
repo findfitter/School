@@ -1,18 +1,31 @@
-// Деньги: монеты 1, 2, 5 и 10 рублей. Три вида заданий:
-//   count  — сколько всего денег (монеты лежат на экране);
-//   pay    — заплати ровно N ₽ (монеты ставятся касанием или перетаскиванием в кошелёк);
+// Деньги в евро, только настоящие номиналы: монеты 1 и 2 €, банкноты 5, 10, 20, 50 и 100 €. Три вида заданий:
+//   count  — сколько всего денег (монеты и банкноты лежат на экране);
+//   pay    — заплати ровно N € (монеты и банкноты ставятся касанием или перетаскиванием в кошелёк);
 //   change — у тебя столько-то, вещь стоит столько-то, сколько сдачи.
-// Уровни: 0 — сумма до 10; 1 — до 20 (с десятками); 2 — плюс «заплати»; 3 — «заплати» и «сдача».
-// После ошибки уровень падает, после двух верных подряд растёт.
-// Ошибочные задания повторяются в конце серии.
+// Уровни: 0 — сумма до 10 (монеты 1 и 2 €, банкнота 5 €); 1 — до 20 (с банкнотой 10 €); 2 — плюс «заплати»;
+// 3 — «заплати» и «сдача»; 4–6 — суммы кратны десяти (банкноты 10, 20, 50 и 100 €): «сколько всего», «заплати», «сдача».
+// Центы пока не используются: суммы только в целых евро.
+// После ошибки уровень падает, после трёх верных подряд растёт. Ошибочные задания повторяются в конце серии.
 
 import { TEXT } from './texts.js';
 
-const COINS = [1, 2, 5, 10];
+const COINS = [1, 2]; // монеты 1 и 2 €
+const NOTES = [5, 10, 20, 50, 100]; // банкноты
+const ALL_VALUES = [...COINS, ...NOTES];
+const SMALL = [1, 2, 5, 10]; // чем набираются небольшие суммы (до 20 €)
 const ITEMS = ['🍬', '🍦', '🎈', '🍎', '🚗', '🧸', '📖', '🍪'];
-const LEVEL_KINDS = [['count'], ['count'], ['count', 'pay'], ['pay', 'change']];
+// big — суммы кратны десяти (банкноты 10, 20, 50 и 100 €).
+const LEVELS = [
+  { kinds: ['count'] },
+  { kinds: ['count'] },
+  { kinds: ['count', 'pay'] },
+  { kinds: ['pay', 'change'] },
+  { kinds: ['count'], big: true },
+  { kinds: ['count', 'pay'], big: true },
+  { kinds: ['pay', 'change'], big: true },
+];
 const CLEAN_TO_LEVEL_UP = 3; // верных подряд до повышения уровня
-const MAX_ANSWER = 20;
+const MAX_ANSWER = 200;
 const DRAG_THRESHOLD = 14; // px, после которого касание считается перетаскиванием
 
 const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -33,9 +46,21 @@ function shuffle(list) {
 function makeTask(level, used) {
   let task;
   for (let attempt = 0; attempt < 50; attempt++) {
-    const kind = pick(LEVEL_KINDS[level]);
-    if (kind === 'count') {
-      const pool = level === 0 ? [1, 2, 5] : COINS;
+    const kind = pick(LEVELS[level].kinds);
+    const big = Boolean(LEVELS[level].big);
+    if (kind === 'count' && big) {
+      let coins;
+      do {
+        coins = Array.from({ length: rnd(2, 4) }, () => pick([10, 10, 20, 20, 50, 100]));
+      } while (sum(coins) < 30 || sum(coins) > 150 || coins.filter((v) => v >= 50).length > 2 || !coins.some((v) => v >= 50));
+      task = { k: 'count', c: coins.sort((a, b) => b - a) };
+    } else if (kind === 'pay' && big) {
+      task = { k: 'pay', p: 10 * rnd(3, 15), e: rnd(0, ITEMS.length - 1) };
+    } else if (kind === 'change' && big) {
+      const given = pick([50, 100, 100]);
+      task = { k: 'change', g: given, p: 10 * rnd(1, given / 10 - 1), e: rnd(0, ITEMS.length - 1) };
+    } else if (kind === 'count') {
+      const pool = level === 0 ? [1, 2, 5] : SMALL;
       const [lo, hi] = level === 0 ? [4, 10] : [8, 20];
       let coins;
       do {
@@ -57,15 +82,15 @@ const answerOf = (task) => (task.k === 'count' ? sum(task.c) : task.k === 'chang
 
 function labelOf(task) {
   if (task.k === 'count') return `${TEXT.labels.count} ${task.c.join(' + ')}`;
-  if (task.k === 'pay') return `${TEXT.labels.pay} ${task.p} ₽`;
+  if (task.k === 'pay') return `${TEXT.labels.pay} ${task.p} €`;
   return `${TEXT.labels.change}: ${task.g} − ${task.p}`;
 }
 
-// Монеты, которыми «дали» сумму (20 = две по 10).
+// Деньги, которыми «дали» сумму (20 € = одна банкнота, 7 € = 5 + 2).
 function coinsFor(amount) {
   const coins = [];
   let left = amount;
-  for (const value of [10, 5, 2, 1]) {
+  for (const value of [100, 50, 20, 10, 5, 2, 1]) {
     while (left >= value && coins.length < 4) {
       coins.push(value);
       left -= value;
@@ -74,9 +99,11 @@ function coinsFor(amount) {
   return coins;
 }
 
+// Варианты ответа: верный и два соседних (у больших сумм — соседние десятки).
 function makeChoices(answer) {
+  const step = answer > 20 ? 10 : 1;
   const options = new Set([answer]);
-  for (const v of shuffle([-2, -1, 1, 2].map((d) => answer + d))) {
+  for (const v of shuffle([-2, -1, 1, 2].map((d) => answer + d * step))) {
     if (v >= 0 && v <= MAX_ANSWER && options.size < 3) options.add(v);
   }
   return shuffle([...options]);
@@ -89,9 +116,9 @@ function planHardTasks(hardKeys, total) {
     .map((key) => {
       try {
         const t = JSON.parse(key);
-        if (t.k === 'count' && Array.isArray(t.c) && t.c.every((c) => COINS.includes(c))) return t;
-        if (t.k === 'pay' && Number.isInteger(t.p) && t.p >= 1 && t.p <= 20 && ITEMS[t.e]) return t;
-        if (t.k === 'change' && [5, 10, 20].includes(t.g) && t.p >= 1 && t.p < t.g && ITEMS[t.e]) return t;
+        if (t.k === 'count' && Array.isArray(t.c) && t.c.length && t.c.every((c) => ALL_VALUES.includes(c))) return t;
+        if (t.k === 'pay' && Number.isInteger(t.p) && t.p >= 1 && t.p <= 150 && (t.p <= 20 || t.p % 10 === 0) && ITEMS[t.e]) return t;
+        if (t.k === 'change' && [5, 10, 20, 50, 100].includes(t.g) && t.p >= 1 && t.p < t.g && (t.g <= 20 || t.p % 10 === 0) && ITEMS[t.e]) return t;
       } catch {
         // неразборчивый ключ пропускаем
       }
@@ -111,11 +138,21 @@ function el(tag, className, text) {
   return node;
 }
 
+// Монета (круглая) или банкнота (прямоугольная, с числом в углах и знаком €).
 const coinEl = (value, tag = 'div') => {
+  if (NOTES.includes(value)) {
+    const note = el(tag, `mn-note n${value}`);
+    note.dataset.value = String(value);
+    note.append(el('span', 'mn-note-corner a', String(value)), el('span', 'mn-note-main', String(value)), el('span', 'mn-note-sign', '€'), el('span', 'mn-note-corner b', String(value)));
+    return note;
+  }
   const coin = el(tag, `mn-coin c${value}`, String(value));
   coin.dataset.value = String(value);
   return coin;
 };
+
+// Чем платить в задании «заплати»: для сумм до 20 € — монеты 1, 2 и банкноты 5, 10; для больших — банкноты 10, 20, 50, 100.
+const trayFor = (task) => (task.p > 20 ? [10, 20, 50, 100] : SMALL);
 
 // Касание кнопки: срабатывает при отпускании пальца на самой кнопке (и с клавиатуры).
 function onTap(button, fn) {
@@ -244,7 +281,7 @@ export function start(ctx) {
         const given = el('div', 'mn-coins');
         for (const value of coinsFor(task.g)) given.append(coinEl(value));
         const item = el('div', 'mn-item');
-        item.append(el('span', 'mn-emoji', ITEMS[task.e]), el('span', 'mn-tag', `${task.p} ₽`));
+        item.append(el('span', 'mn-emoji', ITEMS[task.e]), el('span', 'mn-tag', `${task.p} €`));
         const sub = el('div', 'mn-sub', `${task.g} − ${task.p} = ?`);
         stage.append(given, item, sub);
         numberAnswers(answer, (value, button) => {
@@ -265,7 +302,7 @@ export function start(ctx) {
         const text = fill(TEXT.payAsk, { price: task.p });
         prompt.textContent = text;
         const item = el('div', 'mn-item');
-        item.append(el('span', 'mn-emoji', ITEMS[task.e]), el('span', 'mn-tag', `${task.p} ₽`));
+        item.append(el('span', 'mn-emoji', ITEMS[task.e]), el('span', 'mn-tag', `${task.p} €`));
         const wallet = el('div', 'mn-wallet');
         const paid = el('div', 'mn-paid');
         const placed = [];
@@ -312,7 +349,7 @@ export function start(ctx) {
           }
         };
 
-        for (const value of COINS) {
+        for (const value of trayFor(task)) {
           const coin = coinEl(value, 'button');
           coin.type = 'button';
           makeDraggable(coin, wallet, () => add(value));
@@ -376,7 +413,7 @@ export function start(ctx) {
 
   // ---------- серия ----------
   async function run() {
-    let level = Math.min(ctx.level ?? 0, LEVEL_KINDS.length - 1); // уровень помнится между сериями (core: ctx.level)
+    let level = Math.min(ctx.level ?? 0, LEVELS.length - 1); // уровень помнится между сериями (core: ctx.level)
     let clean = 0;
     let correct = 0;
     const used = new Set();
@@ -393,7 +430,7 @@ export function start(ctx) {
       if (firstTry) {
         correct += 1;
         clean += 1;
-        if (clean >= CLEAN_TO_LEVEL_UP && level < LEVEL_KINDS.length - 1) {
+        if (clean >= CLEAN_TO_LEVEL_UP && level < LEVELS.length - 1) {
           level += 1;
           clean = 0;
         }

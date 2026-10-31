@@ -3,6 +3,10 @@
 
 export const TEXT = {
   chooseTopic: 'Выбери тему',
+  groupNew: '✨ Новое',
+  groupMore: 'Ещё темы',
+  groupDone: '✓ Уже слушали',
+  badgeNew: 'Новое',
   listenAgain: 'Ещё раз',
   next: 'Дальше',
   back: 'Назад',

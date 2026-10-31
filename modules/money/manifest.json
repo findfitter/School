@@ -3,8 +3,8 @@
   "title": "Деньги",
   "subject": "math",
   "icon": "💰",
-  "description": "Считаем монеты и покупаем",
-  "version": "1.0.0",
+  "description": "Считаем евро: монеты и банкноты, покупаем",
+  "version": "2.0.0",
   "styles": [
     "style.css"
   ],

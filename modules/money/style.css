@@ -88,21 +88,15 @@
   box-shadow: 0 4px 0 rgba(0, 0, 0, 0.18), inset 0 0 0 0.08em rgba(255, 255, 255, 0.6);
 }
 
+/* Монеты евро: 1 € — серебристая середина и золотистое кольцо, 2 € — наоборот и чуть крупнее */
+.mn-coin.c1 {
+  background: radial-gradient(circle at 50% 50%, #e8ebf0 0 52%, #d9a520 54% 100%);
+}
+
 .mn-coin.c2 {
-  --d: clamp(68px, 12.8vh, 116px);
-}
-
-.mn-coin.c5 {
-  --d: clamp(72px, 13.6vh, 124px);
-  background: radial-gradient(circle at 35% 30%, #fff1b8, #d9a520);
+  --d: clamp(70px, 13.2vh, 120px);
+  background: radial-gradient(circle at 50% 50%, #e6b53a 0 52%, #d5dae3 54% 100%);
   color: #5a4210;
-}
-
-.mn-coin.c10 {
-  --d: clamp(76px, 14.4vh, 132px);
-  background: radial-gradient(circle at 35% 30%, #ffe28a, #c98f10);
-  color: #5a4210;
-  border-color: #b4bac6;
 }
 
 .mn-coin.small {
@@ -279,4 +273,113 @@
 .mn-answer.faded {
   opacity: 0.3;
   box-shadow: none;
+}
+
+
+/* Бумажные деньги (банкноты 50 и 100 ₽): прямоугольник с числом в углах и крупным номиналом */
+.mn-note {
+  --w: clamp(120px, 19vw, 190px);
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--w);
+  height: calc(var(--w) * 0.5);
+  padding: 0;
+  border: 0.18em solid rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  font-size: calc(var(--w) * 0.2);
+  font-weight: 800;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.18), inset 0 0 0 0.12em rgba(255, 255, 255, 0.55);
+  overflow: hidden;
+}
+
+/* цвет банкноты — по номиналу, как у настоящих евро */
+.mn-note.n5 {
+  background: linear-gradient(135deg, #e2e5ea, #b2b8c4);
+  color: #3b4050;
+}
+
+.mn-note.n10 {
+  background: linear-gradient(135deg, #ffd0cf, #f08a86);
+  color: #6e1f1c;
+}
+
+.mn-note.n20 {
+  background: linear-gradient(135deg, #cfe0ff, #7fa8f0);
+  color: #1b3f7a;
+}
+
+.mn-note.n50 {
+  background: linear-gradient(135deg, #ffdcb8, #f2a64a);
+  color: #6b3a05;
+}
+
+.mn-note.n100 {
+  background: linear-gradient(135deg, #d3f2d3, #72cd8c);
+  color: #1f5a2f;
+}
+
+/* водяной знак: круг за номиналом */
+.mn-note::before {
+  content: '';
+  position: absolute;
+  width: 46%;
+  height: 92%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.32);
+}
+
+.mn-note-main {
+  position: relative;
+  font-size: 1.7em;
+  line-height: 1;
+}
+
+.mn-note-sign {
+  position: relative;
+  margin-left: 0.15em;
+  font-size: 0.9em;
+  align-self: flex-end;
+  margin-bottom: 0.4em;
+}
+
+.mn-note-corner {
+  position: absolute;
+  font-size: 0.5em;
+  line-height: 1;
+}
+
+.mn-note-corner.a {
+  top: 0.45em;
+  left: 0.5em;
+}
+
+.mn-note-corner.b {
+  bottom: 0.45em;
+  right: 0.5em;
+}
+
+.mn-note.small {
+  --w: clamp(96px, 13vw, 132px);
+}
+
+.mn-note.pressed {
+  box-shadow: none;
+}
+
+.mn-note.dragging {
+  position: relative;
+  z-index: 20;
+  transition: none;
+}
+
+.mn-tray .mn-note {
+  touch-action: none;
+  transition: transform 0.2s;
+}
+
+.mn-note.n100 .mn-note-main {
+  font-size: 1.45em;
 }

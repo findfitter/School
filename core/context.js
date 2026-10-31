@@ -56,6 +56,9 @@ export function createContext({ container, manifest, services, onFinish, onTask 
       pick: pickWord,
       size: (ns, n) => storage.setVocabSize(ns, n),
       status: (key) => storage.wordInfo(key).status,
+      // Знакомство со словами: отметить слово прослушанным (ключ вида «enh:cat») и узнать, слушали ли его.
+      mark: (key) => storage.recordWord(key, true),
+      seen: (key) => storage.wordInfo(key).n > 0,
     }),
     challenge: challenge ? Object.freeze({ ...challenge, used: Object.freeze([...(challenge.used || [])]) }) : null,
     // Задание закончено (первый заход, не повтор в конце серии): { ok — верно с первой попытки, level — уровень сложности }.

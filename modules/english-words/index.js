@@ -1,4 +1,7 @@
 // Hello! Знакомство: ребёнок слушает и разглядывает новые английские слова (голос Sonia).
+// Выбор темы: сверху крупно «Новое» (темы, которые ещё не слушала, и начатые — не больше BIG_COUNT), ниже мелко
+// «Ещё темы», в самом низу тусклые «Уже слушали» (все слова темы прослушаны). Прослушанное слово ядро помнит
+// под ключом «enh:слово» (ctx.words.mark / seen).
 // Тема -> страницы по 4 карточки. При открытии страницы слова проговариваются по очереди,
 // касание карточки повторяет слово. Проверок нет — это знакомство; задания «услышь и выбери»
 // будут отдельным модулем.
@@ -7,6 +10,7 @@ import { TEXT } from './texts.js';
 
 const PAGE_SIZE = 4;
 const GAP_MS = 350; // пауза между словами при автоматическом чтении страницы
+const BIG_COUNT = 6; // сколько тем показывается крупно (следующие для знакомства)
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -81,15 +85,53 @@ export async function start(ctx) {
   ctx.container.append(root);
 
   // ---------- выбор темы ----------
+  // Сколько слов темы уже прослушано: new — ни одного, started — часть, done — все.
+  function topicState(topic) {
+    const heard = topic.words.filter((w) => ctx.words.seen(`enh:${w.en}`)).length;
+    const total = topic.words.length;
+    return { topic, heard, total, status: heard === 0 ? 'new' : heard < total ? 'started' : 'done' };
+  }
+
   function showTopics() {
     run += 1;
-    const tiles = topics.map((topic) =>
-      button('ew-topic', '', () => showLesson(topic, 0)));
-    topics.forEach((topic, i) => {
-      tiles[i].append(el('span', 'ew-topic-icon', topic.icon), el('span', 'ew-topic-title', topic.title), el('span', 'ew-topic-ru', topic.ru));
-    });
-    root.replaceChildren(el('div', 'ew-heading', TEXT.chooseTopic), el('div', 'ew-topics', ''));
-    root.querySelector('.ew-topics').append(...tiles);
+    const states = topics.map(topicState);
+    // Сначала начатые, потом новые (внутри — порядок из words.json); прослушанные уходят вниз.
+    const todo = [...states.filter((s) => s.status === 'started'), ...states.filter((s) => s.status === 'new')];
+    const done = states.filter((s) => s.status === 'done');
+
+    const bigTile = (s) => {
+      const tile = button(`ew-topic big ${s.status}`, '', () => showLesson(s.topic, 0));
+      tile.append(
+        el('span', 'ew-badge', s.status === 'new' ? TEXT.badgeNew : `${s.heard}/${s.total}`),
+        el('span', 'ew-topic-icon', s.topic.icon),
+        el('span', 'ew-topic-title', s.topic.title),
+        el('span', 'ew-topic-ru', s.topic.ru));
+      return tile;
+    };
+    const smallTile = (s) => {
+      const tile = button(`ew-topic small ${s.status}`, '', () => showLesson(s.topic, 0));
+      tile.append(el('span', 'ew-topic-icon', s.topic.icon), el('span', 'ew-topic-title', s.topic.title));
+      if (s.status === 'done') tile.append(el('span', 'ew-check', '✓'));
+      return tile;
+    };
+    const group = (title, tiles, extra = '') => {
+      if (!tiles.length) return null;
+      const box = el('div', `ew-group ${extra}`);
+      box.append(el('div', 'ew-group-title', title), (() => {
+        const row = el('div', 'ew-row');
+        row.append(...tiles);
+        return row;
+      })());
+      return box;
+    };
+
+    const topics_ = el('div', 'ew-topics');
+    topics_.append(...[
+      group(TEXT.groupNew, todo.slice(0, BIG_COUNT).map(bigTile), 'big'),
+      group(TEXT.groupMore, todo.slice(BIG_COUNT).map(smallTile)),
+      group(TEXT.groupDone, done.map(smallTile), 'done'),
+    ].filter(Boolean));
+    root.replaceChildren(el('div', 'ew-heading', TEXT.chooseTopic), topics_);
   }
 
   // ---------- страница с карточками ----------
@@ -111,6 +153,7 @@ export async function start(ctx) {
       const mine = ++run;
       highlight(card);
       await ctx.speak(word.en, 'en');
+      if (alive) ctx.words.mark(`enh:${word.en}`); // слово прослушано
       if (alive && mine === run) highlight(null);
     }
 
@@ -121,6 +164,7 @@ export async function start(ctx) {
         if (!alive || mine !== run) return;
         highlight(cards[i]);
         await ctx.speak(words[i].en, 'en');
+        if (alive) ctx.words.mark(`enh:${words[i].en}`); // слово прослушано
         await wait(GAP_MS);
       }
       if (alive && mine === run) highlight(null);
