@@ -65,6 +65,75 @@ function makeTask(variant) {
   return { variant, kind, facing, hero, item, screenSide: side, answer, prompt };
 }
 
+// ---------- рисунки: человечки и рука (плоская акварель вместо больших эмодзи; фильтр wcS — общий, core/art/filters.js) ----------
+const SVG_NS = 'xmlns="http://www.w3.org/2000/svg"';
+function svg(markup, className) {
+  const doc = new DOMParser().parseFromString(markup, 'image/svg+xml');
+  const node = document.importNode(doc.documentElement, true);
+  if (className) node.setAttribute('class', className);
+  return node;
+}
+
+const SKIN = '#F2C9A5';
+const SILHOUETTE = '#4A3A3A'; // спиной к тебе: тёмный силуэт
+const WHITE_HAIR = '#E6E3E8';
+// Внешность героев (ключ — texts.js heroes[].who): волосы, одежда, платье ли, причёска.
+const LOOKS = {
+  мальчик: { hair: '#7A4A2A', top: '#4372B8', bottom: '#4A5A8A', style: 'short' },
+  девочка: { hair: '#C9623A', top: '#D9667F', dress: true, style: 'long' },
+  мама: { hair: '#9A6B48', top: '#B8485F', dress: true, style: 'long' },
+  папа: { hair: '#4A2E22', top: '#3A8D82', bottom: '#4A5A8A', style: 'short' },
+  бабушка: { hair: WHITE_HAIR, top: '#6E5DB8', dress: true, style: 'bun' },
+  дедушка: { hair: WHITE_HAIR, top: '#4372B8', bottom: '#4A5A8A', style: 'bald' },
+};
+
+// Человечек во весь рост: лицом (с лицом и руками по бокам) или спиной (тёмный силуэт).
+function heroSvg(who, facing) {
+  const look = LOOKS[who] || LOOKS.мальчик;
+  const back = facing === 'back';
+  const c = (color) => (back ? SILHOUETTE : color);
+  const skin = c(SKIN);
+  const hair = c(look.hair);
+  const top = c(look.top);
+  const bottom = c(look.bottom || look.top);
+  const hairBehind = look.style === 'long' ? `<ellipse cx="60" cy="58" rx="35" ry="38" fill="${hair}"/>` : '';
+  const hairTop = {
+    short: `<path d="M30 50 C28 20 92 20 90 50 C84 36 36 36 30 50 Z" fill="${hair}"/>`,
+    long: `<path d="M29 54 C26 20 94 20 91 54 C82 34 38 34 29 54 Z" fill="${hair}"/>`,
+    bun: `<circle cx="60" cy="16" r="12" fill="${hair}"/><path d="M30 50 C28 20 92 20 90 50 C84 36 36 36 30 50 Z" fill="${hair}"/>`,
+    bald: `<ellipse cx="31" cy="52" rx="7" ry="13" fill="${hair}"/><ellipse cx="89" cy="52" rx="7" ry="13" fill="${hair}"/>`,
+  }[look.style];
+  const legs = look.dress
+    ? `<rect x="43" y="168" width="13" height="46" rx="6" fill="${skin}"/><rect x="64" y="168" width="13" height="46" rx="6" fill="${skin}"/>`
+    : `<rect x="40" y="148" width="18" height="66" rx="8" fill="${bottom}"/><rect x="62" y="148" width="18" height="66" rx="8" fill="${bottom}"/>`;
+  const shoes = `<ellipse cx="49" cy="217" rx="12" ry="6" fill="${c('#5A4636')}"/><ellipse cx="71" cy="217" rx="12" ry="6" fill="${c('#5A4636')}"/>`;
+  const body = look.dress
+    ? `<path d="M36 86 H84 L98 176 H22 Z" fill="${top}"/>`
+    : `<rect x="32" y="84" width="56" height="74" rx="14" fill="${top}"/>`;
+  const arm = (x) => `<rect x="${x}" y="88" width="16" height="46" rx="8" fill="${top}"/><rect x="${x + 1}" y="124" width="14" height="36" rx="7" fill="${skin}"/><circle cx="${x + 8}" cy="162" r="9" fill="${skin}"/>`;
+  const face = back
+    ? ''
+    : `<circle cx="49" cy="52" r="3.4" fill="#3B2412"/><circle cx="71" cy="52" r="3.4" fill="#3B2412"/>
+       <ellipse cx="42" cy="63" rx="6" ry="4" fill="#E58AA0" opacity="0.5"/><ellipse cx="78" cy="63" rx="6" ry="4" fill="#E58AA0" opacity="0.5"/>
+       <path d="M50 64 Q60 73 70 64" stroke="#8A3A22" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+       ${who === 'дедушка' ? '<path d="M46 63 Q60 56 74 63 Q60 70 46 63 Z" fill="#E6E3E8"/><circle cx="49" cy="52" r="9" fill="none" stroke="#5A4636" stroke-width="2"/><circle cx="71" cy="52" r="9" fill="none" stroke="#5A4636" stroke-width="2"/>' : ''}`;
+  return svg(`<svg ${SVG_NS} viewBox="0 0 120 230" aria-hidden="true"><g filter="url(#wcS)">
+    ${hairBehind}${legs}${shoes}${body}${arm(10)}${arm(94)}
+    <rect x="53" y="72" width="14" height="18" fill="${skin}"/>
+    <circle cx="60" cy="50" r="30" fill="${look.style === 'long' || !back ? skin : hair}"/>
+    ${back && look.style !== 'bald' ? `<circle cx="60" cy="50" r="30" fill="${hair}"/>` : ''}
+    ${hairTop}${face}
+  </g></svg>`, 'lo-person');
+}
+
+// Рука, на которую можно нажать («покажи руку»).
+const handSvg = () => svg(`<svg ${SVG_NS} viewBox="0 0 64 84" aria-hidden="true"><g filter="url(#wcS)" fill="#E9B98F">
+  <rect x="16" y="36" width="34" height="42" rx="15"/>
+  <rect x="16" y="10" width="8" height="38" rx="4"/><rect x="26" y="3" width="8" height="44" rx="4"/>
+  <rect x="36" y="7" width="8" height="42" rx="4"/><rect x="46" y="16" width="8" height="34" rx="4"/>
+  <rect x="4" y="42" width="9" height="28" rx="4.5" transform="rotate(-38 8 56)"/>
+</g></svg>`, 'lo-hand-art');
+
 function el(tag, className, text) {
   const node = document.createElement(tag);
   if (className) node.className = className;
@@ -157,7 +226,8 @@ export function start(ctx) {
         if (task.kind === 'hold') {
           if (task.screenSide === side) node.append(el('span', 'lo-item', task.item.emoji));
         } else {
-          const hand = el('button', 'lo-hand', '✋');
+          const hand = el('button', 'lo-hand');
+          hand.append(handSvg());
           hand.type = 'button';
           onTap(hand, () => choose(side, hand));
           options.set(side, hand);
@@ -165,7 +235,8 @@ export function start(ctx) {
         }
         return node;
       };
-      const figure = el('div', `lo-figure ${task.facing}`, task.hero.emoji);
+      const figure = el('div', `lo-figure ${task.facing}`);
+      figure.append(heroSvg(task.hero.who, task.facing));
       const tag = el('div', 'lo-tag', `${TEXT.facingIcon[task.facing]} ${TEXT.facing[task.facing]}`);
       const middle = el('div', 'lo-middle');
       middle.append(figure, tag);

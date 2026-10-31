@@ -3,6 +3,7 @@
   "title": "Hello! Слушаем предложения",
   "subject": "english",
   "icon": "💬",
+  "glyph": "♪",
   "description": "Слушаем предложение и выбираем картинку",
   "version": "1.0.0",
   "voice": true,

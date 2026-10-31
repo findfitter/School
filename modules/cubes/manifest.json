@@ -3,6 +3,7 @@
   "title": "Кубики",
   "subject": "orientation",
   "icon": "🧊",
+  "glyph": "▦",
   "description": "Сколько кубиков в постройке?",
   "version": "0.1.0",
   "styles": ["style.css", "../addition-10/keypad.css"],

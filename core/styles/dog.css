@@ -54,9 +54,9 @@
   align-items: center;
   gap: 14px;
   padding: 8px 18px 8px 14px;
-  border-radius: var(--radius);
-  background: var(--card);
-  box-shadow: var(--shadow);
+  border-radius: 8px;
+  background: var(--book-card);
+  box-shadow: var(--book-shadow);
 }
 
 .dog-earned-bone {
@@ -70,7 +70,7 @@
 }
 
 .dog-earned small {
-  color: var(--ink-soft);
+  color: var(--book-ink-soft);
   font-size: 0.68em;
   font-weight: 600;
   line-height: 1.2;
@@ -98,9 +98,9 @@
   flex-direction: column;
   gap: 8px;
   padding: 2px 14px 12px;
-  border-radius: var(--radius);
-  background: var(--card);
-  box-shadow: var(--shadow);
+  border-radius: 8px;
+  background: var(--book-card);
+  box-shadow: var(--book-shadow);
 }
 
 .dog-shop .section-title {
@@ -109,7 +109,7 @@
 }
 
 .dog-shop-btn {
-  background: var(--soft);
+  background: #f2ebdd;
   box-shadow: none;
 }
 
@@ -129,24 +129,6 @@
 }
 
 /* Пока собак нет */
-.dog-empty {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border-radius: var(--radius);
-  background: var(--card);
-  box-shadow: var(--shadow);
-  text-align: center;
-}
-
-.dog-empty p {
-  max-width: 32em;
-  color: var(--ink-soft);
-}
-
 .dog-earned-line {
   font-size: 0.8em;
 }
@@ -157,11 +139,6 @@
   aspect-ratio: 240 / 270;
 }
 
-.dog-art.ghost {
-  filter: grayscale(1) brightness(1.1);
-  opacity: 0.35;
-}
-
 .dog-question {
   position: absolute;
   inset: 0;
@@ -170,7 +147,7 @@
   justify-content: center;
   font-size: 4em;
   font-weight: 800;
-  color: var(--ink-soft);
+  color: var(--book-ink-soft);
 }
 
 .dog-name {
@@ -179,7 +156,7 @@
 }
 
 .dog-meta {
-  color: var(--ink-soft);
+  color: var(--book-ink-soft);
   font-size: 0.8em;
 }
 
@@ -200,9 +177,9 @@
   justify-content: center;
   gap: 2px;
   padding: 10px 16px;
-  border-radius: var(--radius);
-  background: var(--card);
-  box-shadow: var(--shadow);
+  border-radius: 8px;
+  background: var(--book-card);
+  box-shadow: var(--book-shadow);
 }
 
 .dog-preview .dog-art-box {
@@ -255,9 +232,9 @@
 .chip-btn {
   min-height: var(--tap);
   padding: 0 18px;
-  border-radius: var(--radius);
-  background: var(--card);
-  box-shadow: var(--shadow);
+  border-radius: 8px;
+  background: var(--book-card);
+  box-shadow: var(--book-shadow);
   font-weight: 800;
 }
 
@@ -265,12 +242,12 @@
   min-height: var(--tap);
   padding: 0 16px;
   font-size: 0.85em;
-  background: var(--soft);
+  background: #f2ebdd;
   box-shadow: none;
 }
 
 .chip-btn.active {
-  background: var(--primary);
+  background: #c9623a;
   color: #fff;
 }
 
@@ -284,12 +261,12 @@
   height: var(--tap);
   border-radius: 50%;
   border: 4px solid rgba(43, 45, 66, 0.18);
-  box-shadow: var(--shadow);
+  box-shadow: var(--book-shadow);
 }
 
 .swatch.active {
-  border-color: var(--ink);
-  outline: 4px solid var(--accent);
+  border-color: var(--book-ink);
+  outline: 4px solid var(--book-gold);
 }
 
 .dog-input {
@@ -297,9 +274,9 @@
   min-height: var(--tap);
   padding: 0 20px;
   border: 4px solid #c9cfe6;
-  border-radius: var(--radius);
-  background: var(--card);
-  color: var(--ink);
+  border-radius: 8px;
+  background: var(--book-card);
+  color: var(--book-ink);
   font: inherit;
   font-size: 1.2em;
   font-weight: 800;
@@ -308,7 +285,7 @@
 }
 
 .dog-input:focus {
-  border-color: var(--primary);
+  border-color: #c9623a;
   outline: none;
 }
 
@@ -342,29 +319,32 @@
   width: clamp(150px, 34vh, 250px);
 }
 
-/* ---------- Анимация собаки (части SVG: хвост, тело, голова, глаза, язык) ---------- */
+/* ---------- Анимация собаки (части SVG: хвост, тело, голова, глаза, язык) ----------
+   Холст рисунка 240×270 (core/dogs.js). Хвост, тело, голова стоят на внешних группах в этих координатах; глаза и язык лежат
+   внутри рисунка эскиза 300×340 (группа scale(0.8)), поэтому их точки поворота — в координатах эскиза. У хвоста (у каждой
+   породы свой корень) и у лапки dog-paw-r точка поворота задана прямо в рисунке (style), здесь — запасная. */
 .dog-art .dog-tail {
-  transform-origin: 166px 232px;
+  transform-origin: 158px 232px;
   animation: dog-wag 1.2s ease-in-out infinite;
 }
 
 .dog-art .dog-body {
-  transform-origin: 120px 256px;
+  transform-origin: 120px 262px;
   animation: dog-breathe 3.2s ease-in-out infinite;
 }
 
 .dog-art .dog-head {
-  transform-origin: 120px 165px;
+  transform-origin: 120px 147px;
   animation: dog-tilt 7s ease-in-out infinite;
 }
 
 .dog-art .dog-eyes {
-  transform-origin: 120px 102px;
+  transform-origin: 150px 104px;
   animation: dog-blink 4.6s infinite;
 }
 
 .dog-art .dog-tongue {
-  transform-origin: 120px 140px;
+  transform-origin: 150px 160px;
   animation: dog-pant 1s ease-in-out infinite;
 }
 
@@ -453,10 +433,10 @@
   position: relative;
   height: 100%;
   min-height: 0;
-  border-radius: var(--radius);
+  border-radius: 8px;
   overflow: hidden;
   background: linear-gradient(180deg, #bfe3ff 0%, #e4f4ff 58%);
-  box-shadow: var(--shadow);
+  box-shadow: var(--book-shadow);
 }
 
 .dog-lawn {
@@ -528,7 +508,7 @@
 }
 
 .dog-tag.selected {
-  background: var(--accent);
+  background: var(--book-gold);
 }
 
 .dog-pointer {
@@ -538,7 +518,7 @@
 }
 
 .dog-tag.selected .dog-pointer {
-  color: var(--ink);
+  color: var(--book-ink);
   animation: pointer-bob 0.9s ease-in-out infinite;
 }
 
@@ -590,7 +570,7 @@
   padding: 6px 18px;
   border-radius: 24px;
   background: #fff;
-  box-shadow: var(--shadow);
+  box-shadow: var(--book-shadow);
   font-weight: 800;
   animation: bubble-pop 0.3s both;
 }
@@ -631,15 +611,15 @@
   padding: 4px 18px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.7);
-  color: var(--ink-soft);
+  color: var(--book-ink-soft);
   font-size: 0.75em;
   text-align: center;
   transition: background 0.2s, color 0.2s;
 }
 
 .dog-note.show {
-  background: var(--accent);
-  color: var(--ink);
+  background: var(--book-gold);
+  color: var(--book-ink);
 }
 
 /* Какашки на траве: нажми — уберётся (тратится пакетик) */
@@ -694,7 +674,7 @@
   gap: 8px;
   padding: 4px 10px;
   border: 3px dashed #c9cfe6;
-  border-radius: var(--radius);
+  border-radius: 8px;
   font-size: 0.7em;
   font-weight: 800;
 }
@@ -710,9 +690,9 @@
   flex-direction: column;
   gap: 6px;
   padding: 8px 14px 10px;
-  border-radius: var(--radius);
-  background: var(--card);
-  box-shadow: var(--shadow);
+  border-radius: 8px;
+  background: var(--book-card);
+  box-shadow: var(--book-shadow);
 }
 
 .dog-stats-name {
@@ -726,7 +706,7 @@
 }
 
 .dog-stats-name small {
-  color: var(--ink-soft);
+  color: var(--book-ink-soft);
   font-size: 0.7em;
 }
 
@@ -767,12 +747,7 @@
 }
 
 .dog-bar-fill.high {
-  background: var(--good, #52c47a);
-}
-
-.dog-tabs {
-  display: flex;
-  gap: 4px;
+  background: var(--book-done);
 }
 
 .dog-tab {
@@ -784,12 +759,8 @@
   align-items: center;
   justify-content: center;
   border-radius: 18px;
-  background: var(--soft, #e8eefc);
+  background: #f2ebdd;
   line-height: 1.05;
-}
-
-.dog-tab-icon {
-  font-size: 1.5em;
 }
 
 .dog-tab-title {
@@ -798,7 +769,7 @@
 }
 
 .dog-tab.active {
-  background: var(--primary, #4f8cff);
+  background: #c9623a;
   color: #fff;
 }
 
@@ -814,7 +785,7 @@
 }
 
 .dog-earned-note {
-  color: var(--ink-soft);
+  color: var(--book-ink-soft);
   font-size: 0.65em;
   text-align: center;
 }
@@ -846,10 +817,10 @@
 .ball-field {
   position: relative;
   height: 100%;
-  border-radius: var(--radius);
+  border-radius: 8px;
   overflow: hidden;
   touch-action: none;
-  box-shadow: var(--shadow);
+  box-shadow: var(--book-shadow);
   outline: none;
   cursor: pointer;
 }
@@ -927,7 +898,7 @@
   translate: -50% 0;
   padding: 4px 22px;
   border-radius: 999px;
-  background: var(--accent, #ffd23f);
+  background: var(--book-gold);
   font-size: 1.3em;
   font-weight: 800;
 }
@@ -982,8 +953,8 @@
   min-height: 1.3em;
   padding: 4px 22px;
   border-radius: 999px;
-  background: var(--card);
-  box-shadow: var(--shadow);
+  background: var(--book-card);
+  box-shadow: var(--book-shadow);
   font-size: 1.05em;
   font-weight: 800;
   text-align: center;
@@ -1001,11 +972,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius);
+  border-radius: 8px;
   overflow: hidden;
   touch-action: none;
   background: linear-gradient(180deg, #d8f0ff, #f2fbff);
-  box-shadow: var(--shadow);
+  box-shadow: var(--book-shadow);
   outline: none;
 }
 
@@ -1115,10 +1086,10 @@
 
 .trick-stage {
   position: relative;
-  border-radius: var(--radius);
+  border-radius: 8px;
   overflow: hidden;
   background: linear-gradient(180deg, #bfe3ff 0%, #e4f4ff 58%);
-  box-shadow: var(--shadow);
+  box-shadow: var(--book-shadow);
   perspective: 800px;
 }
 
@@ -1141,7 +1112,7 @@
   padding: 8px 20px;
   border-radius: 24px;
   background: #fff;
-  box-shadow: var(--shadow);
+  box-shadow: var(--book-shadow);
   font-size: 1.1em;
   font-weight: 800;
   animation: bubble-pop 0.3s both;
@@ -1159,7 +1130,7 @@
 }
 
 .trick-hint {
-  color: var(--ink-soft);
+  color: var(--book-ink-soft);
   font-size: 0.85em;
 }
 
@@ -1188,7 +1159,7 @@
 }
 
 .trick-name small {
-  color: var(--ink-soft);
+  color: var(--book-ink-soft);
   font-size: 0.8em;
   font-weight: 700;
 }
@@ -1207,7 +1178,7 @@
 
 .dog-wrap.do-sit .dog-body {
   animation: trick-sit 1.7s ease-in-out both;
-  transform-origin: 120px 256px;
+  transform-origin: 120px 262px;
 }
 
 .dog-wrap.do-sit .dog-head {
@@ -1216,7 +1187,6 @@
 
 .dog-wrap.do-paw .dog-paw-r {
   animation: trick-paw 1.7s ease-in-out both;
-  transform-origin: 142px 214px;
 }
 
 .dog-wrap.do-paw {
@@ -1280,9 +1250,9 @@
 .hide-field {
   position: relative;
   height: 100%;
-  border-radius: var(--radius);
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: var(--shadow);
+  box-shadow: var(--book-shadow);
 }
 
 .hide-dog {
@@ -1336,10 +1306,10 @@
 .walk-field {
   position: relative;
   height: 100%;
-  border-radius: var(--radius);
+  border-radius: 8px;
   overflow: hidden;
   touch-action: none;
-  box-shadow: var(--shadow);
+  box-shadow: var(--book-shadow);
   background: linear-gradient(180deg, #bfe3ff 0%, #e4f4ff 55%, #b7ec9c 55%, #7fd08a 100%);
 }
 
@@ -1429,10 +1399,10 @@
   align-items: flex-end;
   justify-content: center;
   padding-bottom: 6%;
-  border-radius: var(--radius);
+  border-radius: 8px;
   overflow: hidden;
   background: linear-gradient(180deg, #bfe3ff 0%, #e4f4ff 55%, #b7ec9c 55%, #7fd08a 100%);
-  box-shadow: var(--shadow);
+  box-shadow: var(--book-shadow);
 }
 
 .quiz-dog {
@@ -1448,7 +1418,7 @@
 }
 
 .quiz-progress {
-  color: var(--ink-soft);
+  color: var(--book-ink-soft);
   font-size: 0.8em;
   font-weight: 800;
 }
@@ -1456,8 +1426,8 @@
 .quiz-bubble {
   padding: 10px 22px;
   border-radius: 24px;
-  background: var(--card);
-  box-shadow: var(--shadow);
+  background: var(--book-card);
+  box-shadow: var(--book-shadow);
   font-size: 1.15em;
   font-weight: 800;
   line-height: 1.2;
@@ -1494,7 +1464,7 @@
   flex: 1 1 28%;
   min-height: clamp(64px, 11vh, 84px);
   font-size: 1.2em;
-  background: var(--primary, #4f8cff);
+  background: #c9623a;
   color: #fff;
 }
 
@@ -1511,12 +1481,12 @@
 }
 
 .quiz-option.right {
-  background: var(--good, #52c47a);
+  background: var(--book-done);
 }
 
 .quiz-hint {
   min-height: 2.4em;
-  color: var(--ink-soft);
+  color: var(--book-ink-soft);
   font-size: 0.85em;
 }
 
@@ -1532,9 +1502,9 @@
   gap: 24px;
   min-height: clamp(110px, 24vh, 190px);
   padding: 10px 20px;
-  border-radius: var(--radius);
-  background: var(--card);
-  box-shadow: var(--shadow);
+  border-radius: 8px;
+  background: var(--book-card);
+  box-shadow: var(--book-shadow);
 }
 
 .read-emoji {
@@ -1581,12 +1551,6 @@
 }
 
 /* ---------- Наряды, обстановка, фотоальбом ---------- */
-.dog-slot-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
 .dog-slot-chips .chip-btn.small {
   min-height: var(--tap);
   padding: 0 10px;
@@ -1604,24 +1568,44 @@
   width: var(--tap);
   height: var(--tap);
   border-radius: 18px;
-  background: var(--card);
-  box-shadow: var(--shadow);
+  background: var(--book-card);
+  box-shadow: var(--book-shadow);
   font-size: 1.9em;
   line-height: 1;
-}
-
-.dog-tile.on {
-  outline: 4px solid var(--accent, #ffd23f);
-  background: #fff8dc;
-}
-
-.dog-tile.locked {
-  background: var(--soft, #e8eefc);
 }
 
 .dog-tile.pressed {
   transform: translateY(3px);
   box-shadow: none;
+}
+
+.dog-tile > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 3px;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.dog-tile-none {
+  display: block;
+}
+
+/* «Снять» в слоте наряда: та же собака без вещи, сверху крестик */
+.dog-tile-x {
+  position: absolute;
+  left: 4px;
+  top: 2px;
+  font-size: 0.4em;
+  font-style: normal;
+  color: var(--book-ink-soft);
+}
+
+/* Рисунок обстановки (core/dog-art.js): ширину и место задаёт decorElement */
+.decor-art {
+  display: block;
+  height: auto;
 }
 
 .dog-tile-badge {
@@ -1631,7 +1615,7 @@
   font-size: 0.34em;
   font-style: normal;
   font-weight: 800;
-  color: var(--ink-soft, #6b6f85);
+  color: var(--book-ink-soft);
 }
 
 .dog-photo-row {
@@ -1746,12 +1730,12 @@
   gap: 2px;
   padding: 6px;
   border-radius: 18px;
-  background: var(--card);
-  box-shadow: var(--shadow);
+  background: var(--book-card);
+  box-shadow: var(--book-shadow);
 }
 
 .album-thumb small {
-  color: var(--ink-soft);
+  color: var(--book-ink-soft);
   font-size: 0.6em;
 }
 
@@ -1761,7 +1745,7 @@
   justify-self: center;
   margin-top: 18vh;
   text-align: center;
-  color: var(--ink-soft);
+  color: var(--book-ink-soft);
 }
 
 .album-empty-icon {

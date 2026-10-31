@@ -3,6 +3,7 @@
   "title": "Деньги",
   "subject": "math",
   "icon": "💰",
+  "glyph": "€",
   "description": "Считаем евро: монеты и банкноты, покупаем",
   "version": "2.0.0",
   "styles": [

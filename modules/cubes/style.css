@@ -1,4 +1,4 @@
-/* Кубики. Размеры в vh/vw, чтобы всё помещалось на экране Хромбука без прокрутки. */
+/* Кубики. Размеры в vh/vw, чтобы всё помещалось на экране Хромбука без прокрутки. Стиль «сказочной книжки»: токены и общие классы — core/styles/base.css, book.css; прогресс серии рисует ядро (дорожка лапок), собственные точки скрыты. */
 
 .cb {
   height: 100%;
@@ -27,26 +27,29 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #d8dcee;
+  background: #e3d8c4;
 }
 
 .cb-dot.done {
-  background: var(--good, #52c47a);
+  background: var(--book-done);
 }
 
 .cb-dot.again {
-  border: 3px solid var(--primary, #4f8cff);
+  border: 3px solid var(--math-ribbon);
   background: transparent;
 }
 
 .cb-dot.again.done {
-  background: var(--primary, #4f8cff);
+  background: var(--math-ribbon);
 }
 
 .cb-prompt {
   flex: none;
-  font-size: clamp(20px, 4vh, 32px);
-  font-weight: 800;
+  font-family: var(--font-hand);
+  font-size: clamp(30px, 6.2vh, 50px);
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--book-ink);
   text-align: center;
 }
 
@@ -79,9 +82,9 @@
   flex: none;
   min-width: 2.4em;
   padding: 0 0.5em;
-  border: 6px dashed #b9c3e6;
-  border-radius: 24px;
-  background: var(--card, #fff);
+  border: 4px solid #eadfcb;
+  border-radius: 8px;
+  background: var(--book-card);
   font-size: clamp(36px, 8vh, 64px);
   font-weight: 800;
   line-height: 1.3;
@@ -90,8 +93,8 @@
 
 .cb-slot.ok {
   border-style: solid;
-  border-color: var(--good, #52c47a);
-  background: #e8f8ee;
+  border-color: var(--book-done);
+  background: #dcefe0;
 }
 
 .cb-answers {
@@ -105,16 +108,16 @@
 .cb-answer {
   min-width: clamp(100px, 18vw, 180px);
   height: clamp(70px, 13vh, 110px);
-  border-radius: 26px;
-  background: var(--card, #fff);
-  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  border-radius: 8px;
+  background: var(--book-card);
+  box-shadow: var(--book-shadow);
   font-size: clamp(36px, 8vh, 60px);
   font-weight: 800;
-  color: var(--ink, #2b2d42);
+  color: var(--book-ink);
 }
 
 .cb-answer.pressed {
-  transform: translateY(4px);
+  transform: scale(0.96);
   box-shadow: none;
 }
 
@@ -140,9 +143,9 @@
   width: clamp(140px, 27vw, 300px);
   height: clamp(110px, 25vh, 200px);
   padding: 8px;
-  border-radius: 26px;
-  background: var(--card, #fff);
-  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  border-radius: 8px;
+  background: var(--book-card);
+  box-shadow: var(--book-shadow);
 }
 
 .cb-option .cb-svg {
@@ -151,7 +154,7 @@
 }
 
 .cb-option.pressed {
-  transform: translateY(4px);
+  transform: scale(0.96);
   box-shadow: none;
 }
 
@@ -160,7 +163,8 @@
 }
 
 .cb-option.right {
-  outline: 6px solid var(--good, #52c47a);
+  box-shadow: var(--book-shadow), inset 0 0 0 5px var(--book-done);
+  background: #dcefe0;
 }
 
 .cb-option.point {
@@ -180,7 +184,7 @@
   align-items: center;
   font-weight: 800;
   font-size: clamp(14px, 2.6vh, 20px);
-  color: var(--ink-soft, #6b6f85);
+  color: var(--book-ink-soft);
 }
 
 .cb-eye.left {

@@ -6,12 +6,13 @@ export const STR = {
 
   // lang — язык, на котором ребёнок видит и слышит служебные тексты после заданий этого предмета.
   subjects: {
-    math: { title: 'Математика', icon: '🔢', lang: 'ru' },
-    russian: { title: 'Русский язык', icon: '📖', lang: 'ru' },
-    german: { title: 'Deutsch', icon: '🇩🇪', lang: 'de' },
-    english: { title: 'English', icon: '🇬🇧', lang: 'ru' },
-    orientation: { title: 'Пространственное мышление', icon: '🧠', lang: 'ru' },
-    other: { title: 'Другое', icon: '🧩', lang: 'ru' },
+    // glyph — надпись на закладке-главе в «сказочной книжке»; short — короткое название на странице главы.
+    math: { title: 'Математика', icon: '🔢', lang: 'ru', glyph: '1+2' },
+    russian: { title: 'Русский язык', icon: '📖', lang: 'ru', glyph: 'Аа' },
+    german: { title: 'Deutsch', icon: '🇩🇪', lang: 'de', glyph: 'Dd' },
+    english: { title: 'English', icon: '🇬🇧', lang: 'ru', glyph: 'Hi' },
+    orientation: { title: 'Пространственное мышление', short: 'Пространство', icon: '🧠', lang: 'ru', glyph: '↻' },
+    other: { title: 'Другое', icon: '🧩', lang: 'ru', glyph: '?' },
   },
   subjectOrder: ['math', 'orientation', 'russian', 'german', 'english'],
 
@@ -30,11 +31,33 @@ export const STR = {
     empty: 'Пока нет заданий. Модули включаются в разделе для родителей.',
   },
 
+  // Главный экран «сказочная книжка» (core/screens/menu.js).
+  book: {
+    chapters: ['Глава первая', 'Глава вторая', 'Глава третья', 'Глава четвёртая', 'Глава пятая', 'Глава шестая'],
+    chaptersNav: 'Главы',
+    hello: 'Привет! Откроем новую главу?',
+    helloChallenge: 'Ждёт сложная задача с косточкой!',
+    pathTitle: 'Дорожка к косточке',
+    pathProgress: '{n} из {total} звёзд',
+    pathLeft: 'Ещё {n} {stars} — и откроется сложная задача с косточкой.',
+    starForms: ['звезду', 'звезды', 'звёзд'],
+    artLabel: 'Дорожка к косточке',
+    challengeBonus: '+1 косточка',
+    stamp: 'Готово!',
+    taskForms: ['задание', 'задания', 'заданий'],
+    doneCount: 'готово {n}',
+    starsLabel: 'Звёзды: {n}',
+    cardStars: 'Звёзд: {n} из 3',
+    trackLabel: 'Задание {n} из {total}',
+    bonesLabel: 'Косточки: {n}',
+  },
+
   // Служебные тексты для ребёнка — на языке предмета.
   result: {
     ru: {
       praise: { 1: 'Молодец! Попробуем ещё?', 2: 'Здорово!', 3: 'Отлично!' },
       score: 'Верно: {correct} из {total}',
+      stamp: 'Готово!',
       shopHint: 'Можно купить наклейку в магазине!',
       superPopup: {
         title: 'Ура! Супер-наклейка!',
@@ -58,6 +81,7 @@ export const STR = {
     de: {
       praise: { 1: 'Gut gemacht! Noch einmal?', 2: 'Toll gemacht!', 3: 'Super!' },
       score: '{correct} von {total} richtig',
+      stamp: 'Fertig!',
       shopHint: 'Im Laden gibt es neue Sticker!',
       superPopup: {
         title: 'Hurra! Super-Sticker!',
@@ -97,6 +121,22 @@ export const STR = {
     notEnough: 'Не хватает {n} ⭐',
     owned: 'Уже у тебя',
     bought: 'Теперь это твоя наклейка!',
+    tabsLabel: 'Разделы',
+    tabMineShort: 'Коллекция',
+    tabShopShort: 'Лавка',
+    shopTitle: 'Лавка наклеек',
+    shopSub: 'Наклейки покупаются за звёзды из заданий',
+    stamp: 'Есть!',
+    notEnoughHint: 'Не хватает звёзд — реши ещё пару заданий!',
+    sayPick: 'Нравится? Нажми «Купить»!',
+    sayOwned: 'Эта наклейка уже в твоём альбоме',
+    sayBought: 'Ура! Наклейка теперь в твоём альбоме!',
+    worldLeft: 'Каждая наклейка дорисовывает сказку. Ещё {n} ждут тебя!',
+    worldDone: 'Мир готов! Ты собрала все наклейки!',
+    prevWorld: 'Предыдущий мир',
+    nextWorld: 'Следующий мир',
+    prevPage: 'Предыдущая страница',
+    nextPage: 'Следующая страница',
     ok: 'Ура!',
   },
 
@@ -124,6 +164,28 @@ export const STR = {
     tabCare: 'Уход',
     tabPlay: 'Играть',
     tabShop: 'Магазин',
+    playTitle: 'Поиграем?',
+    homeTitle: 'Двор и будка',
+    tabsLabel: 'Разделы',
+    playHint: 'Игры поднимают настроение',
+    shopHint: 'Покупаем за косточки',
+    careHints: {
+      hungry: '{name} хочет есть',
+      yard: 'Во дворе надо прибраться',
+      dirty: 'Пора помыть {name}',
+      tired: '{name} хочет спать',
+      good: '{name}: всё хорошо!',
+    },
+    statWords: ['очень мало', 'маловато', 'хорошо', 'отлично'],
+    emptySoon: 'Скоро здесь будет твой друг',
+    breedNotes: {
+      labrador: 'Добрый и весёлый. Гладкая шерсть, хвост-«выдра»',
+      shepherd: 'Умная и смелая. Стоячие уши, тёмная спина',
+      poodle: 'Кудрявый артист. Помпоны на лапах и хвосте',
+      dachshund: 'Длинная и смешная. Короткие лапки, длинные уши',
+      husky: 'Северная собака. Голубые глаза, хвост бубликом',
+      whippet: 'Самый быстрый бегун. Тонкие лапы, сложенные ушки',
+    },
     statFed: 'Сытость',
     statMood: 'Настроение',
     statClean: 'Чистота',

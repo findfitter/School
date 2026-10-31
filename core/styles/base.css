@@ -1,20 +1,124 @@
 /* Основа: переменные, сброс, сенсорные настройки, кнопки. Без :hover — экран сенсорный. */
 
+/* Шрифты лежат в fonts/ (лицензия SIL OFL — рядом, OFL-*.txt). Andika — всё, что ребёнок читает;
+   Caveat — только крупные рукописные заголовки (класс .hand в book.css). Подмножества latin (в нём немецкие
+   умлауты и ß) и cyrillic. */
+@font-face {
+  font-family: "Andika";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../../fonts/andika-cyrillic-400-normal.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: "Andika";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../../fonts/andika-latin-400-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Andika";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../../fonts/andika-cyrillic-700-normal.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: "Andika";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../../fonts/andika-latin-700-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Caveat";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../../fonts/caveat-cyrillic-600-normal.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: "Caveat";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../../fonts/caveat-latin-600-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Caveat";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../../fonts/caveat-cyrillic-700-normal.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: "Caveat";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../../fonts/caveat-latin-700-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 :root {
-  --bg: #fff7e6;
+  --bg: #e4ece6; /* стол (как --book-table); модули без книжного стиля пока читают --bg, --card, --primary… */
   --ink: #2b2d42;
   --ink-soft: #6b6f85;
   --card: #ffffff;
   --primary: #4f8cff;
-  --primary-ink: #ffffff;
   --accent: #ffd23f;
   --good: #52c47a;
-  --danger: #e76f51;
   --soft: #e8eefc;
-  --radius: 24px;
   --tap: 64px;
   --shadow: 0 5px 0 rgba(43, 45, 66, 0.14);
-  --font: system-ui, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+  --font: "Andika", system-ui, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+  --font-hand: "Caveat", "Segoe Print", "Bradley Hand", "Chalkboard SE", "Comic Sans MS", cursive;
+
+  /* «Сказочная книжка» (design/README.md). Старые переменные выше пока остаются. */
+  --u: calc(min(100vw, 160vh) / 1280); /* «один пиксель эскиза» 1280×800; размеры — calc(var(--u) * N) */
+  --book-table: #e4ece6; /* стол */
+  --book-paper: #fbf5e8; /* страница */
+  --book-card: #fffdf6; /* карточка, записка */
+  --book-ink: #3b2f2f; /* чернила */
+  --book-ink-soft: #7a6a5c; /* приглушённый текст */
+  --book-cover: #4a5a8a; /* обложка книги */
+  --book-gold: #f4c34e; /* золото, звёзды */
+  --book-done: #2f7d4f; /* «готово» */
+  --book-shadow: 0 6px 14px rgba(80, 55, 30, 0.12), 0 1px 2px rgba(80, 55, 30, 0.1);
+  --book-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --tex-paper: none; /* фактура бумаги: картинку ставит core/art/textures.js */
+  --tape-rot: 3deg; /* наклон скотча; карточка может задать свой */
+  --stamp-gap: #fff6e8; /* цвет бумаги между кольцами печати */
+
+  /* Предметы: лента закладки, акварельное пятно, чернила главы, скотч */
+  --math-ribbon: #c9623a;
+  --math-blob: #f2b49a;
+  --math-ink: #8c3a1c;
+  --math-tape: rgba(224, 122, 79, 0.45);
+  --orientation-ribbon: #3a8d82;
+  --orientation-blob: #a6d6cc;
+  --orientation-ink: #1f5d55;
+  --orientation-tape: rgba(79, 165, 154, 0.45);
+  --russian-ribbon: #b8485f;
+  --russian-blob: #edb0be;
+  --russian-ink: #8a2a42;
+  --russian-tape: rgba(217, 102, 127, 0.45);
+  --german-ribbon: #6e5db8;
+  --german-blob: #c6bcea;
+  --german-ink: #47388f;
+  --german-tape: rgba(140, 123, 209, 0.45);
+  --english-ribbon: #4372b8;
+  --english-blob: #afc8ec;
+  --english-ink: #234c8a;
+  --english-tape: rgba(91, 143, 214, 0.45);
 }
 
 *, *::before, *::after {
@@ -76,9 +180,9 @@ button {
   min-height: var(--tap);
   min-width: var(--tap);
   padding: 0 28px;
-  border-radius: var(--radius);
-  background: var(--card);
-  box-shadow: var(--shadow);
+  border-radius: 8px;
+  background: var(--book-card);
+  box-shadow: var(--book-shadow);
   font-weight: 700;
   display: inline-flex;
   align-items: center;
@@ -87,18 +191,19 @@ button {
 }
 
 .btn.primary {
-  background: var(--primary);
-  color: var(--primary-ink);
+  background: #c9623a;
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(201, 98, 58, 0.3);
 }
 
 .btn.danger {
-  background: var(--danger);
+  background: #b8485f;
   color: #fff;
 }
 
 .btn.quiet {
-  background: var(--soft);
-  box-shadow: none;
+  background: #f3ead7;
+  box-shadow: inset 0 0 0 2px #e3d8c4;
 }
 
 .btn.big {
@@ -113,8 +218,8 @@ button {
   font-size: 1.6em;
 }
 
-.btn.pressed, .btn:active, .tile.pressed, .tile:active {
-  transform: translateY(4px);
+.btn.pressed, .btn:active {
+  transform: scale(0.96);
   box-shadow: none;
 }
 

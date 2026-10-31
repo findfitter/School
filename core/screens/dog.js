@@ -23,7 +23,11 @@ import { createQuizGame } from '../dog/quiz.js';
 import { createReadingGame } from '../dog/reading.js';
 import { createAlbumGame, DECOR_POSITIONS } from '../dog/album.js';
 import { createSleepGame } from '../dog/sleep.js';
-import { ITEMS, SLOT_GROUPS, itemById } from '../dog-items.js';
+import { ITEMS, SLOT_GROUPS } from '../dog-items.js';
+import { drawItem, decorElement, drawDecor } from '../dog-art.js';
+import { createBook, createSheet, noteButton } from './book.js';
+import { svgEl, blob } from './book-art.js';
+import { yardArt, statBar, BOWL_ART, CAN_ART } from './dog-scene.js';
 
 const D = STR.dog;
 
@@ -32,20 +36,26 @@ const POOP_SPOTS = [[-34, 70], [34, 70], [-14, 84], [14, 84]];
 const EAT_MS = 2600; // сколько собака ест
 const POOP_MS = 1500; // сколько она «делает дела» до появления какашки
 const TICK_MS = 30000; // как часто пересчитываем показатели на открытом экране
-const SUGGESTED_NAMES = NAMES.slice(0, 6); // готовые имена в выборе собаки (на экране без прокрутки их немного)
+const SUGGESTED_NAMES = NAMES.slice(0, 4); // готовые имена в выборе собаки (на экране без прокрутки их немного)
 
 // Где стоят собаки во дворе (в % ширины сцены) в зависимости от их числа.
 const SLOTS = { 1: [50], 2: [30, 70], 3: [18, 50, 82] };
 
 // Вкладки справа. Каждая — список кнопок (см. tabContent).
+// color — цвет тканевой закладки (классы предметов s-* из book.css), head — заголовок страницы вкладки.
 const TABS = [
-  { id: 'care', icon: '🐾', title: D.tabCare },
-  { id: 'play', icon: '⚽', title: D.tabPlay },
-  { id: 'learn', icon: '🎓', title: D.tabLearn, testOnly: true }, // пока только на тестовом экране
-  { id: 'outfit', icon: '👕', title: D.tabOutfit },
-  { id: 'home', icon: '🏡', title: D.tabHome },
-  { id: 'shop', icon: '🛒', title: D.tabShop },
+  { id: 'care', icon: '🐾', title: D.tabCare, head: D.tabCare, color: 's-math' },
+  { id: 'play', icon: '⚽', title: D.tabPlay, head: D.playTitle, color: 's-orientation' },
+  { id: 'learn', icon: '🎓', title: D.tabLearn, head: D.tabLearn, color: 's-other', testOnly: true }, // пока только на тестовом экране
+  { id: 'outfit', icon: '👕', title: D.tabOutfit, head: D.tabOutfit, color: 's-russian' },
+  { id: 'home', icon: '🏡', title: D.tabHome, head: D.homeTitle, color: 's-german' },
+  { id: 'shop', icon: '🛒', title: D.tabShop, head: D.tabShop, color: 's-english' },
 ];
+
+// Подпись под шкалой словом: от «очень мало» до «отлично».
+const statWord = (v) => D.statWords[v >= 80 ? 3 : v >= 50 ? 2 : v >= 25 ? 1 : 0];
+// Цвета шкал (design/README.md, 4.3).
+const STAT_COLORS = { fed: '#E59A5E', mood: '#E58AA0', clean: '#7FB3D5', energy: '#8CCB98' };
 
 // scope: 'real' — рабочий экран ребёнка; 'test' — тестовый экран в разделе для родителя (свои собаки и косточки,
 // сверху панель «+1 🦴» и сброс), чтобы проверять новые возможности, не трогая рабочие данные.
@@ -63,17 +73,26 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
   const alive = () => screen.isConnected;
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  const chip = h('div', { class: 'chip' });
+  // Экран бывает в двух видах: разворот книги (слева двор и показатели, справа вкладки и дела) и страница на весь экран
+  // (мини-игры и выбор собаки). Счётчик косточек и кнопка «Назад» есть в обоих.
+  const screen = h('div', { class: 'screen dog-screen' });
+  const chips = [];
+  const newChip = () => {
+    const c = h('span', { class: 'chip dog-bones-chip' });
+    chips.push(c);
+    return c;
+  };
+  const updateChips = () => chips.forEach((c) => { c.textContent = format(D.bonesChip, { n: store.bonesBalance() }); });
+  const goBack = () => (game ? endGame() : draft ? closeCreator() : onBack());
+  const backNote = () => noteButton({ label: `⬅ ${STR.common.back}`, className: 'dog-back', onTap: goBack });
+
+  const book = createBook({ className: 'dog-book', topLeft: [backNote()], top: [testing ? testTools() : null, newChip()] });
+  const sheet = createSheet({ className: 'dog-sheet' });
   const main = h('main', { class: 'content dog-content' });
   const footer = h('footer', { class: 'buy-bar dog-footer' });
-  const screen = h('div', { class: 'screen dog-screen' },
-    h('header', { class: 'bar' },
-      button('btn', `⬅ ${STR.common.back}`, () => (game ? endGame() : draft ? closeCreator() : onBack())),
-      h('h1', { text: testing ? D.testTitle : D.title }),
-      testing ? testTools() : null,
-      chip),
-    main,
-    footer);
+  sheet.el.append(h('header', { class: 'bar' }, backNote(), h('h1', { class: 'hand', text: testing ? D.testTitle : D.title }), newChip()), main, footer);
+  let leftHead = null; // имя и возраст выбранной собаки (левая страница)
+  let leftStats = null; // шкалы показателей
 
   // Тестовый экран: выдать косточки и начать сначала (только для проверки новых возможностей).
   function testTools() {
@@ -95,11 +114,12 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
   const selected = () => store.dogs().find((d) => d.id === selectedId);
 
   function refresh() {
-    chip.textContent = format(D.bonesChip, { n: store.bonesBalance() });
+    updateChips();
     if (draft || game) return;
     footer.hidden = true;
     footer.replaceChildren();
-    main.replaceChildren(homeView());
+    fillBook();
+    screen.replaceChildren(book.el);
     showNews();
   }
 
@@ -158,6 +178,7 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
     });
     footer.hidden = true;
     main.replaceChildren(game.el);
+    screen.replaceChildren(sheet.el);
   }
 
   function showPlayOver() {
@@ -177,26 +198,45 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
     refresh();
   }
 
-  // ---------- Главный экран раздела ----------
-  function homeView() {
+  // ---------- Главный экран раздела (разворот книги) ----------
+  function fillBook() {
     const dogs = store.dogs();
     if (!dogs.some((d) => d.id === selectedId)) selectedId = dogs[0]?.id ?? null;
+    clearInterval(tickerId);
     if (!dogs.length) {
       yard = null;
-      const ghost = drawDog({ breed: 'labrador', color: 'grey', age: 3 });
-      ghost.classList.add('ghost');
-      return h('div', { class: 'dog-empty' },
-        h('div', { class: 'dog-art-box' }, ghost, h('span', { class: 'dog-question', text: '?' })),
-        h('h2', { text: D.emptyTitle }),
-        h('p', { text: `${D.emptyText} ${D.howTo}` }),
-        h('p', { class: 'dog-earned-line', text: `${format(D.earned, { n: store.bones() })} · ${format(D.spent, { n: store.bones() - store.bonesBalance() })}` }),
-        buyDogButton(D.buyFirst));
+      fillEmpty();
+      return;
     }
+    leftHead = h('div', { class: 'dog-head-row' });
+    leftStats = h('div', { class: 'dog-stats' });
     const side = h('div', { class: 'dog-side' });
     yard = yardView(dogs, () => renderSide(side));
+    book.leftPage.replaceChildren(leftHead, h('div', { class: 'dog-yard' }, svgEl(yardArt()), yard.stage), leftStats);
+    book.rightPage.replaceChildren(side);
     renderSide(side);
     startTicker(side, dogs.length);
-    return h('div', { class: 'dog-home' }, yard.stage, side);
+  }
+
+  // Пока собаки нет: пустая будка на лужайке и надпись «Скоро здесь будет твой друг»; справа — как её получить.
+  function fillEmpty() {
+    const bubble = h('div', { class: 'dog-note show dog-soon', text: D.emptySoon });
+    const stage = h('div', { class: 'dog-stage dogs-0' }, h('div', { class: 'dog-decor-layer' }, (() => {
+      const house = drawDecor('doghouse', { name: '' });
+      house.setAttribute('class', 'dog-decor decor-art dog-empty-house');
+      return house;
+    })()), bubble);
+    leftHead = null;
+    leftStats = null;
+    book.leftPage.replaceChildren(
+      h('div', { class: 'dog-head-row' }, h('h1', { class: 'dog-name hand', text: D.title })),
+      h('div', { class: 'dog-yard' }, svgEl(yardArt()), stage));
+    book.rightPage.replaceChildren(
+      h('div', { class: 'dog-empty' },
+        h('h2', { class: 'hand', text: D.emptyTitle }),
+        h('p', { text: `${D.emptyText} ${D.howTo}` }),
+        h('p', { class: 'dog-earned-line', text: `${format(D.earned, { n: store.bones() })} · ${format(D.spent, { n: store.bones() - store.bonesBalance() })}` }),
+        buyDogButton(D.buyFirst)));
   }
 
   // Каждые полминуты показатели пересчитываются, собака на экране меняет выражение.
@@ -213,48 +253,97 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
     }, TICK_MS);
   }
 
-  // ---------- Правая колонка: показатели, вкладки, кнопки ----------
-  function renderSide(side) {
+  // ---------- Страницы: левая (имя, показатели) и правая (закладки, заголовок, дела) ----------
+  // turn — страница вкладки «переворачивается» (только при смене вкладки, не при каждом обновлении).
+  function renderSide(side, { turn = false } = {}) {
     const dog = selected();
-    side.replaceChildren(statsCard(dog), tabStrip(side), tabContent(side, dog));
+    if (!dog) return;
+    leftHead.replaceChildren(
+      h('h1', { class: 'dog-name hand', text: dog.name }),
+      h('span', { class: 'dog-meta', text: `${breedById.get(dog.breed).name} · ${ageLabel(dog.age)}` }));
+    leftStats.replaceChildren(
+      statRow(D.statFed, dog.fed, STAT_COLORS.fed),
+      statRow(D.statMood, dog.mood, STAT_COLORS.mood),
+      statRow(D.statClean, 100 - dog.dirt, STAT_COLORS.clean),
+      statRow(D.statEnergy, dog.energy, STAT_COLORS.energy));
+    const info = TABS.find((t) => t.id === tab);
+    side.replaceChildren(
+      tabStrip(side),
+      h('div', { class: `dog-tab-page${turn ? ' page-turn' : ''} ${info.color}` },
+        h('div', { class: 'dog-tab-head' },
+          h('h2', { class: 'dog-tab-title hand', text: info.head }),
+          h('p', { class: 'dog-tab-hint', text: tabHint(dog) })),
+        tabContent(side, dog)));
   }
 
-  function bar(icon, value, label) {
-    const level = value < 25 ? 'low' : value < 55 ? 'mid' : 'high';
-    const fill = h('i', { class: `dog-bar-fill ${level}` });
-    fill.style.width = `${Math.round(value)}%`;
-    const wrap = h('div', { class: 'dog-bar', title: `${label}: ${Math.round(value)}%` }, h('span', { text: icon }), h('div', { class: 'dog-bar-track' }, fill));
-    return wrap;
+  function statRow(label, value, color) {
+    const v = Math.round(value);
+    return h('div', { class: 'dog-stat', title: `${label}: ${v}%` },
+      h('div', { class: 'dog-stat-line' }, h('span', { class: 'dog-stat-name hand', text: label }), h('span', { class: 'dog-stat-word', text: statWord(value) })),
+      h('div', { class: 'dog-stat-bar', role: 'img', 'aria-label': `${label}: ${v} из 100` }, svgEl(statBar(value, color))));
   }
 
-  function statsCard(dog) {
-    return h('div', { class: 'dog-stats' },
-      h('div', { class: 'dog-stats-name' }, h('strong', { text: dog.name }), h('small', { text: `${breedById.get(dog.breed).name} · ${ageLabel(dog.age)}` })),
-      h('div', { class: 'dog-bars' }, bar('🍖', dog.fed, D.statFed), bar('❤️', dog.mood, D.statMood), bar('🧼', 100 - dog.dirt, D.statClean), bar('⚡', dog.energy, D.statEnergy)));
+  // Подсказка под заголовком вкладки: что сейчас нужно собаке (на вкладке «Уход») или что делать на вкладке.
+  function tabHint(dog) {
+    if (tab === 'care') {
+      const H = D.careHints;
+      const name = dog.name;
+      if (dog.fed < HUNGRY_AT) return format(H.hungry, { name });
+      if (dog.poops > 0) return H.yard;
+      if (dog.dirt >= DIRTY_AT) return format(H.dirty, { name });
+      if (dog.energy < TIRED_AT) return format(H.tired, { name });
+      return format(H.good, { name });
+    }
+    if (tab === 'play') return dog.energy < TIRED_AT ? D.tiredNoPlay : D.playHint;
+    if (tab === 'outfit') return D.outfitHint;
+    if (tab === 'home') return D.homeHint;
+    if (tab === 'learn') return D.learnNote;
+    return D.shopHint;
   }
 
+  // Закладки-вкладки: цвет — как у предметов на главном экране.
   function tabStrip(side) {
-    return h('div', { class: 'dog-tabs', role: 'tablist' },
+    return h('nav', { class: 'dog-tabs', role: 'tablist', 'aria-label': D.tabsLabel },
       TABS.filter((t) => !t.testOnly || testing).map((t) => {
-        const btn = button(`dog-tab${t.id === tab ? ' active' : ''}`, [h('span', { class: 'dog-tab-icon', text: t.icon }), h('span', { class: 'dog-tab-title', text: t.title })], () => {
-          if (busy) return;
+        const btn = button(`ribbon dog-tab ${t.color}${t.id === tab ? ' on active' : ''}`, [
+          h('span', { class: 'dog-tab-icon', text: t.icon }),
+          h('span', { class: 'dog-tab-label', text: t.title }),
+        ], () => {
+          if (busy || t.id === tab) return;
           tab = t.id;
-          renderSide(side);
+          app.services.sounds('tap');
+          renderSide(side, { turn: true });
         });
         btn.setAttribute('aria-label', t.title);
+        btn.setAttribute('aria-pressed', String(t.id === tab));
         return btn;
       }));
   }
 
-  // Кнопка действия: подпись слева, счётчик справа.
+  // Карточка действия: акварельный значок, название, счётчик. label — «эмодзи название» (первое слово — значок);
+  // для магазина «название — цена» делится на название и подпись.
   function action(label, count, handler, { primary = false, disabled = false } = {}) {
-    const btn = button(`btn dog-action${primary ? ' primary' : ''}`, [h('span', { text: label }), count != null ? h('span', { text: count }) : null], handler);
+    const m = /^(\S+)\s+([\s\S]*)$/.exec(label);
+    const icon = m ? m[1] : '';
+    let title = m ? m[2] : label;
+    let sub = count;
+    const dash = title.indexOf(' — ');
+    if (dash > 0 && sub == null) {
+      sub = title.slice(dash + 3);
+      title = title.slice(0, dash);
+    }
+    const btn = button(`paper-card dog-card${primary ? ' primary' : ''}`, [
+      h('i', { class: 'tape', 'aria-hidden': 'true' }),
+      h('span', { class: 'dog-card-icon' }, svgEl(blob(), 'bk-blob'), h('span', { class: 'dog-card-glyph', text: icon })),
+      h('span', { class: 'dog-card-title', text: title }),
+      sub != null ? h('span', { class: 'dog-card-sub', text: sub }) : null,
+    ], handler);
     if (disabled) btn.disabled = true;
     return btn;
   }
 
   function tabContent(side, dog) {
-    const box = h('div', { class: 'dog-tab-body' });
+    const box = h('div', { class: `dog-tab-body dog-tab-${tab}` });
     if (tab === 'care') {
       box.append(
         action(`🥫 ${D.feed}`, format(D.feedLeft, { n: store.food() }), () => yard.feed(), { primary: true }),
@@ -300,19 +389,17 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
       box.append(...catalogPanel(side, tab === 'outfit' ? 'outfit' : 'decor', dog));
     } else if (tab === 'shop') {
       const buy = (template, buyFn) => {
-        const btn = button('btn dog-shop-btn', format(template, { price: PACK_PRICE }), () => {
+        return action(format(template, { price: PACK_PRICE }), null, () => {
           if (store.bonesBalance() < PACK_PRICE || !buyFn()) return;
           app.services.sounds('star');
           refresh();
-        });
-        btn.disabled = store.bonesBalance() < PACK_PRICE;
-        return btn;
+        }, { disabled: store.bonesBalance() < PACK_PRICE });
       };
       box.append(
         buy(D.buyFood, store.buyFood),
         buy(D.buyBags, store.buyBags),
         buy(D.buyShampoo, store.buyShampoo),
-        price() != null ? buyDogButton(D.buyNext) : h('p', { class: 'hint-line', text: D.maxDogs }),
+        price() != null ? buyDogCard(D.buyNext) : h('p', { class: 'hint-line', text: D.maxDogs }),
         h('small', { class: 'dog-earned-note', text: `${format(D.earned, { n: store.bones() })} · ${format(D.spent, { n: store.bones() - store.bonesBalance() })}` }));
     }
     return box;
@@ -323,7 +410,6 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
   function catalogPanel(side, kind, dog) {
     const groups = SLOT_GROUPS[kind];
     const slot = catSlot[kind];
-    const info = h('small', { class: 'dog-earned-note', text: kind === 'outfit' ? D.outfitHint : D.homeHint });
     const owned = new Set(store.items());
     const current = kind === 'outfit' ? dog.outfit[slot] : store.decor()[slot];
 
@@ -337,20 +423,25 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
       }));
 
     // Плитка «ничего» (снять / убрать). Для ошейника это обычный красный.
-    const none = button(`dog-tile${current ? '' : ' on'}`, [h('span', { text: slot === 'collar' ? '🔴' : '✖️' })], () => apply(side, kind, slot, '', dog));
+    // Рисунки плиток: наряд — на маленькой собаке ребёнка, обстановка — сама вещь (core/dog-art.js).
+    const houseName = store.dogs()[0]?.name || dog.name;
+    const none = button(`dog-tile${current ? '' : ' on'}`, [
+      kind === 'outfit' ? drawItem(null, { dog, slot }) : h('span', { class: 'dog-tile-none', text: '✖️' }),
+      kind === 'outfit' && slot !== 'collar' ? h('i', { class: 'dog-tile-x', text: '✖' }) : null,
+    ], () => apply(side, kind, slot, '', dog));
     none.title = slot === 'collar' ? D.collarDefault : D.takeOff;
     const tiles = h('div', { class: 'dog-tiles' }, none,
       ITEMS.filter((i) => i.kind === kind && i.slot === slot).map((item) => {
         const have = owned.has(item.id);
         const tile = button(`dog-tile${current === item.id ? ' on' : ''}${have ? '' : ' locked'}`, [
-          h('span', { text: item.icon }),
+          drawItem(item, { dog, name: houseName }),
           h('i', { class: 'dog-tile-badge', text: have ? '✓' : `${item.price}🦴` }),
         ], () => {
           if (!have) {
             if (store.bonesBalance() < item.price) return yard.say(format(D.itemNeedBones, { title: item.title, price: item.price }), 2600);
             if (!store.buyItem(item.id)) return;
             app.services.sounds('star');
-            chip.textContent = format(D.bonesChip, { n: store.bonesBalance() });
+            updateChips();
           }
           apply(side, kind, slot, item.id, dog);
         });
@@ -358,7 +449,7 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
         return tile;
       }));
 
-    const out = [chips, tiles, info];
+    const out = [chips, tiles];
     if (kind === 'decor') {
       out.push(h('div', { class: 'dog-photo-row' },
         action(`📷 ${D.album.shoot}`, null, () => yard.photo(), { primary: true }),
@@ -392,7 +483,7 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
     const effects = h('div', { class: 'dog-effects' });
     const note = h('div', { class: 'dog-note', text: D.petHint });
     const decorLayer = h('div', { class: 'dog-decor-layer' });
-    const stage = h('div', { class: `dog-stage dogs-${dogs.length}` }, h('div', { class: 'dog-lawn' }), decorLayer, poopLayer);
+    const stage = h('div', { class: `dog-stage dogs-${dogs.length}` }, decorLayer, poopLayer);
 
     const lookKey = (dog) => `${moodState(dog.mood)}-${dog.dirt >= 70 ? 3 : dog.dirt >= DIRTY_AT ? 2 : dog.dirt >= WASH_FROM ? 1 : 0}-${Object.values(dog.outfit).join('/')}-${dog.age}-${dog.energy < TIRED_AT ? 'tired' : ''}`;
     const statusIcons = (dog) => [dog.fed < HUNGRY_AT ? '🍖' : '', dog.mood < SAD_AT ? '😢' : '', dog.dirt >= DIRTY_AT ? '🧼' : ''].join('');
@@ -400,7 +491,7 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
     dogs.forEach((dog, i) => {
       const wrap = h('div', { class: 'dog-wrap' }, drawDog(dog));
       const bubble = h('div', { class: 'dog-bubble', hidden: true });
-      const bowl = h('div', { class: 'dog-bowl', hidden: true }, h('span', { class: 'dog-can', text: '🥫' }), h('span', { class: 'dog-food', text: '🥣' }));
+      const bowl = h('div', { class: 'dog-bowl', hidden: true }, h('span', { class: 'dog-can' }, svgEl(CAN_ART)), h('span', { class: 'dog-food' }, svgEl(BOWL_ART)));
       const status = h('span', { class: 'dog-status', text: statusIcons(dog) });
       const tag = h('div', { class: 'dog-tag' }, h('span', { class: 'dog-pointer', text: '▼' }), h('strong', { text: dog.name }), status);
       const slot = h('div', { class: 'dog-slot' }, tag, h('div', { class: 'dog-center' }, wrap, bowl), bubble);
@@ -556,12 +647,7 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
     function repaintDecor() {
       const decor = store.decor();
       decorLayer.replaceChildren(...Object.entries(decor).filter(([, id]) => id).map(([slot, id]) => {
-        const pos = DECOR_POSITIONS[slot];
-        const el = h('span', { class: `dog-decor decor-${slot}`, text: itemById.get(id).icon });
-        el.style.left = `${pos.x}%`;
-        el.style.top = `${pos.y}%`;
-        el.style.fontSize = `${pos.size}cqw`;
-        return el;
+        return decorElement(id, DECOR_POSITIONS[slot], { name: store.dogs()[0]?.name || '', className: `dog-decor decor-${slot}` });
       }));
     }
 
@@ -594,6 +680,15 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
     return btn;
   }
 
+  // То же в виде карточки (вкладка «Магазин»).
+  function buyDogCard(template) {
+    const need = missing();
+    return action(`🐶 ${need > 0 ? format(D.notEnough, { n: need }) : format(template, { price: price() })}`, null, () => {
+      app.services.sounds('tap');
+      openCreator();
+    }, { disabled: need > 0 });
+  }
+
   // ---------- Выбор собаки ----------
   function openCreator() {
     draft = { breed: 'labrador', color: 'ginger', age: 3, name: '' };
@@ -607,18 +702,29 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
 
   function renderCreator() {
     const preview = h('div', { class: 'dog-art-box' });
-    const previewName = h('strong', { class: 'dog-name' });
+    const previewName = h('strong', { class: 'dog-name hand' });
     const previewMeta = h('span', { class: 'dog-meta' });
-    const breedBtns = new Map();
+    const breedCards = new Map(); // порода -> { card, art }
     const colorBtns = new Map();
     const ageText = h('span', { class: 'dog-age-value' });
     const nameInput = h('input', { class: 'dog-input', type: 'text', maxLength: NAME_MAX, placeholder: D.namePlaceholder, autocomplete: 'off' });
     const buy = button('btn primary big', '', onBuy);
     const cancel = button('btn', D.cancel, closeCreator);
 
-    for (const breed of BREEDS) {
-      breedBtns.set(breed.id, button('chip-btn', breed.name, () => { draft.breed = breed.id; update(); }));
-    }
+    // Карточки пород — как «Шесть пород» в Wardrobe.dc.html: бумага, скотч, крупная собака, название и пара слов о породе.
+    BREEDS.forEach((breed, k) => {
+      const art = h('div', { class: 'dog-breed-art' });
+      const card = button('paper-card dog-breed', [
+        h('i', { class: 'tape', 'aria-hidden': 'true' }),
+        art,
+        h('span', { class: 'dog-breed-name hand', text: breed.name }),
+        h('span', { class: 'dog-breed-note', text: D.breedNotes[breed.id] }),
+      ], () => { draft.breed = breed.id; app.services.sounds('tap'); update(); });
+      card.style.setProperty('--rot', `${[-1.2, 1, -0.7, 1.3, -1, 0.8][k % 6]}deg`);
+      card.style.setProperty('--tape-rot', `${k % 2 ? -4 : 3}deg`);
+      card.setAttribute('aria-label', breed.name);
+      breedCards.set(breed.id, { card, art });
+    });
     for (const color of COLORS) {
       const swatch = button('swatch', '', () => { draft.color = color.id; update(); });
       swatch.style.background = color.hex;
@@ -631,11 +737,17 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
       update(false);
     });
 
+    let artColor = null;
     function update(syncInput = true) {
       preview.replaceChildren(drawDog(draft));
       previewName.textContent = draft.name.trim() || '…';
       previewMeta.textContent = `${breedById.get(draft.breed).name} · ${ageLabel(draft.age)}`;
-      for (const [id, btn] of breedBtns) btn.classList.toggle('active', id === draft.breed);
+      // Собаки на карточках пород перерисовываются только при смене окраса.
+      if (artColor !== draft.color) {
+        artColor = draft.color;
+        for (const [id, { art }] of breedCards) art.replaceChildren(drawDog({ breed: id, color: draft.color, age: 3, mood: 'happy', paint: false }));
+      }
+      for (const [id, { card }] of breedCards) card.classList.toggle('active', id === draft.breed);
       for (const [id, btn] of colorBtns) btn.classList.toggle('active', id === draft.color);
       ageText.textContent = ageLabel(draft.age);
       if (syncInput && nameInput.value !== draft.name) nameInput.value = draft.name;
@@ -655,18 +767,19 @@ export function renderDog(app, { scope = 'real', onBack = () => app.go.menu() } 
 
     main.replaceChildren(
       h('div', { class: 'dog-create' },
-        h('div', { class: 'dog-preview' }, preview, previewName, previewMeta,
-          h('div', { class: 'dog-age' }, h('span', { text: D.age }), stepper)),
+        h('section', { class: 'dog-breeds-box' },
+          h('h2', { class: 'section-title hand', text: D.breed }),
+          h('div', { class: 'dog-breeds' }, [...breedCards.values()].map((b) => b.card))),
         h('div', { class: 'dog-controls' },
-          h('h2', { class: 'section-title', text: D.breed }),
-          h('div', { class: 'dog-chips' }, [...breedBtns.values()]),
-          h('h2', { class: 'section-title', text: D.color }),
-          h('div', { class: 'dog-swatches' }, [...colorBtns.values()]),
-          h('h2', { class: 'section-title', text: D.name }),
+          h('div', { class: 'dog-preview' }, preview,
+            h('div', { class: 'dog-preview-text' }, previewName, previewMeta,
+              h('div', { class: 'dog-age' }, h('span', { text: D.age }), stepper))),
+          h('div', { class: 'dog-swatches', role: 'group', 'aria-label': D.color }, [...colorBtns.values()]),
           nameInput,
           names)));
     footer.hidden = false;
     footer.replaceChildren(cancel, buy);
+    screen.replaceChildren(sheet.el);
     update();
   }
 

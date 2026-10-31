@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Собака</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: {{w}}px; height: {{h}}px; font-family: system-ui, sans-serif; color: #3B2F2F;">
+<svg role="img" aria-label="{{label}}" width="{{w}}" height="{{h}}" viewBox="0 0 300 340" style="display: block; overflow: visible;">
+  <defs>
+    <filter id="pupPaint" x="-10%" y="-12%" width="120%" height="124%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="5" result="n"></feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap>
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="g"></feTurbulence>
+      <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.6 0 0 0 0.65" result="ga"></feColorMatrix>
+      <feComposite in="d" in2="ga" operator="in" result="t"></feComposite>
+      <feMorphology in="d" operator="erode" radius="1.2" result="er"></feMorphology>
+      <feComposite in="d" in2="er" operator="out" result="edge"></feComposite>
+      <feColorMatrix in="edge" type="matrix" values="0.45 0 0 0 0  0 0.4 0 0 0  0 0 0.38 0 0  0 0 0 0.75 0" result="ed"></feColorMatrix>
+      <feMerge><feMergeNode in="t"></feMergeNode><feMergeNode in="ed"></feMergeNode></feMerge>
+    </filter>
+    <linearGradient id="{{u}}b" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="{{co.dark}}"></stop><stop offset="0.3" stop-color="{{co.base}}"></stop><stop offset="0.62" stop-color="{{co.lift}}"></stop><stop offset="1" stop-color="{{co.dark}}"></stop></linearGradient>
+    <radialGradient id="{{u}}h" cx="0.42" cy="0.32" r="0.72"><stop offset="0" stop-color="{{co.headLight}}"></stop><stop offset="0.55" stop-color="{{co.headBase}}"></stop><stop offset="1" stop-color="{{co.headDark}}"></stop></radialGradient>
+    <linearGradient id="{{u}}e" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{{co.earTop}}"></stop><stop offset="1" stop-color="{{co.earBottom}}"></stop></linearGradient>
+    <radialGradient id="{{u}}m" cx="0.5" cy="0.35" r="0.7"><stop offset="0" stop-color="{{co.muzzleLight}}"></stop><stop offset="1" stop-color="{{co.muzzle}}"></stop></radialGradient>
+    <radialGradient id="{{u}}c" cx="0.5" cy="0.28" r="0.75"><stop offset="0" stop-color="{{co.chestLight}}"></stop><stop offset="0.65" stop-color="{{co.chest}}"></stop><stop offset="1" stop-color="{{co.chest}}" stop-opacity="0"></stop></radialGradient>
+    <linearGradient id="{{u}}l" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="{{co.legDark}}"></stop><stop offset="0.5" stop-color="{{co.legLight}}"></stop><stop offset="1" stop-color="{{co.legDark}}"></stop></linearGradient>
+    <radialGradient id="{{u}}p" cx="0.5" cy="0.3" r="0.8"><stop offset="0" stop-color="{{co.pawLight}}"></stop><stop offset="1" stop-color="{{co.paw}}"></stop></radialGradient>
+    <linearGradient id="{{u}}t" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="{{co.tailDark}}"></stop><stop offset="0.6" stop-color="{{co.tail}}"></stop><stop offset="1" stop-color="{{co.tailLight}}"></stop></linearGradient>
+    <radialGradient id="{{u}}i" cx="0.5" cy="0.55" r="0.6"><stop offset="0" stop-color="{{co.irisLight}}"></stop><stop offset="0.65" stop-color="{{co.iris}}"></stop><stop offset="1" stop-color="{{co.irisDark}}"></stop></radialGradient>
+    <radialGradient id="{{u}}n" cx="0.4" cy="0.3" r="0.8"><stop offset="0" stop-color="#5E4840"></stop><stop offset="1" stop-color="#1A1310"></stop></radialGradient>
+    <linearGradient id="{{u}}q" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFA3B2"></stop><stop offset="1" stop-color="#E5677F"></stop></linearGradient>
+    <linearGradient id="{{u}}k" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{{collarTop}}"></stop><stop offset="1" stop-color="{{collarBottom}}"></stop></linearGradient>
+    <radialGradient id="{{u}}g" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#FFE69A"></stop><stop offset="1" stop-color="#E0A800"></stop></radialGradient>
+  </defs>
+
+  <g filter="{{paint}}">
+    <ellipse cx="150" cy="328" rx="112" ry="10" fill="#4A3A2A" opacity="0.18"></ellipse>
+
+    <!-- Хвосты -->
+    <sc-if value="{{b.lab}}" hint-placeholder-val="{{ true }}">
+      <g class="{{cls.tail}}"><path d="M200 300 C236 300 262 278 266 238 C268 220 262 206 254 200 C256 222 250 250 230 268 C220 278 208 284 196 286 Z" fill="url(#{{u}}t)"></path></g>
+    </sc-if>
+    <sc-if value="{{b.shepherd}}" hint-placeholder-val="{{ false }}">
+      <g class="{{cls.tail}}"><path d="M196 280 C232 284 260 298 274 326 C262 336 238 334 220 324 C206 316 198 302 194 292 Z" fill="url(#{{u}}t)"></path><path d="M214 296 C236 304 252 314 262 326" stroke="{{co.tailLight}}" stroke-width="2" fill="none" opacity="0.5"></path></g>
+    </sc-if>
+    <sc-if value="{{b.poodle}}" hint-placeholder-val="{{ false }}">
+      <g class="{{cls.tail}}"><path d="M198 292 C222 286 238 264 242 238" stroke="{{co.base}}" stroke-width="11" stroke-linecap="round" fill="none"></path><g fill="url(#{{u}}t)"><circle cx="246" cy="222" r="20"></circle><circle cx="232" cy="212" r="12"></circle><circle cx="258" cy="210" r="12"></circle><circle cx="246" cy="202" r="12"></circle></g></g>
+    </sc-if>
+    <sc-if value="{{b.dachshund}}" hint-placeholder-val="{{ false }}">
+      <g class="{{cls.tail}}"><path d="M260 250 C282 240 294 218 292 190" stroke="url(#{{u}}t)" stroke-width="11" stroke-linecap="round" fill="none"></path></g>
+    </sc-if>
+    <sc-if value="{{b.husky}}" hint-placeholder-val="{{ false }}">
+      <g class="{{cls.tail}}"><path d="M196 262 C248 266 278 226 260 186 C252 170 230 168 220 182 C240 196 238 226 204 238 Z" fill="url(#{{u}}t)"></path><path d="M260 186 C252 170 230 168 220 182 C230 186 238 192 240 202 C248 198 256 194 260 186 Z" fill="#F6F2EA"></path></g>
+    </sc-if>
+    <sc-if value="{{b.whippet}}" hint-placeholder-val="{{ false }}">
+      <g class="{{cls.tail}}"><path d="M196 304 C238 310 258 288 250 252" stroke="url(#{{u}}t)" stroke-width="8" stroke-linecap="round" fill="none"></path></g>
+    </sc-if>
+
+    <!-- Тело: обычное (лабрадор, овчарка, пудель, хаски) -->
+    <sc-if value="{{body.std}}" hint-placeholder-val="{{ true }}">
+      <ellipse cx="96" cy="282" rx="50" ry="42" fill="url(#{{u}}b)"></ellipse>
+      <ellipse cx="204" cy="282" rx="50" ry="42" fill="url(#{{u}}b)"></ellipse>
+      <sc-if value="{{b.shepherd}}" hint-placeholder-val="{{ false }}">
+        <ellipse cx="96" cy="268" rx="44" ry="24" fill="{{co.saddle}}" opacity="0.75"></ellipse>
+        <ellipse cx="204" cy="268" rx="44" ry="24" fill="{{co.saddle}}" opacity="0.75"></ellipse>
+      </sc-if>
+      <ellipse cx="70" cy="316" rx="27" ry="12" fill="url(#{{u}}p)"></ellipse>
+      <ellipse cx="230" cy="316" rx="27" ry="12" fill="url(#{{u}}p)"></ellipse>
+      <g class="{{cls.body}}">
+        <path d="M106 150 C90 190 84 244 94 304 L206 304 C216 244 210 190 194 150 Z" fill="url(#{{u}}b)"></path>
+        <sc-if value="{{b.shepherd}}" hint-placeholder-val="{{ false }}">
+          <path d="M104 150 C96 176 94 200 98 226 C120 214 180 214 202 226 C206 200 204 176 196 150 Z" fill="{{co.saddle}}" opacity="0.85"></path>
+        </sc-if>
+        <path d="M116 168 C108 204 110 240 120 272 C130 282 140 270 150 282 C160 270 170 282 180 272 C190 240 192 204 184 168 Z" fill="url(#{{u}}c)"></path>
+        <sc-if value="{{b.husky}}" hint-placeholder-val="{{ false }}">
+          <path d="M112 166 C118 176 124 170 130 180 C136 172 142 182 150 174 C158 182 164 172 170 180 C176 170 182 176 188 166" stroke="#F6F2EA" stroke-width="6" stroke-linecap="round" fill="none"></path>
+        </sc-if>
+        <g stroke="{{co.furLine}}" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.6"><path d="M134 212 q4 10 2 20"></path><path d="M166 212 q-4 10 -2 20"></path><path d="M150 226 q0 10 0 18"></path></g>
+      </g>
+      <rect x="111" y="222" width="30" height="92" rx="15" fill="url(#{{u}}l)"></rect>
+      <rect x="159" y="222" width="30" height="92" rx="15" fill="url(#{{u}}l)"></rect>
+      <sc-if value="{{b.poodle}}" hint-placeholder-val="{{ false }}">
+        <g fill="url(#{{u}}c)"><circle cx="134" cy="200" r="12"></circle><circle cx="166" cy="200" r="12"></circle><circle cx="150" cy="214" r="13"></circle><circle cx="140" cy="232" r="11"></circle><circle cx="160" cy="232" r="11"></circle></g>
+        <g fill="url(#{{u}}b)"><ellipse cx="126" cy="300" rx="24" ry="18"></ellipse><ellipse cx="174" cy="300" rx="24" ry="18"></ellipse><circle cx="70" cy="300" r="20"></circle><circle cx="230" cy="300" r="20"></circle></g>
+        <g stroke="{{co.furLine}}" stroke-width="1.8" fill="none" opacity="0.55" stroke-linecap="round"><path d="M114 296 a6 6 0 0 1 10 -4"></path><path d="M130 304 a6 6 0 0 1 10 -4"></path><path d="M162 296 a6 6 0 0 1 10 -4"></path><path d="M176 304 a6 6 0 0 1 10 -4"></path><path d="M84 270 a7 7 0 0 1 12 -4"></path><path d="M206 270 a7 7 0 0 1 12 -4"></path></g>
+      </sc-if>
+      <ellipse cx="126" cy="314" rx="23" ry="13" fill="url(#{{u}}p)"></ellipse>
+      <ellipse cx="174" cy="314" rx="23" ry="13" fill="url(#{{u}}p)"></ellipse>
+      <g stroke="{{co.toe}}" stroke-width="1.8" stroke-linecap="round"><path d="M119 309 v8"></path><path d="M133 309 v8"></path><path d="M167 309 v8"></path><path d="M181 309 v8"></path></g>
+    </sc-if>
+
+    <!-- Тело: длинное (такса) -->
+    <sc-if value="{{body.long}}" hint-placeholder-val="{{ false }}">
+      <g class="{{cls.body}}">
+        <path d="M66 238 C64 196 104 172 150 172 C206 172 254 196 268 236 C276 270 258 304 216 308 L92 308 C72 302 66 272 66 238 Z" fill="url(#{{u}}b)"></path>
+        <ellipse cx="236" cy="282" rx="40" ry="30" fill="url(#{{u}}b)"></ellipse>
+        <path d="M116 180 C106 210 108 248 118 276 C130 284 140 274 150 284 C160 274 170 284 182 276 C192 248 194 210 184 180 Z" fill="url(#{{u}}c)"></path>
+      </g>
+      <ellipse cx="248" cy="316" rx="24" ry="11" fill="url(#{{u}}p)"></ellipse>
+      <rect x="112" y="262" width="28" height="52" rx="14" fill="url(#{{u}}l)"></rect>
+      <rect x="160" y="262" width="28" height="52" rx="14" fill="url(#{{u}}l)"></rect>
+      <ellipse cx="126" cy="314" rx="22" ry="12" fill="url(#{{u}}p)"></ellipse>
+      <ellipse cx="174" cy="314" rx="22" ry="12" fill="url(#{{u}}p)"></ellipse>
+      <g stroke="{{co.toe}}" stroke-width="1.8" stroke-linecap="round"><path d="M119 309 v8"></path><path d="M133 309 v8"></path><path d="M167 309 v8"></path><path d="M181 309 v8"></path></g>
+    </sc-if>
+
+    <!-- Тело: стройное (уиппет) -->
+    <sc-if value="{{body.slim}}" hint-placeholder-val="{{ false }}">
+      <ellipse cx="104" cy="288" rx="40" ry="34" fill="url(#{{u}}b)"></ellipse>
+      <ellipse cx="196" cy="288" rx="40" ry="34" fill="url(#{{u}}b)"></ellipse>
+      <ellipse cx="82" cy="318" rx="22" ry="10" fill="url(#{{u}}p)"></ellipse>
+      <ellipse cx="218" cy="318" rx="22" ry="10" fill="url(#{{u}}p)"></ellipse>
+      <g class="{{cls.body}}">
+        <path d="M118 156 C104 196 104 252 112 306 L188 306 C196 252 196 196 182 156 Z" fill="url(#{{u}}b)"></path>
+        <path d="M124 170 C116 206 118 244 126 276 C136 284 142 276 150 284 C158 276 164 284 174 276 C182 244 184 206 176 170 Z" fill="url(#{{u}}c)"></path>
+      </g>
+      <rect x="116" y="214" width="22" height="100" rx="11" fill="url(#{{u}}l)"></rect>
+      <rect x="162" y="214" width="22" height="100" rx="11" fill="url(#{{u}}l)"></rect>
+      <ellipse cx="127" cy="316" rx="18" ry="10" fill="url(#{{u}}p)"></ellipse>
+      <ellipse cx="173" cy="316" rx="18" ry="10" fill="url(#{{u}}p)"></ellipse>
+    </sc-if>
+
+    <!-- Ошейник, шарф, медаль (под подбородком) -->
+    <path d="M108 172 C128 188 172 188 192 172 L194 186 C172 204 128 204 106 186 Z" fill="url(#{{u}}k)"></path>
+    <sc-if value="{{o.tag}}" hint-placeholder-val="{{ true }}">
+      <circle cx="150" cy="204" r="10" fill="url(#{{u}}g)" stroke="#C99400" stroke-width="1.5"></circle>
+    </sc-if>
+    <sc-if value="{{o.medal}}" hint-placeholder-val="{{ false }}">
+      <path d="M138 192 L150 224 L162 192" stroke="#4372B8" stroke-width="9" stroke-linejoin="round" fill="none"></path>
+      <circle cx="150" cy="236" r="15" fill="url(#{{u}}g)" stroke="#C99400" stroke-width="2.5"></circle>
+      <path transform="translate(150 236)" d="M0 -8 l2.4 5 5.6 .7 -4 3.8 1.1 5.5 -5.1 -2.8 -5.1 2.8 1.1 -5.5 -4 -3.8 5.6 -.7 z" fill="#FFF6D6"></path>
+    </sc-if>
+    <sc-if value="{{o.scarf}}" hint-placeholder-val="{{ false }}">
+      <path d="M100 164 C126 194 174 194 200 164 L206 186 C174 216 126 216 94 186 Z" fill="#E0604E"></path>
+      <path d="M110 178 L118 198 M130 186 L136 206 M150 188 L152 208 M170 186 L166 206 M190 178 L182 198" stroke="#FFFDF6" stroke-width="4.5" opacity="0.75"></path>
+      <path d="M164 194 L184 256 L162 262 L152 198 Z" fill="#E86A55"></path>
+      <path d="M168 256 l2 11 M174 254 l3 11 M180 252 l3 10" stroke="#C94A3A" stroke-width="2.5" stroke-linecap="round"></path>
+    </sc-if>
+
+    <!-- Голова -->
+    <g class="{{cls.head}}">
+      <sc-if value="{{b.shepherd}}" hint-placeholder-val="{{ false }}">
+        <path d="M100 84 L84 4 C106 8 128 28 134 54 Z" fill="url(#{{u}}e)"></path>
+        <path d="M200 84 L216 4 C194 8 172 28 166 54 Z" fill="url(#{{u}}e)"></path>
+        <path d="M104 70 L94 22 C108 28 120 40 126 56 Z" fill="{{co.earInner}}"></path>
+        <path d="M196 70 L206 22 C192 28 180 40 174 56 Z" fill="{{co.earInner}}"></path>
+      </sc-if>
+      <sc-if value="{{b.husky}}" hint-placeholder-val="{{ false }}">
+        <path d="M98 78 L96 12 C116 16 134 36 138 60 Z" fill="url(#{{u}}e)"></path>
+        <path d="M202 78 L204 12 C184 16 166 36 162 60 Z" fill="url(#{{u}}e)"></path>
+        <path d="M104 68 L103 30 C115 36 125 46 128 60 Z" fill="#F6F2EA"></path>
+        <path d="M196 68 L197 30 C185 36 175 46 172 60 Z" fill="#F6F2EA"></path>
+      </sc-if>
+      <sc-if value="{{b.whippet}}" hint-placeholder-val="{{ false }}">
+        <path d="M122 54 C112 36 92 34 84 46 C82 56 90 66 100 72 C104 64 112 58 122 54 Z" fill="url(#{{u}}e)"></path>
+        <path d="M178 54 C188 36 208 34 216 46 C218 56 210 66 200 72 C196 64 188 58 178 54 Z" fill="url(#{{u}}e)"></path>
+        <path d="M112 50 C102 44 94 46 90 52 M188 50 C198 44 206 46 210 52" stroke="{{co.furLine}}" stroke-width="2" fill="none" opacity="0.6" stroke-linecap="round"></path>
+      </sc-if>
+
+      <sc-if value="{{head.std}}" hint-placeholder-val="{{ true }}">
+        <path d="M150 40 C190 40 216 68 218 104 C220 138 204 164 182 176 C172 182 160 184 150 184 C140 184 128 182 118 176 C96 164 80 138 82 104 C84 68 110 40 150 40 Z" fill="url(#{{u}}h)"></path>
+      </sc-if>
+      <sc-if value="{{head.slim}}" hint-placeholder-val="{{ false }}">
+        <path d="M150 46 C182 46 204 70 204 102 C204 134 190 160 174 176 C166 184 158 190 150 190 C142 190 134 184 126 176 C110 160 96 134 96 102 C96 70 118 46 150 46 Z" fill="url(#{{u}}h)"></path>
+      </sc-if>
+
+      <sc-if value="{{b.poodle}}" hint-placeholder-val="{{ false }}">
+        <g fill="url(#{{u}}h)"><circle cx="150" cy="34" r="26"></circle><circle cx="124" cy="46" r="19"></circle><circle cx="176" cy="46" r="19"></circle><circle cx="136" cy="22" r="17"></circle><circle cx="164" cy="22" r="17"></circle></g>
+        <g stroke="{{co.furLine}}" stroke-width="1.8" fill="none" opacity="0.55" stroke-linecap="round"><path d="M128 30 a7 7 0 0 1 12 -3"></path><path d="M152 18 a7 7 0 0 1 12 -3"></path><path d="M144 44 a7 7 0 0 1 12 -3"></path><path d="M166 38 a7 7 0 0 1 12 -3"></path><path d="M116 50 a7 7 0 0 1 12 -3"></path></g>
+      </sc-if>
+      <sc-if value="{{b.husky}}" hint-placeholder-val="{{ false }}">
+        <path d="M150 94 C140 94 132 102 128 112 C112 112 96 120 92 136 C100 162 124 180 150 182 C176 180 200 162 208 136 C204 120 188 112 172 112 C168 102 160 94 150 94 Z" fill="#F6F2EA"></path>
+        <ellipse cx="124" cy="84" rx="9" ry="6" fill="#F6F2EA"></ellipse>
+        <ellipse cx="176" cy="84" rx="9" ry="6" fill="#F6F2EA"></ellipse>
+      </sc-if>
+      <sc-if value="{{b.shepherd}}" hint-placeholder-val="{{ false }}">
+        <ellipse cx="127" cy="100" rx="22" ry="17" fill="{{co.saddle}}" opacity="0.45"></ellipse>
+        <ellipse cx="173" cy="100" rx="22" ry="17" fill="{{co.saddle}}" opacity="0.45"></ellipse>
+        <path d="M150 46 C142 62 142 84 150 96 C158 84 158 62 150 46 Z" fill="{{co.saddle}}" opacity="0.5"></path>
+      </sc-if>
+      <sc-if value="{{forehead}}" hint-placeholder-val="{{ true }}">
+        <ellipse cx="150" cy="70" rx="28" ry="16" fill="{{co.headLight}}" opacity="0.45"></ellipse>
+      </sc-if>
+
+      <ellipse cx="150" cy="{{mz.cy}}" rx="{{mz.rx}}" ry="{{mz.ry}}" fill="url(#{{u}}m)"></ellipse>
+      <g transform="{{noseT}}">
+        <path d="M139 160 C138 183 162 183 161 160 Z" fill="url(#{{u}}q)"></path>
+        <path d="M150 164 v10" stroke="#D9566F" stroke-width="1.6" stroke-linecap="round"></path>
+        <path d="M150 146 L150 157 M150 157 C142 166 129 165 122 156 M150 157 C158 166 171 165 178 156" stroke="#5A3E2B" stroke-width="3" stroke-linecap="round" fill="none"></path>
+        <path d="M133 128 C133 119 167 119 167 128 C167 139 157 147 150 147 C143 147 133 139 133 128 Z" fill="url(#{{u}}n)"></path>
+        <ellipse cx="143" cy="125" rx="6" ry="2.8" fill="#FFFFFF" opacity="0.5"></ellipse>
+      </g>
+
+      <g class="{{cls.eyes}}">
+        <ellipse cx="127" cy="104" rx="12.5" ry="13" fill="#2E1C10"></ellipse><ellipse cx="127" cy="104.5" rx="10.5" ry="11.5" fill="url(#{{u}}i)"></ellipse><circle cx="127" cy="105" r="5.5" fill="#140A05"></circle><circle cx="131" cy="99.5" r="3.6" fill="#FFFFFF"></circle><circle cx="123.5" cy="109" r="1.5" fill="#FFFFFF" opacity="0.8"></circle>
+        <ellipse cx="173" cy="104" rx="12.5" ry="13" fill="#2E1C10"></ellipse><ellipse cx="173" cy="104.5" rx="10.5" ry="11.5" fill="url(#{{u}}i)"></ellipse><circle cx="173" cy="105" r="5.5" fill="#140A05"></circle><circle cx="177" cy="99.5" r="3.6" fill="#FFFFFF"></circle><circle cx="169.5" cy="109" r="1.5" fill="#FFFFFF" opacity="0.8"></circle>
+      </g>
+
+      <sc-if value="{{b.lab}}" hint-placeholder-val="{{ true }}">
+        <path d="M108 62 C88 60 70 76 68 104 C66 128 72 148 88 152 C100 156 110 142 112 122 C114 102 116 80 108 62 Z" fill="url(#{{u}}e)"></path>
+        <path d="M192 62 C212 60 230 76 232 104 C234 128 228 148 212 152 C200 156 190 142 188 122 C186 102 184 80 192 62 Z" fill="url(#{{u}}e)"></path>
+      </sc-if>
+      <sc-if value="{{b.dachshund}}" hint-placeholder-val="{{ false }}">
+        <path d="M106 62 C84 60 62 78 60 112 C58 146 64 178 82 190 C96 198 110 184 112 162 C114 132 116 92 106 62 Z" fill="url(#{{u}}e)"></path>
+        <path d="M194 62 C216 60 238 78 240 112 C242 146 236 178 218 190 C204 198 190 184 188 162 C186 132 184 92 194 62 Z" fill="url(#{{u}}e)"></path>
+        <g stroke="{{co.furLine}}" stroke-width="2" fill="none" opacity="0.45" stroke-linecap="round"><path d="M96 80 C88 108 86 140 90 170"></path><path d="M204 80 C212 108 214 140 210 170"></path></g>
+      </sc-if>
+      <sc-if value="{{b.poodle}}" hint-placeholder-val="{{ false }}">
+        <g fill="url(#{{u}}e)"><circle cx="98" cy="76" r="18"></circle><circle cx="88" cy="102" r="20"></circle><circle cx="84" cy="130" r="21"></circle><circle cx="86" cy="158" r="20"></circle><circle cx="92" cy="182" r="16"></circle><circle cx="202" cy="76" r="18"></circle><circle cx="212" cy="102" r="20"></circle><circle cx="216" cy="130" r="21"></circle><circle cx="214" cy="158" r="20"></circle><circle cx="208" cy="182" r="16"></circle></g>
+        <g stroke="{{co.furLine}}" stroke-width="1.8" fill="none" opacity="0.55" stroke-linecap="round"><path d="M80 100 a7 7 0 0 1 12 -3"></path><path d="M76 134 a7 7 0 0 1 12 -3"></path><path d="M82 162 a7 7 0 0 1 12 -3"></path><path d="M208 100 a7 7 0 0 1 12 -3"></path><path d="M212 134 a7 7 0 0 1 12 -3"></path><path d="M206 162 a7 7 0 0 1 12 -3"></path></g>
+      </sc-if>
+
+      <!-- Очки -->
+      <sc-if value="{{o.round}}" hint-placeholder-val="{{ false }}">
+        <circle cx="127" cy="104" r="18" fill="#DDF0FF" fill-opacity="0.22" stroke="#3B2F2F" stroke-width="3.5"></circle>
+        <circle cx="173" cy="104" r="18" fill="#DDF0FF" fill-opacity="0.22" stroke="#3B2F2F" stroke-width="3.5"></circle>
+        <path d="M145 101 Q150 95 155 101 M109 100 L94 94 M191 100 L206 94" stroke="#3B2F2F" stroke-width="3" fill="none" stroke-linecap="round"></path>
+      </sc-if>
+      <sc-if value="{{o.sun}}" hint-placeholder-val="{{ false }}">
+        <rect x="105" y="91" width="42" height="27" rx="11" fill="#2B2633"></rect>
+        <rect x="153" y="91" width="42" height="27" rx="11" fill="#2B2633"></rect>
+        <path d="M147 100 h6 M105 98 L92 92 M195 98 L208 92" stroke="#2B2633" stroke-width="4" stroke-linecap="round"></path>
+        <path d="M112 98 h11 M160 98 h11" stroke="#FFFFFF" stroke-width="2.5" opacity="0.45" stroke-linecap="round"></path>
+      </sc-if>
+      <sc-if value="{{o.heart}}" hint-placeholder-val="{{ false }}">
+        <path transform="translate(127 93)" d="M0 7 C0 -6 -19 -8 -19 5 C-19 15 -6 21 0 27 C6 21 19 15 19 5 C19 -8 0 -6 0 7 Z" fill="#E5577A" fill-opacity="0.88" stroke="#B8304F" stroke-width="2"></path>
+        <path transform="translate(173 93)" d="M0 7 C0 -6 -19 -8 -19 5 C-19 15 -6 21 0 27 C6 21 19 15 19 5 C19 -8 0 -6 0 7 Z" fill="#E5577A" fill-opacity="0.88" stroke="#B8304F" stroke-width="2"></path>
+        <path d="M145 101 Q150 96 155 101" stroke="#B8304F" stroke-width="3" fill="none"></path>
+        <path d="M118 98 q4 -4 8 -2 M164 98 q4 -4 8 -2" stroke="#FFFFFF" stroke-width="2" fill="none" opacity="0.6" stroke-linecap="round"></path>
+      </sc-if>
+
+      <!-- Шапки -->
+      <g transform="{{hatT}}">
+        <sc-if value="{{o.cap}}" hint-placeholder-val="{{ false }}">
+          <path d="M102 64 C100 24 200 24 198 64 Z" fill="#4372B8"></path>
+          <path d="M150 28 V62" stroke="#2F5A9A" stroke-width="2" opacity="0.6"></path>
+          <circle cx="150" cy="28" r="5" fill="#2F5A9A"></circle>
+          <path d="M96 62 Q150 82 204 62 L208 72 Q150 98 92 72 Z" fill="#2F5A9A"></path>
+        </sc-if>
+        <sc-if value="{{o.party}}" hint-placeholder-val="{{ false }}">
+          <g transform="rotate(12 150 56)">
+            <path d="M118 56 L150 -14 L182 56 Z" fill="#F4C34E"></path>
+            <g fill="#E0604E"><circle cx="141" cy="40" r="4.5"></circle><circle cx="161" cy="30" r="4.5"></circle><circle cx="150" cy="10" r="4"></circle><circle cx="163" cy="48" r="4.5"></circle><circle cx="134" cy="52" r="3.5"></circle></g>
+            <circle cx="150" cy="-16" r="10" fill="#E58AA0"></circle>
+            <ellipse cx="150" cy="56" rx="34" ry="6" fill="#E0A800"></ellipse>
+          </g>
+        </sc-if>
+        <sc-if value="{{o.tophat}}" hint-placeholder-val="{{ false }}">
+          <rect x="116" y="-6" width="68" height="58" rx="6" fill="#2E2A3A"></rect>
+          <rect x="116" y="34" width="68" height="10" fill="#B8485F"></rect>
+          <path d="M126 2 v26" stroke="#FFFFFF" stroke-width="3" opacity="0.22" stroke-linecap="round"></path>
+          <ellipse cx="150" cy="54" rx="58" ry="10" fill="#211E2A"></ellipse>
+        </sc-if>
+        <sc-if value="{{o.crown}}" hint-placeholder-val="{{ false }}">
+          <path d="M110 60 L108 22 L128 40 L140 10 L150 34 L160 10 L172 40 L192 22 L190 60 Z" fill="#F2C230" stroke="#C99400" stroke-width="2" stroke-linejoin="round"></path>
+          <rect x="110" y="50" width="80" height="10" fill="#E0A800"></rect>
+          <circle cx="150" cy="44" r="5.5" fill="#E0604E"></circle><circle cx="128" cy="47" r="4" fill="#7FB3D5"></circle><circle cx="172" cy="47" r="4" fill="#8CCB98"></circle>
+          <g fill="#FFF6D6"><circle cx="140" cy="10" r="3.5"></circle><circle cx="160" cy="10" r="3.5"></circle><circle cx="108" cy="22" r="3"></circle><circle cx="192" cy="22" r="3"></circle></g>
+        </sc-if>
+      </g>
+      <!-- Украшения у уха -->
+      <sc-if value="{{o.bow}}" hint-placeholder-val="{{ false }}">
+        <path d="M198 58 L174 42 L176 72 Z" fill="#E58AA0"></path><path d="M198 58 L222 42 L220 72 Z" fill="#E58AA0"></path><circle cx="198" cy="58" r="8" fill="#C9506E"></circle>
+      </sc-if>
+      <sc-if value="{{o.flower}}" hint-placeholder-val="{{ false }}">
+        <g transform="translate(98 70)"><g fill="#F2B5C3"><circle cx="0" cy="-10" r="8"></circle><circle cx="10" cy="-3" r="8"></circle><circle cx="6" cy="9" r="8"></circle><circle cx="-6" cy="9" r="8"></circle><circle cx="-10" cy="-3" r="8"></circle></g><circle cx="0" cy="0" r="6" fill="#F4C34E"></circle><ellipse cx="14" cy="14" rx="8" ry="3.5" transform="rotate(35 14 14)" fill="#6BAE5E"></ellipse></g>
+      </sc-if>
+
+    </g>
+  </g>
+</svg>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"breed":{"editor":"enum","options":["labrador","shepherd","poodle","dachshund","husky","whippet"],"default":"labrador"},"color":{"editor":"enum","options":["ginger","gold","cream","brown","black","grey","white","pink","blue"],"default":"gold"},"hat":{"editor":"enum","options":["","cap","party","tophat","crown"],"default":""},"glasses":{"editor":"enum","options":["","round","sun","heart"],"default":""},"collar":{"editor":"enum","options":["","collar-blue","collar-green","collar-pink","collar-gold"],"default":""},"extra":{"editor":"enum","options":["","bow","scarf","flower","medal"],"default":""},"size":{"editor":"int","min":60,"max":600,"default":300},"alive":{"editor":"boolean","default":false},"paintOff":{"editor":"boolean","default":false},"$preview":{"width":300,"height":340}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var p = this.props;
+    var COLORS = { ginger: '#d98324', gold: '#e9c46a', cream: '#f0d9b5', brown: '#7a4a2a', black: '#34312f', grey: '#9ba3ab', white: '#f6f1e7', pink: '#f4a6c8', blue: '#7db7f0' };
+    var NAMES = { labrador: 'Лабрадор', shepherd: 'Овчарка', poodle: 'Пудель', dachshund: 'Такса', husky: 'Хаски', whippet: 'Уиппет' };
+    var COLLARS = { 'collar-blue': ['#5B97F5', '#2F6AD0'], 'collar-green': ['#5CC584', '#2E8E54'], 'collar-pink': ['#F78DC3', '#D9559A'], 'collar-gold': ['#F7D35A', '#D4A20E'] };
+    var breed = NAMES[p.breed] ? p.breed : 'labrador';
+    var colorId = COLORS[p.color] ? p.color : 'gold';
+    var base = COLORS[colorId];
+
+    function hx(v) { var s = Math.max(0, Math.min(255, Math.round(v))).toString(16); return s.length < 2 ? '0' + s : s; }
+    function mix(a, b, t) {
+      a = a.replace('#', ''); b = b.replace('#', '');
+      var out = '#';
+      for (var i = 0; i < 6; i += 2) out += hx(parseInt(a.substr(i, 2), 16) * (1 - t) + parseInt(b.substr(i, 2), 16) * t);
+      return out;
+    }
+    function lum(h) { h = h.replace('#', ''); return (0.2126 * parseInt(h.substr(0, 2), 16) + 0.7152 * parseInt(h.substr(2, 2), 16) + 0.0722 * parseInt(h.substr(4, 2), 16)) / 255; }
+    var pale = lum(base) > 0.78;
+    var veryDark = lum(base) < 0.25;
+    var dark = mix(base, '#000000', pale ? 0.16 : 0.28);
+    var light = mix(base, '#FFFFFF', veryDark ? 0.3 : 0.45);
+    var cream = mix(base, '#FFF4DE', veryDark ? 0.35 : 0.62);
+
+    var co = {
+      base: base, dark: dark, lift: mix(base, '#FFFFFF', 0.15),
+      headBase: base, headLight: light, headDark: dark,
+      earTop: base, earBottom: mix(base, '#000000', pale ? 0.2 : 0.34), earInner: mix(base, '#F2C9B8', 0.6),
+      muzzle: cream, muzzleLight: mix(cream, '#FFFFFF', 0.4),
+      chest: cream, chestLight: mix(cream, '#FFFFFF', 0.4),
+      legDark: dark, legLight: mix(base, '#FFFFFF', 0.2),
+      paw: mix(cream, '#000000', 0.08), pawLight: mix(cream, '#FFFFFF', 0.3),
+      tail: base, tailDark: dark, tailLight: light,
+      iris: '#4E2D11', irisLight: '#A06A34', irisDark: '#2A1608',
+      furLine: mix(base, '#000000', 0.18), toe: mix(cream, '#000000', 0.3),
+      saddle: mix(base, '#1C1612', 0.72)
+    };
+    if (breed === 'husky') {
+      var cap = pale ? mix(base, '#000000', 0.35) : base;
+      var white = '#F6F2EA';
+      co.base = cap; co.dark = mix(cap, '#000000', 0.3); co.lift = mix(cap, '#FFFFFF', 0.12);
+      co.headBase = cap; co.headLight = mix(cap, '#FFFFFF', 0.3); co.headDark = mix(cap, '#000000', 0.3);
+      co.earTop = cap; co.earBottom = mix(cap, '#000000', 0.3);
+      co.muzzle = '#E9E3D8'; co.muzzleLight = white; co.chest = '#EDE7DC'; co.chestLight = white;
+      co.legDark = '#D8D1C4'; co.legLight = white; co.paw = '#E2DBCF'; co.pawLight = white;
+      co.tail = cap; co.tailDark = mix(cap, '#000000', 0.3); co.tailLight = mix(cap, '#FFFFFF', 0.3);
+      co.iris = '#3E7EC0'; co.irisLight = '#9ACDF5'; co.irisDark = '#1E4A7A';
+      co.furLine = mix(cap, '#000000', 0.2); co.toe = '#B9B0A2';
+    }
+    if (breed === 'shepherd') {
+      co.earTop = co.saddle; co.earBottom = mix(co.saddle, '#000000', 0.3);
+      co.muzzle = co.saddle; co.muzzleLight = mix(co.saddle, base, 0.35);
+      co.tail = co.saddle; co.tailDark = mix(co.saddle, '#000000', 0.3); co.tailLight = mix(co.saddle, base, 0.5);
+    }
+    if (breed === 'dachshund' || breed === 'whippet') {
+      co.earTop = mix(base, '#000000', 0.12);
+    }
+
+    var MZ = {
+      labrador: { cy: 146, rx: 40, ry: 30, nose: 0 },
+      shepherd: { cy: 154, rx: 31, ry: 34, nose: 10 },
+      poodle: { cy: 150, rx: 33, ry: 32, nose: 6 },
+      dachshund: { cy: 154, rx: 30, ry: 34, nose: 10 },
+      husky: { cy: 148, rx: 38, ry: 30, nose: 4 },
+      whippet: { cy: 156, rx: 28, ry: 34, nose: 12 }
+    }[breed];
+
+    var collarCols = COLLARS[p.collar] || ['#E46A7E', '#B33E56'];
+    var alive = !!p.alive;
+    var size = p.size || 300;
+    var b = {};
+    ['lab', 'shepherd', 'poodle', 'dachshund', 'husky', 'whippet'].forEach(function (k) { b[k] = (k === 'lab' ? 'labrador' : k) === breed; });
+
+    var hatY = breed === 'poodle' ? -24 : (breed === 'whippet' ? 6 : 0);
+    var o = {
+      cap: p.hat === 'cap', party: p.hat === 'party', tophat: p.hat === 'tophat', crown: p.hat === 'crown',
+      round: p.glasses === 'round', sun: p.glasses === 'sun', heart: p.glasses === 'heart',
+      bow: p.extra === 'bow', scarf: p.extra === 'scarf', flower: p.extra === 'flower', medal: p.extra === 'medal',
+      tag: p.extra !== 'medal' && p.extra !== 'scarf'
+    };
+
+    return {
+      u: 'pup-' + breed + '-' + colorId + '-' + (p.collar || 'red'),
+      w: size, h: Math.round(size * 340 / 300),
+      label: NAMES[breed],
+      co: co, b: b,
+      body: { std: breed === 'labrador' || breed === 'shepherd' || breed === 'poodle' || breed === 'husky', long: breed === 'dachshund', slim: breed === 'whippet' },
+      head: { std: breed !== 'whippet', slim: breed === 'whippet' },
+      forehead: breed !== 'husky' && breed !== 'poodle',
+      mz: MZ, noseT: 'translate(0 ' + MZ.nose + ')',
+      hatT: 'translate(0 ' + hatY + ')',
+      collarTop: collarCols[0], collarBottom: collarCols[1],
+      o: o,
+      paint: p.paintOff ? '' : 'url(#pupPaint)',
+      cls: { tail: alive ? 'pup-tail' : '', body: alive ? 'pup-body' : '', head: alive ? 'pup-head' : '', eyes: alive ? 'pup-eyes' : '' }
+    };
+  }
+}
+</script>
+</body>
+</html>

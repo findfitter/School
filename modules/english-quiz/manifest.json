@@ -3,6 +3,7 @@
   "title": "Hello! Угадай слово",
   "subject": "english",
   "icon": "🎧",
+  "glyph": "Abc",
   "description": "Слушаем слово и выбираем картинку",
   "version": "1.0.0",
   "voice": true,

@@ -3,6 +3,7 @@
   "title": "Lesen und Bild finden",
   "subject": "german",
   "icon": "🔎",
+  "glyph": "Such",
   "description": "Lies und finde das passende Bild",
   "version": "1.0.0",
   "styles": ["style.css"],

@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Моя школа — сказочная книжка</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&amp;family=Caveat:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3B2F2F}a:hover{color:#1F1717}
+button{font:inherit;border:0;cursor:pointer;padding:0;color:inherit;background:none;-webkit-tap-highlight-color:transparent}
+.hand{font-family:'Caveat',cursive}
+.card{transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s cubic-bezier(.2,.8,.2,1)}
+.card:hover{transform:rotate(0deg) translateY(-4px) scale(1.03)!important;box-shadow:0 16px 28px rgba(80,55,30,.18),0 2px 4px rgba(80,55,30,.08)!important}
+.card:active{transform:rotate(0deg) scale(.97)!important;transition-duration:.12s}
+.ribbon{transition:height .45s cubic-bezier(.2,1.3,.4,1),transform .3s ease}
+.ribbon:hover{transform:translateY(5px)}
+.soft{transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .3s ease}
+.soft:hover{transform:translateY(-3px) scale(1.04)}
+.soft:active{transform:scale(.95);transition-duration:.12s}
+.turn{transform-origin:0 50%;animation:turn .8s cubic-bezier(.2,.8,.2,1) both}
+.fade{animation:fadeUp .7s .15s cubic-bezier(.2,.8,.2,1) both}
+.stamp{animation:stamp .45s cubic-bezier(.2,1.6,.4,1) both}
+.sun-rays{transform-box:fill-box;transform-origin:50% 50%;animation:spin 40s linear infinite}
+.butterfly{animation:fly 10s ease-in-out infinite}
+.wing-l{transform-box:fill-box;transform-origin:100% 50%;animation:flapL .22s ease-in-out infinite alternate}
+.wing-r{transform-box:fill-box;transform-origin:0% 50%;animation:flapR .22s ease-in-out infinite alternate}
+.dog-tail{transform-box:fill-box;transform-origin:0% 100%;animation:wag 1.1s ease-in-out infinite}
+.dog-body{transform-box:fill-box;transform-origin:50% 100%;animation:breathe 3.6s ease-in-out infinite}
+.dog-head{transform-box:fill-box;transform-origin:50% 90%;animation:tilt 7s ease-in-out infinite}
+.dog-eyes{transform-box:fill-box;transform-origin:50% 50%;animation:blink 5s infinite}
+.sparkle{transform-box:fill-box;transform-origin:50% 50%;animation:twinkle 2.4s ease-in-out infinite}
+@keyframes turn{from{opacity:0;transform:perspective(1800px) rotateY(-55deg)}60%{opacity:1}to{opacity:1;transform:perspective(1800px) rotateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes stamp{from{opacity:0;transform:scale(1.9) rotate(-28deg)}to{opacity:.9;transform:scale(1) rotate(-12deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fly{0%,100%{transform:translate(0,0)}25%{transform:translate(70px,-22px)}50%{transform:translate(140px,8px)}75%{transform:translate(64px,26px)}}
+@keyframes flapL{from{transform:scaleX(1)}to{transform:scaleX(.35)}}
+@keyframes flapR{from{transform:scaleX(1)}to{transform:scaleX(.35)}}
+@keyframes wag{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(9deg)}}
+@keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.012,1.022)}}
+@keyframes tilt{0%,100%{transform:rotate(0)}30%{transform:rotate(-3deg)}60%{transform:rotate(2deg)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.08)}}
+@keyframes twinkle{0%,100%{transform:scale(.6);opacity:.4}50%{transform:scale(1.15);opacity:1}}
+@media (prefers-reduced-motion:reduce){.card,.ribbon,.soft,.turn,.fade,.stamp,.sun-rays,.butterfly,.wing-l,.wing-r,.dog-tail,.dog-body,.dog-head,.dog-eyes,.sparkle{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+
+<div style="width: 1280px; height: 800px; position: relative; overflow: hidden; background: #E4ECE6; font-family: 'Andika', system-ui, sans-serif; color: #3B2F2F;">
+
+  <!-- Акварельные фильтры, градиенты собаки -->
+  <svg aria-hidden="true" width="0" height="0" style="position: absolute;">
+    <defs>
+      <filter id="wc" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" seed="4" result="n"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap>
+        <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="9" result="g"></feTurbulence>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.9 0 0 0 0.45" result="ga"></feColorMatrix>
+        <feComposite in="d" in2="ga" operator="in" result="t"></feComposite>
+        <feMorphology in="d" operator="erode" radius="1.6" result="er"></feMorphology>
+        <feComposite in="d" in2="er" operator="out" result="edge"></feComposite>
+        <feColorMatrix in="edge" type="matrix" values="0.72 0 0 0 0  0 0.72 0 0 0  0 0 0.72 0 0  0 0 0 0.55 0" result="ed"></feColorMatrix>
+        <feMerge><feMergeNode in="t"></feMergeNode><feMergeNode in="ed"></feMergeNode></feMerge>
+      </filter>
+      <filter id="wc2" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="3" seed="11" result="n"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="22" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap>
+        <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="2" seed="3" result="g"></feTurbulence>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1 0 0 0 0.35" result="ga"></feColorMatrix>
+        <feComposite in="d" in2="ga" operator="in" result="t"></feComposite>
+        <feMorphology in="d" operator="erode" radius="2" result="er"></feMorphology>
+        <feComposite in="d" in2="er" operator="out" result="edge"></feComposite>
+        <feColorMatrix in="edge" type="matrix" values="0.75 0 0 0 0  0 0.75 0 0 0  0 0 0.75 0 0  0 0 0 0.5 0" result="ed"></feColorMatrix>
+        <feMerge><feMergeNode in="t"></feMergeNode><feMergeNode in="ed"></feMergeNode></feMerge>
+      </filter>
+      <filter id="wcS" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.08" numOctaves="2" seed="6" result="n"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap>
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="2" result="g"></feTurbulence>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.9 0 0 0 0.5" result="ga"></feColorMatrix>
+        <feComposite in="d" in2="ga" operator="in" result="t"></feComposite>
+        <feMorphology in="d" operator="erode" radius="1" result="er"></feMorphology>
+        <feComposite in="d" in2="er" operator="out" result="edge"></feComposite>
+        <feColorMatrix in="edge" type="matrix" values="0.7 0 0 0 0  0 0.7 0 0 0  0 0 0.7 0 0  0 0 0 0.6 0" result="ed"></feColorMatrix>
+        <feMerge><feMergeNode in="t"></feMergeNode><feMergeNode in="ed"></feMergeNode></feMerge>
+      </filter>
+      <filter id="wcDog" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="5" result="n"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap>
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="g"></feTurbulence>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.6 0 0 0 0.65" result="ga"></feColorMatrix>
+        <feComposite in="d" in2="ga" operator="in" result="t"></feComposite>
+        <feMorphology in="d" operator="erode" radius="1.2" result="er"></feMorphology>
+        <feComposite in="d" in2="er" operator="out" result="edge"></feComposite>
+        <feColorMatrix in="edge" type="matrix" values="0.45 0 0 0 0  0 0.4 0 0 0  0 0 0.38 0 0  0 0 0 0.75 0" result="ed"></feColorMatrix>
+        <feMerge><feMergeNode in="t"></feMergeNode><feMergeNode in="ed"></feMergeNode></feMerge>
+      </filter>
+      <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="1" result="n"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+      </filter>
+      <filter id="stampInk" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="12" result="g"></feTurbulence>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  2.2 0 0 0 -0.55" result="ga"></feColorMatrix>
+        <feComposite in="SourceGraphic" in2="ga" operator="in"></feComposite>
+      </filter>
+      <filter id="paper" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="2"></feTurbulence>
+        <feColorMatrix type="matrix" values="0 0 0 0 0.45  0 0 0 0 0.36  0 0 0 0 0.25  0.24 0 0 0 -0.05"></feColorMatrix>
+      </filter>
+      <linearGradient id="gBody" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C4863D"></stop><stop offset="0.3" stop-color="#E2A653"></stop><stop offset="0.62" stop-color="#EBB767"></stop><stop offset="1" stop-color="#BC7E37"></stop></linearGradient>
+      <radialGradient id="gHead" cx="0.42" cy="0.32" r="0.72"><stop offset="0" stop-color="#F4C981"></stop><stop offset="0.55" stop-color="#E2A756"></stop><stop offset="1" stop-color="#C38640"></stop></radialGradient>
+      <linearGradient id="gEar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C8893F"></stop><stop offset="1" stop-color="#9A6128"></stop></linearGradient>
+      <radialGradient id="gMuzzle" cx="0.5" cy="0.35" r="0.7"><stop offset="0" stop-color="#FCEFD6"></stop><stop offset="1" stop-color="#EDCB96"></stop></radialGradient>
+      <radialGradient id="gChest" cx="0.5" cy="0.28" r="0.75"><stop offset="0" stop-color="#FBE9C9"></stop><stop offset="0.65" stop-color="#F0CC8F"></stop><stop offset="1" stop-color="#E7B56A" stop-opacity="0"></stop></radialGradient>
+      <linearGradient id="gLeg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C08139"></stop><stop offset="0.5" stop-color="#E9B466"></stop><stop offset="1" stop-color="#C08139"></stop></linearGradient>
+      <radialGradient id="gPaw" cx="0.5" cy="0.3" r="0.8"><stop offset="0" stop-color="#F8E2B9"></stop><stop offset="1" stop-color="#DDAF6C"></stop></radialGradient>
+      <linearGradient id="gTail" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#B9793A"></stop><stop offset="0.6" stop-color="#E0A453"></stop><stop offset="1" stop-color="#F1C27C"></stop></linearGradient>
+      <radialGradient id="gNose" cx="0.4" cy="0.3" r="0.8"><stop offset="0" stop-color="#5E4840"></stop><stop offset="1" stop-color="#1A1310"></stop></radialGradient>
+      <radialGradient id="gIris" cx="0.5" cy="0.55" r="0.6"><stop offset="0" stop-color="#A06A34"></stop><stop offset="0.65" stop-color="#4E2D11"></stop><stop offset="1" stop-color="#2A1608"></stop></radialGradient>
+      <linearGradient id="gTongue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFA3B2"></stop><stop offset="1" stop-color="#E5677F"></stop></linearGradient>
+      <linearGradient id="gCollar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D9667F"></stop><stop offset="1" stop-color="#A8405A"></stop></linearGradient>
+      <radialGradient id="gTag" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#FFE69A"></stop><stop offset="1" stop-color="#E0A800"></stop></radialGradient>
+    </defs>
+  </svg>
+
+  <!-- Стол: акварельные пятна и бумага -->
+  <svg aria-hidden="true" width="1280" height="800" viewBox="0 0 1280 800" style="position: absolute; left: 0; top: 0;">
+    <ellipse cx="160" cy="80" rx="260" ry="120" fill="#CFE2D8" filter="url(#wc2)"></ellipse>
+    <ellipse cx="1160" cy="760" rx="300" ry="140" fill="#F1DEC4" filter="url(#wc2)"></ellipse>
+    <ellipse cx="1220" cy="60" rx="160" ry="90" fill="#E7D7EC" opacity="0.8" filter="url(#wc2)"></ellipse>
+    <rect width="1280" height="800" filter="url(#paper)"></rect>
+  </svg>
+
+  <!-- Верх стола: звёзды, косточки, наклейки -->
+  <div style="position: absolute; right: 36px; top: 14px; height: 52px; display: flex; align-items: center; gap: 12px; z-index: 3;">
+    <div style="height: 48px; padding: 0 6px; border-radius: 24px; background: #FFFDF6; display: flex; align-items: center; box-shadow: 0 6px 14px rgba(80,55,30,.12);">
+      <span style="display: flex; align-items: center; gap: 6px; padding: 0 12px 0 6px; font-size: 21px; font-weight: 700;" aria-label="Звёзды: 12">
+        <svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.1l-5.9 3.2 1.3-6.5L2.5 9.3l6.6-.8z" fill="#F4C34E" filter="url(#wcS)"></path></svg>12
+      </span>
+      <span style="width: 1px; height: 24px; background: #E8DCC6;"></span>
+      <span style="display: flex; align-items: center; gap: 6px; padding: 0 12px 0 10px; font-size: 21px; font-weight: 700;" aria-label="Косточки: 3">
+        <svg aria-hidden="true" width="30" height="30" viewBox="0 0 36 36"><g fill="#EBD3A8" filter="url(#wcS)"><circle cx="9" cy="13" r="5"></circle><circle cx="9" cy="23" r="5"></circle><circle cx="27" cy="13" r="5"></circle><circle cx="27" cy="23" r="5"></circle><rect x="9" y="13" width="18" height="10"></rect></g></svg>3
+      </span>
+    </div>
+    <a href="Dog.dc.html" class="soft hand" style="position: relative; height: 48px; padding: 0 20px 0 14px; border-radius: 10px; background: #FFFDF6; display: flex; align-items: center; gap: 8px; font-size: 27px; font-weight: 700; color: #8C3A1C; text-decoration: none; box-shadow: 0 6px 14px rgba(80,55,30,.12); transform: rotate(-1.2deg);">
+      <span aria-hidden="true" style="position: absolute; left: 50%; top: -9px; margin-left: -28px; width: 56px; height: 18px; background: rgba(224,122,79,0.45); transform: rotate(3deg);"></span>
+      <svg aria-hidden="true" width="26" height="26" viewBox="0 0 48 48"><g fill="#C9623A" filter="url(#wcS)"><ellipse cx="24" cy="31" rx="10" ry="8.5"></ellipse><circle cx="12" cy="20" r="4.5"></circle><circle cx="20" cy="13" r="4.5"></circle><circle cx="28" cy="13" r="4.5"></circle><circle cx="36" cy="20" r="4.5"></circle></g></svg>
+      Бобик
+    </a>
+    <a href="Stickers.dc.html" class="soft hand" style="position: relative; height: 48px; padding: 0 20px 0 14px; border-radius: 10px; background: #FFFDF6; display: flex; align-items: center; gap: 8px; font-size: 27px; font-weight: 700; color: #8A2A42; text-decoration: none; box-shadow: 0 6px 14px rgba(80,55,30,.12); transform: rotate(1.5deg);">
+      <span aria-hidden="true" style="position: absolute; left: 50%; top: -9px; margin-left: -28px; width: 56px; height: 18px; background: rgba(217,102,127,0.45); transform: rotate(-4deg);"></span>
+      <svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.1l-5.9 3.2 1.3-6.5L2.5 9.3l6.6-.8z" fill="#D9667F" filter="url(#wcS)"></path></svg>
+      Наклейки
+    </a>
+    <button type="button" class="soft" aria-label="Для родителей" style="width: 44px; height: 44px; border-radius: 22px; background: rgba(255,253,246,0.6); display: flex; align-items: center; justify-content: center;">
+      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7A6A5C" stroke-width="2" stroke-linecap="round"><rect x="5" y="10.5" width="14" height="10" rx="3"></rect><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"></path></svg>
+    </button>
+  </div>
+
+  <!-- Книга: обложка -->
+  <div style="position: absolute; left: 28px; top: 76px; width: 1224px; height: 712px; border-radius: 22px; background: #4A5A8A; box-shadow: 0 26px 50px rgba(50,40,40,.28), inset 0 0 0 3px rgba(255,255,255,.08);"></div>
+
+  <!-- ЛЕВАЯ СТРАНИЦА -->
+  <div style="position: absolute; left: 44px; top: 88px; width: 596px; height: 688px; border-radius: 16px 0 0 16px; background: linear-gradient(90deg, #FBF5E8 0%, #FBF5E8 86%, #EBDFC6 100%); box-shadow: -3px 2px 0 #F1E8D6, -6px 4px 0 #E3D6BC;">
+
+    <sc-if value="{{showMenu}}" hint-placeholder-val="{{ true }}">
+      <div class="fade" style="position: absolute; inset: 0;">
+        <div style="position: absolute; left: 48px; top: 18px; right: 48px; display: flex; align-items: baseline; justify-content: space-between;">
+          <h1 class="hand" style="margin: 0; font-size: 62px; font-weight: 700; line-height: 1; color: #3B2F2F;">Моя школа</h1>
+          <span class="hand" style="font-size: 26px; font-weight: 600; color: #7A6A5C;">суббота, 31 октября</span>
+        </div>
+
+        <!-- Акварельная иллюстрация: дорожка Бобика к косточке -->
+        <svg role="img" aria-label="Бобик идёт по дорожке к косточке" width="516" height="432" viewBox="0 0 516 432" style="position: absolute; left: 40px; top: 100px;">
+          <defs><filter id="deckleAR" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="1" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter><mask id="deckleAL" maskUnits="userSpaceOnUse" x="0" y="0" width="516" height="432"><rect x="8" y="8" width="500" height="416" rx="6" fill="#FFFFFF" filter="url(#deckleAR)"></rect></mask></defs><g mask="url(#deckleAL)">
+            <rect x="0" y="0" width="516" height="432" fill="#D3E6F2" filter="url(#wc2)"></rect>
+            <g fill="#FFFFFF" opacity="0.75" filter="url(#wc)"><ellipse cx="150" cy="70" rx="60" ry="18"></ellipse><ellipse cx="180" cy="58" rx="34" ry="20"></ellipse><ellipse cx="320" cy="110" rx="46" ry="14"></ellipse></g>
+            <g class="sun-rays" stroke="#F2C25A" stroke-width="5" stroke-linecap="round" opacity="0.7"><path d="M432 14 v14"></path><path d="M432 116 v14"></path><path d="M378 72 h14"></path><path d="M472 72 h14"></path><path d="M394 34 l10 10"></path><path d="M460 100 l10 10"></path><path d="M470 34 l-10 10"></path><path d="M404 100 l-10 10"></path></g>
+            <circle cx="432" cy="72" r="36" fill="#F7D774" filter="url(#wc)"></circle>
+            <path d="M0 260 C90 206 180 214 262 242 C342 270 420 202 516 216 L516 432 L0 432 Z" fill="#B9D99A" opacity="0.9" filter="url(#wc2)"></path>
+            <path d="M0 330 C120 288 258 306 360 336 C430 356 480 346 516 336 L516 432 L0 432 Z" fill="#8FC27A" opacity="0.9" filter="url(#wc)"></path>
+            <path d="M58 300 C60 250 62 210 70 170 L84 170 C80 210 82 250 86 300 Z" fill="#9A6B48" filter="url(#wcS)"></path>
+            <g fill="#6FAE6B" opacity="0.88" filter="url(#wc)"><circle cx="76" cy="150" r="58"></circle><circle cx="118" cy="178" r="40"></circle><circle cx="36" cy="182" r="38"></circle></g>
+            <path d="M30 422 C120 390 180 368 222 338 C272 300 330 306 370 276 C400 254 420 236 440 226" stroke="#D7B07A" stroke-width="18" stroke-linecap="round" fill="none" opacity="0.75" filter="url(#wcS)"></path>
+            <path d="M30 422 C120 390 180 368 222 338 C272 300 330 306 370 276 C400 254 420 236 440 226" stroke="#A87A48" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 13" fill="none"></path>
+            <g fill="#F4C34E" filter="url(#wcS)">
+              <path transform="translate(60 384) scale(0.9)" d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.1l-5.9 3.2 1.3-6.5L2.5 9.3l6.6-.8z"></path>
+              <path transform="translate(120 360) scale(0.9)" d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.1l-5.9 3.2 1.3-6.5L2.5 9.3l6.6-.8z"></path>
+              <path transform="translate(176 336) scale(0.9)" d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.1l-5.9 3.2 1.3-6.5L2.5 9.3l6.6-.8z"></path>
+            </g>
+            <g fill="none" stroke="#C4A57A" stroke-width="2.2" stroke-linejoin="round">
+              <path transform="translate(318 276) scale(0.9)" d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.1l-5.9 3.2 1.3-6.5L2.5 9.3l6.6-.8z"></path>
+              <path transform="translate(364 248) scale(0.9)" d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.1l-5.9 3.2 1.3-6.5L2.5 9.3l6.6-.8z"></path>
+            </g>
+            <g transform="translate(424 196)">
+              <g fill="#F3E2BF" filter="url(#wcS)"><circle cx="9" cy="13" r="7"></circle><circle cx="9" cy="27" r="7"></circle><circle cx="43" cy="13" r="7"></circle><circle cx="43" cy="27" r="7"></circle><rect x="9" y="13" width="34" height="14"></rect></g>
+              <path class="sparkle" d="M56 -6 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3 z" fill="#F7D774"></path>
+              <path class="sparkle" style="animation-delay: 1.2s;" d="M-8 2 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 z" fill="#F7D774"></path>
+            </g>
+            <g fill="#E58AA0" filter="url(#wcS)"><circle cx="300" cy="384" r="7"></circle><circle cx="470" cy="392" r="6"></circle><circle cx="140" cy="410" r="6"></circle></g>
+            <g fill="#F7D774" filter="url(#wcS)"><circle cx="330" cy="400" r="6"></circle><circle cx="420" cy="378" r="5"></circle></g>
+            <g class="butterfly">
+              <g transform="translate(150 120)">
+                <ellipse class="wing-l" cx="-8" cy="0" rx="10" ry="13" fill="#E58AA0" opacity="0.85"></ellipse>
+                <ellipse class="wing-r" cx="8" cy="0" rx="10" ry="13" fill="#F2B5C3" opacity="0.85"></ellipse>
+                <rect x="-1.5" y="-9" width="3" height="18" rx="1.5" fill="#5A4636"></rect>
+              </g>
+            </g>
+            <g transform="translate(188 196) scale(0.4533)">
+              <g filter="url(#wcDog)">
+                <ellipse cx="150" cy="327" rx="108" ry="10" fill="#4A6B3A" opacity="0.25"></ellipse>
+                <g class="dog-tail"><path d="M200 300 C236 300 262 278 266 238 C268 220 262 206 254 200 C256 222 250 250 230 268 C220 278 208 284 196 286 Z" fill="url(#gTail)"></path></g>
+                <ellipse cx="96" cy="282" rx="50" ry="42" fill="url(#gBody)"></ellipse>
+                <ellipse cx="204" cy="282" rx="50" ry="42" fill="url(#gBody)"></ellipse>
+                <ellipse cx="70" cy="316" rx="27" ry="12" fill="url(#gPaw)"></ellipse>
+                <ellipse cx="230" cy="316" rx="27" ry="12" fill="url(#gPaw)"></ellipse>
+                <g class="dog-body">
+                  <path d="M106 150 C90 190 84 244 94 304 L206 304 C216 244 210 190 194 150 Z" fill="url(#gBody)"></path>
+                  <path d="M116 168 C108 204 110 240 120 272 C130 282 140 270 150 282 C160 270 170 282 180 272 C190 240 192 204 184 168 Z" fill="url(#gChest)"></path>
+                </g>
+                <rect x="111" y="222" width="30" height="92" rx="15" fill="url(#gLeg)"></rect>
+                <rect x="159" y="222" width="30" height="92" rx="15" fill="url(#gLeg)"></rect>
+                <ellipse cx="126" cy="314" rx="23" ry="13" fill="url(#gPaw)"></ellipse>
+                <ellipse cx="174" cy="314" rx="23" ry="13" fill="url(#gPaw)"></ellipse>
+                <path d="M108 172 C128 188 172 188 192 172 L194 186 C172 204 128 204 106 186 Z" fill="url(#gCollar)"></path>
+                <circle cx="150" cy="204" r="10" fill="url(#gTag)"></circle>
+                <g class="dog-head">
+                  <path d="M150 40 C190 40 216 68 218 104 C220 138 204 164 182 176 C172 182 160 184 150 184 C140 184 128 182 118 176 C96 164 80 138 82 104 C84 68 110 40 150 40 Z" fill="url(#gHead)"></path>
+                  <ellipse cx="150" cy="70" rx="28" ry="16" fill="#F7D79C" opacity="0.45"></ellipse>
+                  <ellipse cx="150" cy="146" rx="40" ry="30" fill="url(#gMuzzle)"></ellipse>
+                  <path d="M139 160 C138 183 162 183 161 160 Z" fill="url(#gTongue)"></path>
+                  <path d="M150 146 L150 157 M150 157 C142 166 129 165 122 156 M150 157 C158 166 171 165 178 156" stroke="#6B4A33" stroke-width="3" stroke-linecap="round" fill="none"></path>
+                  <path d="M133 128 C133 119 167 119 167 128 C167 139 157 147 150 147 C143 147 133 139 133 128 Z" fill="url(#gNose)"></path>
+                  <ellipse cx="143" cy="125" rx="6" ry="2.8" fill="#FFFFFF" opacity="0.5"></ellipse>
+                  <g class="dog-eyes">
+                    <ellipse cx="127" cy="104" rx="12.5" ry="13" fill="#3B2412"></ellipse><ellipse cx="127" cy="104.5" rx="10.5" ry="11.5" fill="url(#gIris)"></ellipse><circle cx="127" cy="105" r="5.5" fill="#140A05"></circle><circle cx="131" cy="99.5" r="3.6" fill="#FFFFFF"></circle>
+                    <ellipse cx="173" cy="104" rx="12.5" ry="13" fill="#3B2412"></ellipse><ellipse cx="173" cy="104.5" rx="10.5" ry="11.5" fill="url(#gIris)"></ellipse><circle cx="173" cy="105" r="5.5" fill="#140A05"></circle><circle cx="177" cy="99.5" r="3.6" fill="#FFFFFF"></circle>
+                  </g>
+                  <path d="M106 62 C84 60 62 78 60 110 C58 142 66 170 84 180 C98 188 110 176 111 156 C113 128 116 92 106 62 Z" fill="url(#gEar)"></path>
+                  <path d="M194 62 C216 60 238 78 240 110 C242 142 234 170 216 180 C202 188 190 176 189 156 C187 128 184 92 194 62 Z" fill="url(#gEar)"></path>
+                </g>
+              </g>
+            </g>
+          </g>
+        </svg>
+
+        <!-- Реплика Бобика -->
+        <div class="hand" style="position: absolute; left: 286px; top: 196px; width: 216px; padding: 10px 16px 12px; background: #FFFDF6; border: 2.5px solid #5A4636; border-radius: 30px 36px 28px 24px / 26px 22px 32px 28px; font-size: 27px; font-weight: 700; line-height: 1.05; text-align: center; color: #3B2F2F; box-sizing: border-box;">
+          Привет! Откроем новую главу?
+          <svg aria-hidden="true" width="34" height="26" viewBox="0 0 34 26" style="position: absolute; left: 22px; bottom: -22px;"><path d="M4 0 C10 10 8 18 2 24 C14 20 22 12 26 0" fill="#FFFDF6" stroke="#5A4636" stroke-width="2.5" stroke-linejoin="round"></path><rect x="3" y="-3" width="25" height="5" fill="#FFFDF6"></rect></svg>
+        </div>
+
+        <!-- Дорожка к косточке -->
+        <div style="position: absolute; left: 48px; right: 48px; top: 548px;">
+          <div style="display: flex; align-items: baseline; justify-content: space-between;">
+            <span class="hand" style="font-size: 32px; font-weight: 700;">Дорожка к косточке</span>
+            <span style="font-size: 18px; font-weight: 700; color: #7A6A5C;">12 из 25 звёзд</span>
+          </div>
+          <svg aria-hidden="true" width="500" height="30" viewBox="0 0 500 30" style="display: block; margin-top: 6px;">
+            <rect x="4" y="6" width="236" height="18" rx="9" fill="#F4C34E" filter="url(#wcS)"></rect>
+            <rect x="3" y="5" width="494" height="20" rx="10" fill="none" stroke="#5A4636" stroke-width="2.2" filter="url(#rough)"></rect>
+          </svg>
+          <p style="margin: 8px 0 0; font-size: 17px; color: #6E5E50;">Собери все звёзды — и откроется сложная задача с косточкой.</p>
+        </div>
+        <span class="hand" style="position: absolute; left: 0; right: 0; bottom: 8px; text-align: center; font-size: 20px; color: #A08E7C;">— 2 —</span>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{showTask}}" hint-placeholder-val="{{ false }}">
+      <div class="fade" style="position: absolute; inset: 0;">
+        <button type="button" class="soft hand" onClick="{{goHome}}" style="position: absolute; left: 40px; top: 20px; height: 50px; padding: 0 18px 0 12px; border-radius: 12px; background: #FFFDF6; display: flex; align-items: center; gap: 8px; font-size: 28px; font-weight: 700; box-shadow: 0 6px 14px rgba(80,55,30,.12);">
+          <svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#C9623A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11 L12 4 l8.5 7"></path><path d="M6 9.5 V20 h12 V9.5"></path><path d="M10 20 v-5 h4 v5"></path></svg>
+          Домой
+        </button>
+
+        <svg role="img" aria-label="Корзинка с тремя яблоками, под деревом ещё четыре яблока, рядом сидит Бобик" width="516" height="400" viewBox="0 0 516 400" style="position: absolute; left: 40px; top: 86px;">
+          <defs><filter id="deckleBR" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="1" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter><mask id="deckleBL" maskUnits="userSpaceOnUse" x="0" y="0" width="516" height="400"><rect x="8" y="8" width="500" height="384" rx="6" fill="#FFFFFF" filter="url(#deckleBR)"></rect></mask></defs><g mask="url(#deckleBL)">
+            <rect x="0" y="0" width="516" height="400" fill="#D6E8F0" filter="url(#wc2)"></rect>
+            <g class="sun-rays" stroke="#F2C25A" stroke-width="5" stroke-linecap="round" opacity="0.7"><path d="M70 6 v12"></path><path d="M70 106 v12"></path><path d="M16 62 h12"></path><path d="M112 62 h12"></path></g>
+            <circle cx="70" cy="62" r="32" fill="#F7D774" filter="url(#wc)"></circle>
+            <path d="M0 240 C120 210 260 226 380 236 C440 240 480 228 516 226 L516 400 L0 400 Z" fill="#B9D99A" opacity="0.9" filter="url(#wc2)"></path>
+            <path d="M0 300 C140 282 300 292 516 278 L516 400 L0 400 Z" fill="#8FC27A" opacity="0.9" filter="url(#wc)"></path>
+            <path d="M420 312 C422 260 424 210 430 150 L448 150 C446 210 448 260 452 312 Z" fill="#9A6B48" filter="url(#wcS)"></path>
+            <g fill="#6FAE6B" opacity="0.88" filter="url(#wc)"><circle cx="436" cy="110" r="68"></circle><circle cx="372" cy="142" r="44"></circle><circle cx="490" cy="150" r="42"></circle></g>
+            <path d="M64 290 L176 290 L164 340 Q120 350 76 340 Z" fill="#C99A5E" filter="url(#wcS)"></path>
+            <path d="M70 306 H170 M74 322 H166" stroke="#9C6F3A" stroke-width="2.5" opacity="0.7"></path>
+            <path d="M78 290 C80 254 160 254 162 290" stroke="#9C6F3A" stroke-width="5" fill="none" stroke-linecap="round"></path>
+            <g filter="url(#wcS)">
+              <circle cx="94" cy="282" r="17" fill="#E0604E"></circle><circle cx="122" cy="276" r="17" fill="#E86A55"></circle><circle cx="150" cy="282" r="17" fill="#DD5A49"></circle>
+              <circle cx="356" cy="322" r="17" fill="#E0604E"></circle><circle cx="392" cy="330" r="17" fill="#E86A55"></circle><circle cx="428" cy="322" r="17" fill="#DD5A49"></circle><circle cx="464" cy="330" r="17" fill="#E0604E"></circle>
+            </g>
+            <g fill="#6BAE5E"><ellipse cx="100" cy="263" rx="6" ry="3" transform="rotate(-25 100 263)"></ellipse><ellipse cx="128" cy="257" rx="6" ry="3" transform="rotate(-25 128 257)"></ellipse><ellipse cx="156" cy="263" rx="6" ry="3" transform="rotate(-25 156 263)"></ellipse><ellipse cx="362" cy="303" rx="6" ry="3" transform="rotate(-25 362 303)"></ellipse><ellipse cx="398" cy="311" rx="6" ry="3" transform="rotate(-25 398 311)"></ellipse><ellipse cx="434" cy="303" rx="6" ry="3" transform="rotate(-25 434 303)"></ellipse><ellipse cx="470" cy="311" rx="6" ry="3" transform="rotate(-25 470 311)"></ellipse></g>
+            <g fill="#FFFFFF" opacity="0.5"><ellipse cx="88" cy="276" rx="4" ry="6"></ellipse><ellipse cx="116" cy="270" rx="4" ry="6"></ellipse><ellipse cx="144" cy="276" rx="4" ry="6"></ellipse><ellipse cx="350" cy="316" rx="4" ry="6"></ellipse><ellipse cx="386" cy="324" rx="4" ry="6"></ellipse><ellipse cx="422" cy="316" rx="4" ry="6"></ellipse><ellipse cx="458" cy="324" rx="4" ry="6"></ellipse></g>
+            <g transform="translate(190 168) scale(0.5)">
+              <g filter="url(#wcDog)">
+                <ellipse cx="150" cy="327" rx="108" ry="10" fill="#4A6B3A" opacity="0.25"></ellipse>
+                <g class="dog-tail"><path d="M200 300 C236 300 262 278 266 238 C268 220 262 206 254 200 C256 222 250 250 230 268 C220 278 208 284 196 286 Z" fill="url(#gTail)"></path></g>
+                <ellipse cx="96" cy="282" rx="50" ry="42" fill="url(#gBody)"></ellipse>
+                <ellipse cx="204" cy="282" rx="50" ry="42" fill="url(#gBody)"></ellipse>
+                <ellipse cx="70" cy="316" rx="27" ry="12" fill="url(#gPaw)"></ellipse>
+                <ellipse cx="230" cy="316" rx="27" ry="12" fill="url(#gPaw)"></ellipse>
+                <g class="dog-body">
+                  <path d="M106 150 C90 190 84 244 94 304 L206 304 C216 244 210 190 194 150 Z" fill="url(#gBody)"></path>
+                  <path d="M116 168 C108 204 110 240 120 272 C130 282 140 270 150 282 C160 270 170 282 180 272 C190 240 192 204 184 168 Z" fill="url(#gChest)"></path>
+                </g>
+                <rect x="111" y="222" width="30" height="92" rx="15" fill="url(#gLeg)"></rect>
+                <rect x="159" y="222" width="30" height="92" rx="15" fill="url(#gLeg)"></rect>
+                <ellipse cx="126" cy="314" rx="23" ry="13" fill="url(#gPaw)"></ellipse>
+                <ellipse cx="174" cy="314" rx="23" ry="13" fill="url(#gPaw)"></ellipse>
+                <path d="M108 172 C128 188 172 188 192 172 L194 186 C172 204 128 204 106 186 Z" fill="url(#gCollar)"></path>
+                <circle cx="150" cy="204" r="10" fill="url(#gTag)"></circle>
+                <g class="dog-head">
+                  <path d="M150 40 C190 40 216 68 218 104 C220 138 204 164 182 176 C172 182 160 184 150 184 C140 184 128 182 118 176 C96 164 80 138 82 104 C84 68 110 40 150 40 Z" fill="url(#gHead)"></path>
+                  <ellipse cx="150" cy="70" rx="28" ry="16" fill="#F7D79C" opacity="0.45"></ellipse>
+                  <ellipse cx="150" cy="146" rx="40" ry="30" fill="url(#gMuzzle)"></ellipse>
+                  <path d="M139 160 C138 183 162 183 161 160 Z" fill="url(#gTongue)"></path>
+                  <path d="M150 146 L150 157 M150 157 C142 166 129 165 122 156 M150 157 C158 166 171 165 178 156" stroke="#6B4A33" stroke-width="3" stroke-linecap="round" fill="none"></path>
+                  <path d="M133 128 C133 119 167 119 167 128 C167 139 157 147 150 147 C143 147 133 139 133 128 Z" fill="url(#gNose)"></path>
+                  <ellipse cx="143" cy="125" rx="6" ry="2.8" fill="#FFFFFF" opacity="0.5"></ellipse>
+                  <sc-if value="{{openEyes}}" hint-placeholder-val="{{ true }}">
+                    <g class="dog-eyes">
+                      <ellipse cx="127" cy="104" rx="12.5" ry="13" fill="#3B2412"></ellipse><ellipse cx="127" cy="104.5" rx="10.5" ry="11.5" fill="url(#gIris)"></ellipse><circle cx="127" cy="105" r="5.5" fill="#140A05"></circle><circle cx="131" cy="99.5" r="3.6" fill="#FFFFFF"></circle>
+                      <ellipse cx="173" cy="104" rx="12.5" ry="13" fill="#3B2412"></ellipse><ellipse cx="173" cy="104.5" rx="10.5" ry="11.5" fill="url(#gIris)"></ellipse><circle cx="173" cy="105" r="5.5" fill="#140A05"></circle><circle cx="177" cy="99.5" r="3.6" fill="#FFFFFF"></circle>
+                    </g>
+                  </sc-if>
+                  <sc-if value="{{happyEyes}}" hint-placeholder-val="{{ false }}">
+                    <path d="M115 107 Q127 93 139 107" stroke="#3B2412" stroke-width="5.5" stroke-linecap="round" fill="none"></path>
+                    <path d="M161 107 Q173 93 185 107" stroke="#3B2412" stroke-width="5.5" stroke-linecap="round" fill="none"></path>
+                  </sc-if>
+                  <path d="M106 62 C84 60 62 78 60 110 C58 142 66 170 84 180 C98 188 110 176 111 156 C113 128 116 92 106 62 Z" fill="url(#gEar)"></path>
+                  <path d="M194 62 C216 60 238 78 240 110 C242 142 234 170 216 180 C202 188 190 176 189 156 C187 128 184 92 194 62 Z" fill="url(#gEar)"></path>
+                </g>
+              </g>
+            </g>
+            <sc-if value="{{happyEyes}}" hint-placeholder-val="{{ false }}">
+              <path class="sparkle" d="M330 170 l4 9 9 4 -9 4 -4 9 -4 -9 -9 -4 9 -4 z" fill="#F7D774"></path>
+              <path class="sparkle" style="animation-delay: .8s;" d="M196 160 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3 z" fill="#F7D774"></path>
+            </sc-if>
+          </g>
+        </svg>
+
+        <p style="position: absolute; left: 48px; right: 48px; top: 508px; margin: 0; font-size: 27px; line-height: 1.45; color: #3B2F2F;">
+          Бобик нашёл в корзинке <span style="padding: 0 6px; border-radius: 8px; background: linear-gradient(transparent 35%, rgba(224,96,78,.28) 35%, rgba(224,96,78,.28) 90%, transparent 90%); font-weight: 700;">3 яблока</span>, а под деревом — ещё <span style="padding: 0 6px; border-radius: 8px; background: linear-gradient(transparent 35%, rgba(224,96,78,.28) 35%, rgba(224,96,78,.28) 90%, transparent 90%); font-weight: 700;">4</span>.
+        </p>
+        <span class="hand" style="position: absolute; left: 0; right: 0; bottom: 8px; text-align: center; font-size: 20px; color: #A08E7C;">— 8 —</span>
+      </div>
+    </sc-if>
+  </div>
+
+  <!-- ПРАВАЯ СТРАНИЦА -->
+  <div style="position: absolute; left: 640px; top: 88px; width: 596px; height: 688px; border-radius: 0 16px 16px 0; background: linear-gradient(90deg, #E8DCC3 0%, #FBF5E8 13%); box-shadow: 3px 2px 0 #F1E8D6, 6px 4px 0 #E3D6BC; z-index: 1;">
+
+    <sc-if value="{{showMenu}}" hint-placeholder-val="{{ true }}">
+      <div class="turn" style="position: absolute; inset: 0;">
+        <!-- Закладки-главы -->
+        <nav aria-label="Главы" style="position: absolute; left: 48px; top: -18px; display: flex; gap: 14px; align-items: flex-start; filter: drop-shadow(0 4px 3px rgba(50,35,25,.25)); z-index: 4;">
+          <sc-for list="{{subjects}}" as="s" hint-placeholder-count="5">
+            <button type="button" class="ribbon" onClick="{{s.pick}}" aria-pressed="{{s.pressed}}" aria-label="{{s.name}}" style="{{s.ribbonStyle}}">
+              <span aria-hidden="true" style="position: absolute; top: 0; bottom: 16px; left: 7px; right: 7px; border-left: 1.5px dashed rgba(255,255,255,.45); border-right: 1.5px dashed rgba(255,255,255,.45);"></span>
+              <span style="position: relative;">{{s.glyph}}</span>
+            </button>
+          </sc-for>
+        </nav>
+
+        <div style="position: absolute; left: 48px; right: 48px; top: 112px; display: flex; align-items: flex-end; justify-content: space-between;">
+          <div>
+            <div class="hand" style="{{chapterStyle}}">{{chapterLabel}}</div>
+            <h2 class="hand" style="margin: 0; font-size: 60px; font-weight: 700; line-height: 0.95; color: #3B2F2F;">{{currentName}}</h2>
+          </div>
+          <span style="font-size: 17px; font-weight: 700; color: #7A6A5C; padding-bottom: 8px;">{{currentMeta}}</span>
+        </div>
+
+        <div style="position: absolute; left: 48px; right: 48px; top: 212px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 100px; column-gap: 18px; row-gap: 15px;">
+          <button type="button" class="card" style="position: relative; border-radius: 6px; background: #FFF6DA; box-shadow: 0 6px 14px rgba(80,55,30,.12), 0 1px 2px rgba(80,55,30,.1); display: flex; align-items: center; gap: 12px; padding: 0 14px; text-align: left; transform: rotate(-1.2deg);">
+            <span aria-hidden="true" style="position: absolute; left: 50%; top: -9px; margin-left: -30px; width: 60px; height: 18px; background: rgba(244,195,78,.6); transform: rotate(3deg);"></span>
+            <span style="position: relative; width: 68px; height: 68px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+              <svg aria-hidden="true" width="68" height="68" viewBox="0 0 68 68" style="position: absolute; inset: 0;"><circle cx="34" cy="34" r="29" fill="#F4C34E" filter="url(#wcS)"></circle></svg>
+              <svg aria-hidden="true" width="40" height="40" viewBox="0 0 36 36" style="position: relative;"><g fill="#FFFDF6"><circle cx="9" cy="13" r="5"></circle><circle cx="9" cy="23" r="5"></circle><circle cx="27" cy="13" r="5"></circle><circle cx="27" cy="23" r="5"></circle><rect x="9" y="13" width="18" height="10"></rect></g></svg>
+            </span>
+            <span style="display: flex; flex-direction: column; gap: 2px;">
+              <span style="font-size: 19px; font-weight: 700; line-height: 1.15; color: #6B4A00;">Сложная задача</span>
+              <span class="hand" style="font-size: 24px; font-weight: 700; color: #9A6A00;">+1 косточка</span>
+            </span>
+          </button>
+
+          <sc-for list="{{tiles}}" as="t" hint-placeholder-count="7">
+            <button type="button" class="card" onClick="{{t.open}}" style="{{t.cardStyle}}">
+              <span aria-hidden="true" style="{{t.tapeStyle}}"></span>
+              <span style="position: relative; width: 68px; height: 68px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                <svg aria-hidden="true" width="68" height="68" viewBox="0 0 68 68" style="position: absolute; inset: 0;"><circle cx="34" cy="34" r="29" fill="{{t.blob}}" filter="url(#wcS)"></circle></svg>
+                <span style="{{t.glyphStyle}}">{{t.glyph}}</span>
+              </span>
+              <span style="display: flex; flex-direction: column; gap: 4px; min-width: 0;">
+                <span style="font-size: 18px; font-weight: 700; line-height: 1.15; color: #3B2F2F;">{{t.title}}</span>
+                <span style="display: flex; gap: 2px;" aria-label="{{t.starsLabel}}">
+                  <sc-for list="{{t.stars}}" as="st" hint-placeholder-count="3">
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.1l-5.9 3.2 1.3-6.5L2.5 9.3l6.6-.8z" fill="{{st.fill}}" stroke="{{st.stroke}}" stroke-width="1.6" stroke-linejoin="round"></path></svg>
+                  </sc-for>
+                </span>
+              </span>
+              <sc-if value="{{t.done}}" hint-placeholder-val="{{ false }}">
+                <span class="stamp hand" style="position: absolute; right: 6px; top: 14px; width: 74px; height: 74px; border-radius: 37px; border: 3px solid #2F7D4F; box-shadow: inset 0 0 0 3px #FFF6E8, inset 0 0 0 5px #2F7D4F; color: #2F7D4F; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; filter: url(#stampInk);">Готово!</span>
+              </sc-if>
+            </button>
+          </sc-for>
+        </div>
+        <span class="hand" style="position: absolute; left: 0; right: 0; bottom: 8px; text-align: center; font-size: 20px; color: #A08E7C;">— 3 —</span>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{showTask}}" hint-placeholder-val="{{ false }}">
+      <div class="turn" style="position: absolute; inset: 0;">
+        <div style="position: absolute; left: 48px; right: 48px; top: 26px;" aria-label="Страница 4 из 10">
+          <div class="hand" style="font-size: 28px; font-weight: 700; color: #7A6A5C;">Страница 4 из 10</div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
+            <sc-for list="{{paws}}" as="p" hint-placeholder-count="10">
+              <svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24"><g fill="{{p.fill}}" filter="url(#wcS)"><ellipse cx="12" cy="15.5" rx="5" ry="4.2"></ellipse><circle cx="6" cy="10" r="2.2"></circle><circle cx="10" cy="6.5" r="2.2"></circle><circle cx="14" cy="6.5" r="2.2"></circle><circle cx="18" cy="10" r="2.2"></circle></g></svg>
+            </sc-for>
+            <svg aria-hidden="true" width="40" height="32" viewBox="0 0 52 40"><g fill="#EBD3A8" filter="url(#wcS)"><circle cx="9" cy="13" r="7"></circle><circle cx="9" cy="27" r="7"></circle><circle cx="43" cy="13" r="7"></circle><circle cx="43" cy="27" r="7"></circle><rect x="9" y="13" width="34" height="14"></rect></g></svg>
+          </div>
+        </div>
+
+        <h2 class="hand" style="position: absolute; left: 0; right: 0; top: 124px; margin: 0; text-align: center; font-size: 50px; font-weight: 700; color: #3B2F2F;">Сколько всего яблок?</h2>
+
+        <div style="position: absolute; left: 0; right: 0; top: 206px; display: flex; align-items: center; justify-content: center; gap: 18px; font-size: 100px; font-weight: 700; line-height: 1;">
+          <span>3</span><span style="color: #C9623A;">+</span><span>4</span><span style="color: #C9623A;">=</span>
+          <span style="position: relative; width: 132px; height: 132px; display: flex; align-items: center; justify-content: center;">
+            <svg aria-hidden="true" width="132" height="132" viewBox="0 0 132 132" style="position: absolute; inset: 0;">
+              <sc-if value="{{solved}}" hint-placeholder-val="{{ false }}">
+                <rect x="8" y="8" width="116" height="116" rx="22" fill="#9ED3A8" filter="url(#wc)"></rect>
+              </sc-if>
+              <rect x="6" y="6" width="120" height="120" rx="24" fill="none" stroke="#C9623A" stroke-width="3.5" stroke-dasharray="10 9" filter="url(#rough)"></rect>
+            </svg>
+            <span style="{{answerStyle}}">{{answerShown}}</span>
+          </span>
+        </div>
+
+        <div style="position: absolute; left: 0; right: 0; top: 388px; display: flex; justify-content: center; gap: 34px;">
+          <sc-for list="{{answers}}" as="ans" hint-placeholder-count="3">
+            <button type="button" class="soft" onClick="{{ans.pick}}" aria-label="{{ans.label}}" style="{{ans.style}}">
+              <svg aria-hidden="true" width="140" height="140" viewBox="0 0 140 140" style="position: absolute; inset: 0;"><circle cx="70" cy="70" r="60" fill="{{ans.blob}}" filter="url(#wc)"></circle></svg>
+              <span style="position: relative;">{{ans.value}}</span>
+            </button>
+          </sc-for>
+        </div>
+
+        <p class="hand" style="{{feedbackStyle}}">{{feedback}}</p>
+
+        <sc-if value="{{solved}}" hint-placeholder-val="{{ false }}">
+          <span class="stamp hand" style="position: absolute; right: 44px; top: 128px; width: 118px; height: 118px; border-radius: 59px; border: 4px solid #2F7D4F; box-shadow: inset 0 0 0 4px #FBF5E8, inset 0 0 0 7px #2F7D4F; color: #2F7D4F; display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 700; filter: url(#stampInk);">Верно!</span>
+        </sc-if>
+        <span class="hand" style="position: absolute; left: 0; right: 0; bottom: 8px; text-align: center; font-size: 20px; color: #A08E7C;">— 9 —</span>
+      </div>
+    </sc-if>
+  </div>
+
+  <!-- Корешок и бумажная фактура страниц -->
+  <div aria-hidden="true" style="position: absolute; left: 606px; top: 88px; width: 68px; height: 688px; background: linear-gradient(90deg, rgba(120,90,50,0) 0%, rgba(120,90,50,.16) 46%, rgba(90,65,35,.3) 50%, rgba(120,90,50,.16) 54%, rgba(120,90,50,0) 100%); pointer-events: none; z-index: 2;"></div>
+  <svg aria-hidden="true" width="1192" height="688" viewBox="0 0 1192 688" style="position: absolute; left: 44px; top: 88px; pointer-events: none; z-index: 2; mix-blend-mode: multiply;"><rect width="1192" height="688" filter="url(#paper)"></rect></svg>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startSubject":{"editor":"enum","options":["math","space","russian","german","english"],"default":"math","section":"Прототип"},"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { subject: null, screen: 'menu', picked: null };
+  }
+
+  renderVals() {
+    var SUBJECTS = [
+      { id: 'math', name: 'Математика', glyph: '1+2', ribbon: '#C9623A', blob: '#F2B49A', ink: '#8C3A1C', tape: 'rgba(224,122,79,.45)', chapter: 'Глава первая',
+        tiles: [
+          { title: 'Сложение до 10', glyph: '+10', stars: 2, task: true },
+          { title: 'Сложение до 20', glyph: '+20', stars: 3, done: true },
+          { title: 'Вычитание до 10', glyph: '−10', stars: 1 },
+          { title: 'Вычитание до 20', glyph: '−20', stars: 0 },
+          { title: 'Сравни числа', glyph: '5>3', stars: 2 },
+          { title: 'Задачи', glyph: '2+?', stars: 0 },
+          { title: 'Деньги', glyph: '₽', stars: 1 }
+        ] },
+      { id: 'space', name: 'Пространство', glyph: '↻', ribbon: '#3A8D82', blob: '#A6D6CC', ink: '#1F5D55', tape: 'rgba(79,165,154,.45)', chapter: 'Глава вторая',
+        tiles: [
+          { title: 'Право и лево', glyph: 'Л·П', stars: 3 },
+          { title: 'Лево и право другого', glyph: 'П·Л', stars: 1 },
+          { title: 'Повороты', glyph: '↻', stars: 0 },
+          { title: 'Вид сверху', glyph: '◎', stars: 2 },
+          { title: 'Кубики', glyph: '▦', stars: 0 }
+        ] },
+      { id: 'russian', name: 'Русский', glyph: 'Аа', ribbon: '#B8485F', blob: '#EDB0BE', ink: '#8A2A42', tape: 'rgba(217,102,127,.45)', chapter: 'Глава третья',
+        tiles: [
+          { title: 'Читаем слова', glyph: 'Аа', stars: 3, done: true },
+          { title: 'Читаем два слова', glyph: 'Аа Бб', stars: 2 },
+          { title: 'Читаем и ищем картинку', glyph: 'Ищи', stars: 1 },
+          { title: 'Собери предложение', glyph: '1·2·3', stars: 0 },
+          { title: 'Длинные предложения', glyph: 'Ааа', stars: 0 }
+        ] },
+      { id: 'german', name: 'Deutsch', glyph: 'Dd', ribbon: '#6E5DB8', blob: '#C6BCEA', ink: '#47388F', tape: 'rgba(140,123,209,.45)', chapter: 'Глава четвёртая',
+        tiles: [
+          { title: 'Wörter lesen', glyph: 'Ww', stars: 2 },
+          { title: 'Zwei Wörter lesen', glyph: 'Ww Zz', stars: 1 },
+          { title: 'Lesen und Bild finden', glyph: 'Such', stars: 0 },
+          { title: 'Sätze bauen', glyph: '1·2·3', stars: 0 },
+          { title: 'Lange Sätze', glyph: 'Satz', stars: 0 },
+          { title: 'Der, die oder das?', glyph: 'der', stars: 1 }
+        ] },
+      { id: 'english', name: 'English', glyph: 'Hi', ribbon: '#4372B8', blob: '#AFC8EC', ink: '#234C8A', tape: 'rgba(91,143,214,.45)', chapter: 'Глава пятая',
+        tiles: [
+          { title: 'Знакомство', glyph: 'Hi!', stars: 3 },
+          { title: 'Угадай слово', glyph: 'Abc', stars: 1 },
+          { title: 'Два слова', glyph: 'Aa Bb', stars: 0 },
+          { title: 'Слушаем предложения', glyph: '♪', stars: 0 }
+        ] }
+    ];
+    var self = this;
+    var currentId = this.state.subject || this.props.startSubject || 'math';
+    var current = SUBJECTS[0];
+    for (var i = 0; i < SUBJECTS.length; i++) { if (SUBJECTS[i].id === currentId) current = SUBJECTS[i]; }
+
+    var subjects = SUBJECTS.map(function (s) {
+      var on = s.id === current.id;
+      return {
+        name: s.name,
+        glyph: s.glyph,
+        pressed: on ? 'true' : 'false',
+        pick: function () { self.setState({ subject: s.id }); },
+        ribbonStyle: 'position: relative; width: 74px; height: ' + (on ? 118 : 86) + 'px; background: linear-gradient(90deg, rgba(0,0,0,.10), rgba(255,255,255,.06) 30%, rgba(255,255,255,0) 70%, rgba(0,0,0,.10)), ' + s.ribbon + '; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 84%, 0 100%); display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 24px; box-sizing: border-box; color: #FFFFFF; font-size: 20px; font-weight: 700;'
+      };
+    });
+
+    var rot = [-1.4, 1.1, 0.8, -1, 1.3, -0.7, 1, -1.2];
+    var tapeRot = [3, -4, 5, -3, 2, -5, 4, -2];
+    var doneCount = 0;
+    var tiles = current.tiles.map(function (t, k) {
+      if (t.done) doneCount++;
+      var r = rot[(k + 1) % rot.length];
+      var stars = [0, 1, 2].map(function (j) {
+        return j < t.stars ? { fill: '#F4C34E', stroke: '#D9A21E' } : { fill: 'none', stroke: '#D8C9AE' };
+      });
+      var long = t.glyph.length > 3;
+      return {
+        title: t.title,
+        glyph: t.glyph,
+        blob: current.blob,
+        done: !!t.done,
+        stars: stars,
+        starsLabel: 'Звёзд: ' + t.stars + ' из 3',
+        open: function () { if (t.task) self.setState({ screen: 'task', picked: null }); },
+        cardStyle: 'position: relative; border-radius: 6px; background: #FFFDF6; box-shadow: 0 6px 14px rgba(80,55,30,.12), 0 1px 2px rgba(80,55,30,.1); display: flex; align-items: center; gap: 12px; padding: 0 14px; text-align: left; transform: rotate(' + r + 'deg);',
+        tapeStyle: 'position: absolute; left: 50%; top: -9px; margin-left: -30px; width: 60px; height: 18px; background: ' + current.tape + '; transform: rotate(' + tapeRot[k % tapeRot.length] + 'deg);',
+        glyphStyle: 'position: relative; font-family: Andika, system-ui, sans-serif; font-weight: 700; color: ' + current.ink + '; font-size: ' + (long ? 17 : 24) + 'px; letter-spacing: -0.5px;'
+      };
+    });
+
+    var n = current.tiles.length;
+    var word = n === 1 ? 'задание' : (n < 5 ? 'задания' : 'заданий');
+
+    var picked = this.state.picked;
+    var CORRECT = 7;
+    var solved = picked === CORRECT;
+    var missed = picked !== null && picked !== CORRECT;
+    var answers = [6, 7, 8].map(function (v) {
+      var blob = '#F2C4A8';
+      var extra = '';
+      if (picked === v && v === CORRECT) blob = '#8CCB98';
+      else if (picked === v) { blob = '#E6DED2'; extra = 'opacity: .55;'; }
+      return {
+        value: v,
+        label: 'Ответ ' + v,
+        blob: blob,
+        style: 'position: relative; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; font-size: 66px; font-weight: 700; color: #3B2F2F; ' + extra,
+        pick: function () { self.setState({ picked: v }); }
+      };
+    });
+
+    var paws = [];
+    for (var p = 0; p < 10; p++) {
+      paws.push({ fill: p < 3 || (p === 3 && solved) ? '#C9623A' : (p === 3 ? '#F2B49A' : '#E3D8C4') });
+    }
+
+    return {
+      showMenu: this.state.screen === 'menu',
+      showTask: this.state.screen === 'task',
+      subjects: subjects,
+      tiles: tiles,
+      currentName: current.name,
+      chapterLabel: current.chapter,
+      chapterStyle: 'font-size: 28px; font-weight: 700; color: ' + current.ink + '; line-height: 1;',
+      currentMeta: n + ' ' + word + (doneCount ? ' · готово ' + doneCount : ''),
+      goHome: function () { self.setState({ screen: 'menu', picked: null }); },
+      answers: answers,
+      paws: paws,
+      solved: solved,
+      answerShown: solved ? '7' : '?',
+      answerStyle: 'position: relative; color: ' + (solved ? '#1F5E38' : '#C9623A') + ';',
+      feedback: solved ? 'Ура! Бобик доволен — держи звезду!' : (missed ? 'Почти! Посчитай яблоки ещё раз' : 'Подсказка: посчитай яблоки на картинке'),
+      feedbackStyle: 'position: absolute; left: 48px; right: 48px; top: 560px; margin: 0; text-align: center; font-size: 34px; font-weight: 700; color: ' + (solved ? '#2F7D4F' : (missed ? '#9A4A2A' : '#7A6A5C')) + ';',
+      happyEyes: solved,
+      openEyes: !solved
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Моя школа — главный экран</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#33285C}a:hover{color:#1E1640}
+button{font:inherit;border:0;cursor:pointer;padding:0;color:inherit;-webkit-tap-highlight-color:transparent}
+.press{transition:transform .28s cubic-bezier(.2,.8,.2,1),box-shadow .28s cubic-bezier(.2,.8,.2,1),background-color .28s ease,color .28s ease}
+.press:hover{transform:translateY(-3px)}
+.press:active{transform:translateY(0) scale(.96);transition-duration:.12s}
+.tile:hover{transform:translateY(-5px);box-shadow:0 18px 36px rgba(51,40,92,.14),0 2px 6px rgba(51,40,92,.06)}
+.screen-in{animation:screenIn .55s cubic-bezier(.2,.8,.2,1) both}
+.screen-in-2{animation:screenIn .55s .08s cubic-bezier(.2,.8,.2,1) both}
+.screen-in-3{animation:screenIn .55s .16s cubic-bezier(.2,.8,.2,1) both}
+.pop{animation:pop .45s cubic-bezier(.2,1.4,.4,1) both}
+.cloud{animation:drift 26s ease-in-out infinite alternate}
+.cloud-2{animation:drift 34s ease-in-out infinite alternate-reverse}
+.dog-tail{transform-box:fill-box;transform-origin:0% 100%;animation:wag 1.1s ease-in-out infinite}
+.dog-body{transform-box:fill-box;transform-origin:50% 100%;animation:breathe 3.6s ease-in-out infinite}
+.dog-head{transform-box:fill-box;transform-origin:50% 90%;animation:tilt 7s ease-in-out infinite}
+.dog-eyes{transform-box:fill-box;transform-origin:50% 50%;animation:blink 5s infinite}
+@keyframes screenIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes drift{from{transform:translateX(-18px)}to{transform:translateX(22px)}}
+@keyframes wag{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(9deg)}}
+@keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.012,1.022)}}
+@keyframes tilt{0%,100%{transform:rotate(0)}30%{transform:rotate(-3deg)}60%{transform:rotate(2deg)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.08)}}
+@media (prefers-reduced-motion:reduce){.press,.tile,.screen-in,.screen-in-2,.screen-in-3,.pop,.cloud,.cloud-2,.dog-tail,.dog-body,.dog-head,.dog-eyes{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+
+<div style="width: 1280px; height: 800px; position: relative; overflow: hidden; background: #E3F2FF; font-family: 'Nunito', system-ui, sans-serif; color: #33285C;">
+
+  <!-- Общие градиенты: собака и фон -->
+  <svg aria-hidden="true" width="0" height="0" style="position: absolute;">
+    <defs>
+      <linearGradient id="gBody" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C4863D"></stop><stop offset="0.3" stop-color="#E2A653"></stop><stop offset="0.62" stop-color="#EBB767"></stop><stop offset="1" stop-color="#BC7E37"></stop></linearGradient>
+      <radialGradient id="gHead" cx="0.42" cy="0.32" r="0.72"><stop offset="0" stop-color="#F4C981"></stop><stop offset="0.55" stop-color="#E2A756"></stop><stop offset="1" stop-color="#C38640"></stop></radialGradient>
+      <linearGradient id="gEar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C8893F"></stop><stop offset="1" stop-color="#9A6128"></stop></linearGradient>
+      <radialGradient id="gMuzzle" cx="0.5" cy="0.35" r="0.7"><stop offset="0" stop-color="#FCEFD6"></stop><stop offset="1" stop-color="#EDCB96"></stop></radialGradient>
+      <radialGradient id="gChest" cx="0.5" cy="0.28" r="0.75"><stop offset="0" stop-color="#FBE9C9"></stop><stop offset="0.65" stop-color="#F0CC8F"></stop><stop offset="1" stop-color="#E7B56A" stop-opacity="0"></stop></radialGradient>
+      <linearGradient id="gLeg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C08139"></stop><stop offset="0.5" stop-color="#E9B466"></stop><stop offset="1" stop-color="#C08139"></stop></linearGradient>
+      <radialGradient id="gPaw" cx="0.5" cy="0.3" r="0.8"><stop offset="0" stop-color="#F8E2B9"></stop><stop offset="1" stop-color="#DDAF6C"></stop></radialGradient>
+      <linearGradient id="gTail" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#B9793A"></stop><stop offset="0.6" stop-color="#E0A453"></stop><stop offset="1" stop-color="#F1C27C"></stop></linearGradient>
+      <radialGradient id="gNose" cx="0.4" cy="0.3" r="0.8"><stop offset="0" stop-color="#5E4840"></stop><stop offset="1" stop-color="#1A1310"></stop></radialGradient>
+      <radialGradient id="gIris" cx="0.5" cy="0.55" r="0.6"><stop offset="0" stop-color="#A06A34"></stop><stop offset="0.65" stop-color="#4E2D11"></stop><stop offset="1" stop-color="#2A1608"></stop></radialGradient>
+      <linearGradient id="gTongue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFA3B2"></stop><stop offset="1" stop-color="#E5677F"></stop></linearGradient>
+      <linearGradient id="gCollar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4F8CF0"></stop><stop offset="1" stop-color="#2C62C4"></stop></linearGradient>
+      <radialGradient id="gTag" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#FFE69A"></stop><stop offset="1" stop-color="#E0A800"></stop></radialGradient>
+      <linearGradient id="gSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#CFE8FF"></stop><stop offset="1" stop-color="#F2F8FF"></stop></linearGradient>
+      <radialGradient id="gSun" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#FFF6D6"></stop><stop offset="1" stop-color="#FFF6D6" stop-opacity="0"></stop></radialGradient>
+      <linearGradient id="gHillBack" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C6EBB0"></stop><stop offset="1" stop-color="#A9DD8E"></stop></linearGradient>
+      <linearGradient id="gHillFront" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A3DA84"></stop><stop offset="1" stop-color="#7FC563"></stop></linearGradient>
+      <radialGradient id="gGround" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.55"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>
+    </defs>
+  </svg>
+
+  <!-- Фон: мягкое небо, солнце, холмы -->
+  <svg aria-hidden="true" width="1280" height="800" viewBox="0 0 1280 800" style="position: absolute; left: 0; top: 0;">
+    <rect width="1280" height="800" fill="url(#gSky)"></rect>
+    <circle cx="1180" cy="40" r="220" fill="url(#gSun)"></circle>
+    <g class="cloud" fill="#FFFFFF" opacity="0.85">
+      <ellipse cx="190" cy="96" rx="64" ry="20"></ellipse><ellipse cx="232" cy="82" rx="40" ry="28"></ellipse><ellipse cx="160" cy="86" rx="30" ry="20"></ellipse>
+    </g>
+    <g class="cloud-2" fill="#FFFFFF" opacity="0.7">
+      <ellipse cx="660" cy="64" rx="48" ry="14"></ellipse><ellipse cx="690" cy="54" rx="28" ry="18"></ellipse>
+    </g>
+    <path d="M0 640 C220 560 420 600 620 660 C820 720 1040 610 1280 640 L1280 800 L0 800 Z" fill="url(#gHillBack)"></path>
+    <path d="M0 700 C180 640 360 650 520 720 C640 772 760 800 900 800 L0 800 Z" fill="url(#gHillFront)"></path>
+  </svg>
+
+  <!-- ============ ГЛАВНЫЙ ЭКРАН ============ -->
+  <sc-if value="{{showMenu}}" hint-placeholder-val="{{ true }}">
+
+    <header class="screen-in" style="position: absolute; left: 32px; right: 32px; top: 24px; height: 64px; display: flex; align-items: center; gap: 14px;">
+      <div style="width: 56px; height: 56px; border-radius: 18px; background: linear-gradient(145deg, #FFB067, #F07A2B); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 18px rgba(240,122,43,.32);">
+        <svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5z"></path><path d="M12 6.5v13"></path></svg>
+      </div>
+      <div style="flex-grow: 1; display: flex; flex-direction: column;">
+        <h1 style="margin: 0; font-size: 30px; font-weight: 900; letter-spacing: -0.4px; line-height: 1.05; color: #33285C;">Моя школа</h1>
+        <span style="font-size: 16px; font-weight: 700; color: #6A6290;">Суббота, 31 октября</span>
+      </div>
+
+      <div style="height: 56px; padding: 0 8px; border-radius: 28px; background: #FFFFFF; display: flex; align-items: center; box-shadow: 0 8px 22px rgba(51,40,92,.08);">
+        <span style="display: flex; align-items: center; gap: 8px; padding: 0 14px 0 6px; font-size: 22px; font-weight: 900;" aria-label="Звёзды: 12">
+          <svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.1l-5.9 3.2 1.3-6.5L2.5 9.3l6.6-.8z" fill="#FFC93C" stroke="#E8A900" stroke-width="1.2" stroke-linejoin="round"></path></svg>12
+        </span>
+        <span style="width: 1px; height: 28px; background: #ECE8F4;"></span>
+        <span style="display: flex; align-items: center; gap: 8px; padding: 0 14px 0 12px; font-size: 22px; font-weight: 900;" aria-label="Косточки: 3">
+          <svg aria-hidden="true" width="32" height="32" viewBox="0 0 36 36"><g fill="#F6E7CB" stroke="#C69A5E" stroke-width="1.8"><circle cx="9" cy="13" r="5"></circle><circle cx="9" cy="23" r="5"></circle><circle cx="27" cy="13" r="5"></circle><circle cx="27" cy="23" r="5"></circle></g><rect x="9" y="13.5" width="18" height="9" fill="#F6E7CB"></rect><path d="M10 13.6 H26 M10 22.4 H26" stroke="#C69A5E" stroke-width="1.8"></path></svg>3
+        </span>
+      </div>
+      <button type="button" class="press" style="height: 56px; padding: 0 22px 0 16px; border-radius: 28px; background: #FFFFFF; color: #86173F; display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 800; box-shadow: 0 8px 22px rgba(51,40,92,.08);">
+        <span style="width: 32px; height: 32px; border-radius: 11px; background: linear-gradient(145deg, #FF8CAE, #E2507E); display: flex; align-items: center; justify-content: center;">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"></path></svg>
+        </span>
+        Наклейки
+      </button>
+      <button type="button" class="press" aria-label="Для родителей" style="width: 48px; height: 48px; border-radius: 24px; background: rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center;">
+        <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6A6290" stroke-width="2" stroke-linecap="round"><rect x="5" y="10.5" width="14" height="10" rx="3"></rect><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"></path></svg>
+      </button>
+    </header>
+
+    <!-- Собака-проводник -->
+    <div class="screen-in-2" style="position: absolute; left: 24px; top: 112px; width: 312px; display: flex; flex-direction: column; align-items: center;">
+      <div style="position: relative; background: #FFFFFF; border-radius: 24px; padding: 16px 22px; font-size: 20px; font-weight: 800; line-height: 1.3; text-align: center; box-shadow: 0 12px 28px rgba(51,40,92,.10); width: 268px; box-sizing: border-box;">
+        Привет! Я Бобик.<br><span style="font-weight: 700; color: #6A6290;">Чем займёмся сегодня?</span>
+        <svg aria-hidden="true" width="28" height="16" viewBox="0 0 28 16" style="position: absolute; left: 50%; bottom: -14px; margin-left: -14px;"><path d="M0 0 H28 L16 14 Q14 16 12 14 Z" fill="#FFFFFF"></path></svg>
+      </div>
+
+      <div style="position: relative; margin-top: 8px; width: 300px; height: 330px; display: flex; justify-content: center;">
+        <svg aria-hidden="true" width="300" height="60" viewBox="0 0 300 60" style="position: absolute; left: 0; bottom: -14px;"><ellipse cx="150" cy="30" rx="140" ry="28" fill="url(#gGround)"></ellipse></svg>
+        <svg role="img" aria-label="Собака Бобик" width="282" height="320" viewBox="0 0 300 340" style="position: relative; overflow: visible;">
+          <ellipse cx="150" cy="327" rx="108" ry="10" fill="#33285C" opacity="0.13"></ellipse>
+          <g class="dog-tail"><path d="M200 300 C236 300 262 278 266 238 C268 220 262 206 254 200 C256 222 250 250 230 268 C220 278 208 284 196 286 Z" fill="url(#gTail)"></path><path d="M254 208 C257 232 249 254 232 270" stroke="#F6D394" stroke-width="2" fill="none" opacity="0.6" stroke-linecap="round"></path></g>
+          <ellipse cx="96" cy="282" rx="50" ry="42" fill="url(#gBody)"></ellipse>
+          <ellipse cx="204" cy="282" rx="50" ry="42" fill="url(#gBody)"></ellipse>
+          <ellipse cx="70" cy="316" rx="27" ry="12" fill="url(#gPaw)"></ellipse>
+          <ellipse cx="230" cy="316" rx="27" ry="12" fill="url(#gPaw)"></ellipse>
+          <g class="dog-body">
+            <path d="M106 150 C90 190 84 244 94 304 L206 304 C216 244 210 190 194 150 Z" fill="url(#gBody)"></path>
+            <path d="M116 168 C108 204 110 240 120 272 C130 282 140 270 150 282 C160 270 170 282 180 272 C190 240 192 204 184 168 Z" fill="url(#gChest)"></path>
+            <g stroke="#E0AE68" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.75"><path d="M134 212 q4 10 2 20"></path><path d="M166 212 q-4 10 -2 20"></path><path d="M150 226 q0 10 0 18"></path><path d="M126 246 q3 8 2 14"></path><path d="M174 246 q-3 8 -2 14"></path></g>
+          </g>
+          <rect x="111" y="222" width="30" height="92" rx="15" fill="url(#gLeg)"></rect>
+          <rect x="159" y="222" width="30" height="92" rx="15" fill="url(#gLeg)"></rect>
+          <ellipse cx="126" cy="314" rx="23" ry="13" fill="url(#gPaw)"></ellipse>
+          <ellipse cx="174" cy="314" rx="23" ry="13" fill="url(#gPaw)"></ellipse>
+          <g stroke="#C9955A" stroke-width="1.8" stroke-linecap="round"><path d="M119 309 v8"></path><path d="M133 309 v8"></path><path d="M167 309 v8"></path><path d="M181 309 v8"></path><path d="M62 312 v7"></path><path d="M76 312 v7"></path><path d="M224 312 v7"></path><path d="M238 312 v7"></path></g>
+          <path d="M108 172 C128 188 172 188 192 172 L194 186 C172 204 128 204 106 186 Z" fill="url(#gCollar)"></path>
+          <circle cx="150" cy="204" r="10" fill="url(#gTag)" stroke="#C99400" stroke-width="1.5"></circle>
+          <g class="dog-head">
+            <path d="M150 40 C190 40 216 68 218 104 C220 138 204 164 182 176 C172 182 160 184 150 184 C140 184 128 182 118 176 C96 164 80 138 82 104 C84 68 110 40 150 40 Z" fill="url(#gHead)"></path>
+            <ellipse cx="150" cy="70" rx="28" ry="16" fill="#F7D79C" opacity="0.45"></ellipse>
+            <path d="M139 96 C142 114 140 126 133 136 L167 136 C160 126 158 114 161 96 Z" fill="#F6DDB0" opacity="0.5"></path>
+            <ellipse cx="150" cy="146" rx="40" ry="30" fill="url(#gMuzzle)"></ellipse>
+            <ellipse cx="150" cy="172" rx="20" ry="8" fill="#EFD0A0"></ellipse>
+            <path d="M139 160 C138 183 162 183 161 160 Z" fill="url(#gTongue)"></path>
+            <path d="M150 164 v10" stroke="#D9566F" stroke-width="1.6" stroke-linecap="round"></path>
+            <path d="M150 146 L150 157 M150 157 C142 166 129 165 122 156 M150 157 C158 166 171 165 178 156" stroke="#6B4A33" stroke-width="2.6" stroke-linecap="round" fill="none"></path>
+            <path d="M133 128 C133 119 167 119 167 128 C167 139 157 147 150 147 C143 147 133 139 133 128 Z" fill="url(#gNose)"></path>
+            <ellipse cx="143" cy="125" rx="6" ry="2.8" fill="#FFFFFF" opacity="0.45"></ellipse>
+            <path d="M141 133 q3 2 6 0 M153 133 q3 2 6 0" stroke="#000000" stroke-width="1.4" opacity="0.45" fill="none" stroke-linecap="round"></path>
+            <g fill="#BD8650"><circle cx="128" cy="146" r="1.4"></circle><circle cx="133" cy="153" r="1.4"></circle><circle cx="135" cy="143" r="1.4"></circle><circle cx="172" cy="146" r="1.4"></circle><circle cx="167" cy="153" r="1.4"></circle><circle cx="165" cy="143" r="1.4"></circle></g>
+            <ellipse cx="125" cy="86" rx="10" ry="4" fill="#F7D79C" opacity="0.75" transform="rotate(-12 125 86)"></ellipse>
+            <ellipse cx="175" cy="86" rx="10" ry="4" fill="#F7D79C" opacity="0.75" transform="rotate(12 175 86)"></ellipse>
+            <g class="dog-eyes">
+              <ellipse cx="127" cy="104" rx="12.5" ry="13" fill="#3B2412"></ellipse><ellipse cx="127" cy="104.5" rx="10.5" ry="11.5" fill="url(#gIris)"></ellipse><circle cx="127" cy="105" r="5.5" fill="#140A05"></circle><circle cx="131" cy="99.5" r="3.4" fill="#FFFFFF"></circle><circle cx="123.5" cy="109" r="1.6" fill="#FFFFFF" opacity="0.8"></circle>
+              <ellipse cx="173" cy="104" rx="12.5" ry="13" fill="#3B2412"></ellipse><ellipse cx="173" cy="104.5" rx="10.5" ry="11.5" fill="url(#gIris)"></ellipse><circle cx="173" cy="105" r="5.5" fill="#140A05"></circle><circle cx="177" cy="99.5" r="3.4" fill="#FFFFFF"></circle><circle cx="169.5" cy="109" r="1.6" fill="#FFFFFF" opacity="0.8"></circle>
+            </g>
+            <g stroke="#F7D79C" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.8"><path d="M144 46 q4 8 2 16"></path><path d="M156 47 q-2 8 0 14"></path><path d="M150 44 q1 7 0 12"></path></g>
+            <path d="M106 62 C84 60 62 78 60 110 C58 142 66 170 84 180 C98 188 110 176 111 156 C113 128 116 92 106 62 Z" fill="url(#gEar)"></path>
+            <path d="M194 62 C216 60 238 78 240 110 C242 142 234 170 216 180 C202 188 190 176 189 156 C187 128 184 92 194 62 Z" fill="url(#gEar)"></path>
+            <g stroke="#D9A05A" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.55"><path d="M98 78 C90 102 88 132 92 162"></path><path d="M202 78 C210 102 212 132 208 162"></path><path d="M84 96 C78 120 78 144 84 166"></path><path d="M216 96 C222 120 222 144 216 166"></path></g>
+          </g>
+        </svg>
+      </div>
+
+      <div style="margin-top: 18px; width: 290px; background: rgba(255,255,255,0.92); border-radius: 22px; padding: 16px 18px; box-sizing: border-box; box-shadow: 0 12px 28px rgba(51,40,92,.10);">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px;">
+          <span style="font-size: 17px; font-weight: 900;">Путь к косточке</span>
+          <span style="font-size: 15px; font-weight: 800; color: #6A6290;">12 из 25</span>
+        </div>
+        <div style="height: 12px; border-radius: 6px; background: #EFEBF7; overflow: hidden;">
+          <div style="width: 48%; height: 12px; border-radius: 6px; background: linear-gradient(90deg, #FFD66B, #FFAE2B);"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Доска с предметами -->
+    <main class="screen-in-3" style="position: absolute; left: 356px; top: 112px; width: 892px; height: 664px; background: rgba(255,255,255,0.94); border-radius: 36px; box-shadow: 0 24px 60px rgba(51,40,92,.12), 0 2px 8px rgba(51,40,92,.04); padding: 24px 28px 28px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px;">
+
+      <nav aria-label="Предметы" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; background: #F4F2F9; border-radius: 26px; padding: 6px;">
+        <sc-for list="{{subjects}}" as="s" hint-placeholder-count="5">
+          <button type="button" class="press" onClick="{{s.pick}}" aria-pressed="{{s.pressed}}" style="{{s.tabStyle}}">
+            <span style="{{s.dotStyle}}">{{s.glyph}}</span>
+            <span>{{s.name}}</span>
+          </button>
+        </sc-for>
+      </nav>
+
+      <div style="display: flex; align-items: baseline; gap: 14px; padding: 0 4px;">
+        <h2 style="margin: 0; font-size: 28px; font-weight: 900; letter-spacing: -0.3px;">{{currentName}}</h2>
+        <span style="font-size: 17px; font-weight: 700; color: #6A6290;">{{currentMeta}}</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 16px; flex-grow: 1;">
+        <button type="button" class="press tile" style="position: relative; border-radius: 26px; background: linear-gradient(160deg, #FFF7DD, #FFE7A6); box-shadow: 0 10px 24px rgba(232,169,0,.18); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 14px;">
+          <span style="width: 92px; height: 92px; border-radius: 28px; background: linear-gradient(145deg, #FFD15C, #F5A300); display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(245,163,0,.35), inset 0 2px 0 rgba(255,255,255,.45);">
+            <svg aria-hidden="true" width="58" height="58" viewBox="0 0 36 36"><g fill="#FFFFFF"><circle cx="9" cy="13" r="5"></circle><circle cx="9" cy="23" r="5"></circle><circle cx="27" cy="13" r="5"></circle><circle cx="27" cy="23" r="5"></circle><rect x="9" y="13" width="18" height="10"></rect></g></svg>
+          </span>
+          <span style="font-size: 19px; font-weight: 900; color: #6B4A00; line-height: 1.15; text-align: center;">Сложная задача</span>
+          <span style="font-size: 14px; font-weight: 800; color: #6B4A00; background: rgba(255,255,255,0.75); border-radius: 12px; padding: 3px 12px;">+1 косточка</span>
+        </button>
+
+        <sc-for list="{{tiles}}" as="t" hint-placeholder-count="7">
+          <button type="button" class="press tile" onClick="{{t.open}}" style="{{t.tileStyle}}">
+            <sc-if value="{{t.done}}" hint-placeholder-val="{{ false }}">
+              <span class="pop" style="position: absolute; top: 12px; right: 12px; height: 28px; padding: 0 10px 0 6px; border-radius: 14px; background: #E3F6EA; color: #1E6E3E; font-size: 14px; font-weight: 900; display: flex; align-items: center; gap: 4px;">
+                <span style="width: 18px; height: 18px; border-radius: 9px; background: #2E9E5B; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7" stroke="#FFFFFF" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+                Готово
+              </span>
+            </sc-if>
+            <span style="{{t.plateStyle}}">{{t.glyph}}</span>
+            <span style="{{t.titleStyle}}">{{t.title}}</span>
+            <span style="display: flex; gap: 3px;" aria-label="{{t.starsLabel}}">
+              <sc-for list="{{t.stars}}" as="st" hint-placeholder-count="3">
+                <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.1l-5.9 3.2 1.3-6.5L2.5 9.3l6.6-.8z" fill="{{st.fill}}" stroke="{{st.stroke}}" stroke-width="1.4" stroke-linejoin="round"></path></svg>
+              </sc-for>
+            </span>
+          </button>
+        </sc-for>
+      </div>
+    </main>
+  </sc-if>
+
+  <!-- ============ ЭКРАН ЗАДАНИЯ ============ -->
+  <sc-if value="{{showTask}}" hint-placeholder-val="{{ false }}">
+
+    <header class="screen-in" style="position: absolute; left: 32px; right: 32px; top: 24px; height: 64px; display: flex; align-items: center; gap: 18px;">
+      <button type="button" class="press" onClick="{{goHome}}" aria-label="Домой" style="width: 60px; height: 60px; border-radius: 22px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 22px rgba(51,40,92,.10);">
+        <svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F07A2B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11 L12 4 l8.5 7"></path><path d="M6 9.5 V20 h12 V9.5"></path><path d="M10 20 v-5 h4 v5"></path></svg>
+      </button>
+
+      <div style="flex-grow: 1; height: 60px; background: rgba(255,255,255,0.85); border-radius: 30px; display: flex; align-items: center; gap: 14px; padding: 0 22px; box-sizing: border-box; box-shadow: 0 8px 22px rgba(51,40,92,.06);" aria-label="Задание 4 из 10">
+        <div style="flex-grow: 1; display: flex; align-items: center; justify-content: space-between;">
+          <sc-for list="{{paws}}" as="p" hint-placeholder-count="10">
+            <svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24"><g fill="{{p.fill}}"><ellipse cx="12" cy="15.5" rx="5" ry="4.2"></ellipse><circle cx="6" cy="10" r="2.2"></circle><circle cx="10" cy="6.5" r="2.2"></circle><circle cx="14" cy="6.5" r="2.2"></circle><circle cx="18" cy="10" r="2.2"></circle></g></svg>
+          </sc-for>
+          <svg aria-hidden="true" width="38" height="38" viewBox="0 0 36 36"><g fill="#F6E7CB" stroke="#C69A5E" stroke-width="1.8"><circle cx="9" cy="13" r="5"></circle><circle cx="9" cy="23" r="5"></circle><circle cx="27" cy="13" r="5"></circle><circle cx="27" cy="23" r="5"></circle></g><rect x="9" y="13.5" width="18" height="9" fill="#F6E7CB"></rect><path d="M10 13.6 H26 M10 22.4 H26" stroke="#C69A5E" stroke-width="1.8"></path></svg>
+        </div>
+        <span style="font-size: 18px; font-weight: 900; color: #6A6290;">{{stepLabel}}</span>
+      </div>
+
+      <div style="height: 56px; padding: 0 20px 0 14px; border-radius: 28px; background: #FFFFFF; display: flex; align-items: center; gap: 8px; font-size: 22px; font-weight: 900; box-shadow: 0 8px 22px rgba(51,40,92,.08);" aria-label="Звёзды: 12">
+        <svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.1l-5.9 3.2 1.3-6.5L2.5 9.3l6.6-.8z" fill="#FFC93C" stroke="#E8A900" stroke-width="1.2" stroke-linejoin="round"></path></svg>
+        12
+      </div>
+    </header>
+
+    <section class="screen-in-2" style="position: absolute; left: 300px; top: 120px; width: 760px; height: 420px; background: rgba(255,255,255,0.95); border-radius: 40px; box-shadow: 0 24px 60px rgba(51,40,92,.12), 0 2px 8px rgba(51,40,92,.04); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;">
+      <div style="display: flex; align-items: center; gap: 24px; font-size: 120px; font-weight: 900; line-height: 1; color: #33285C; letter-spacing: -2px;">
+        <span>3</span>
+        <span style="color: #F07A2B;">+</span>
+        <span>4</span>
+        <span style="color: #F07A2B;">=</span>
+        <span style="{{answerBoxStyle}}">{{answerShown}}</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 28px;" aria-label="Подсказка: три яблока и четыре яблока">
+        <div style="display: flex; gap: 6px; background: #FFF4EA; border-radius: 24px; padding: 12px 16px;">
+          <sc-for list="{{applesA}}" as="a" hint-placeholder-count="3">
+            <svg aria-hidden="true" width="44" height="48" viewBox="0 0 46 50"><path d="M23 12 C23 6 26 3 30 2" stroke="#7A4A2A" stroke-width="3" fill="none" stroke-linecap="round"></path><ellipse cx="31" cy="8" rx="7" ry="4" transform="rotate(-25 31 8)" fill="#52C47A"></ellipse><path d="M23 14 C14 8 3 14 4 27 C5 40 14 48 23 45 C32 48 41 40 42 27 C43 14 32 8 23 14 Z" fill="#EF5350"></path><ellipse cx="14" cy="23" rx="4" ry="6" fill="#FFFFFF" opacity="0.45"></ellipse></svg>
+          </sc-for>
+        </div>
+        <span style="font-size: 40px; font-weight: 900; color: #F4B98E;">+</span>
+        <div style="display: flex; gap: 6px; background: #FFF4EA; border-radius: 24px; padding: 12px 16px;">
+          <sc-for list="{{applesB}}" as="a" hint-placeholder-count="4">
+            <svg aria-hidden="true" width="44" height="48" viewBox="0 0 46 50"><path d="M23 12 C23 6 26 3 30 2" stroke="#7A4A2A" stroke-width="3" fill="none" stroke-linecap="round"></path><ellipse cx="31" cy="8" rx="7" ry="4" transform="rotate(-25 31 8)" fill="#52C47A"></ellipse><path d="M23 14 C14 8 3 14 4 27 C5 40 14 48 23 45 C32 48 41 40 42 27 C43 14 32 8 23 14 Z" fill="#EF5350"></path><ellipse cx="14" cy="23" rx="4" ry="6" fill="#FFFFFF" opacity="0.45"></ellipse></svg>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <div class="screen-in-3" style="position: absolute; left: 300px; top: 590px; width: 760px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px;">
+      <sc-for list="{{answers}}" as="ans" hint-placeholder-count="3">
+        <button type="button" class="press" onClick="{{ans.pick}}" style="{{ans.style}}">{{ans.value}}</button>
+      </sc-for>
+    </div>
+
+    <div class="screen-in-2" style="position: absolute; left: 20px; bottom: 14px; width: 260px; display: flex; flex-direction: column; align-items: center;">
+      <div style="{{bubbleStyle}}">{{dogSays}}
+        <svg aria-hidden="true" width="26" height="15" viewBox="0 0 28 16" style="position: absolute; left: 50%; bottom: -13px; margin-left: -13px;"><path d="M0 0 H28 L16 14 Q14 16 12 14 Z" fill="{{bubbleFill}}"></path></svg>
+      </div>
+      <svg role="img" aria-label="Собака Бобик" width="224" height="254" viewBox="0 0 300 340" style="margin-top: 12px; overflow: visible;">
+        <ellipse cx="150" cy="327" rx="108" ry="10" fill="#33285C" opacity="0.13"></ellipse>
+        <g class="dog-tail"><path d="M200 300 C236 300 262 278 266 238 C268 220 262 206 254 200 C256 222 250 250 230 268 C220 278 208 284 196 286 Z" fill="url(#gTail)"></path><path d="M254 208 C257 232 249 254 232 270" stroke="#F6D394" stroke-width="2" fill="none" opacity="0.6" stroke-linecap="round"></path></g>
+        <ellipse cx="96" cy="282" rx="50" ry="42" fill="url(#gBody)"></ellipse>
+        <ellipse cx="204" cy="282" rx="50" ry="42" fill="url(#gBody)"></ellipse>
+        <ellipse cx="70" cy="316" rx="27" ry="12" fill="url(#gPaw)"></ellipse>
+        <ellipse cx="230" cy="316" rx="27" ry="12" fill="url(#gPaw)"></ellipse>
+        <g class="dog-body">
+          <path d="M106 150 C90 190 84 244 94 304 L206 304 C216 244 210 190 194 150 Z" fill="url(#gBody)"></path>
+          <path d="M116 168 C108 204 110 240 120 272 C130 282 140 270 150 282 C160 270 170 282 180 272 C190 240 192 204 184 168 Z" fill="url(#gChest)"></path>
+          <g stroke="#E0AE68" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.75"><path d="M134 212 q4 10 2 20"></path><path d="M166 212 q-4 10 -2 20"></path><path d="M150 226 q0 10 0 18"></path><path d="M126 246 q3 8 2 14"></path><path d="M174 246 q-3 8 -2 14"></path></g>
+        </g>
+        <rect x="111" y="222" width="30" height="92" rx="15" fill="url(#gLeg)"></rect>
+        <rect x="159" y="222" width="30" height="92" rx="15" fill="url(#gLeg)"></rect>
+        <ellipse cx="126" cy="314" rx="23" ry="13" fill="url(#gPaw)"></ellipse>
+        <ellipse cx="174" cy="314" rx="23" ry="13" fill="url(#gPaw)"></ellipse>
+        <g stroke="#C9955A" stroke-width="1.8" stroke-linecap="round"><path d="M119 309 v8"></path><path d="M133 309 v8"></path><path d="M167 309 v8"></path><path d="M181 309 v8"></path><path d="M62 312 v7"></path><path d="M76 312 v7"></path><path d="M224 312 v7"></path><path d="M238 312 v7"></path></g>
+        <path d="M108 172 C128 188 172 188 192 172 L194 186 C172 204 128 204 106 186 Z" fill="url(#gCollar)"></path>
+        <circle cx="150" cy="204" r="10" fill="url(#gTag)" stroke="#C99400" stroke-width="1.5"></circle>
+        <g class="dog-head">
+          <path d="M150 40 C190 40 216 68 218 104 C220 138 204 164 182 176 C172 182 160 184 150 184 C140 184 128 182 118 176 C96 164 80 138 82 104 C84 68 110 40 150 40 Z" fill="url(#gHead)"></path>
+          <ellipse cx="150" cy="70" rx="28" ry="16" fill="#F7D79C" opacity="0.45"></ellipse>
+          <path d="M139 96 C142 114 140 126 133 136 L167 136 C160 126 158 114 161 96 Z" fill="#F6DDB0" opacity="0.5"></path>
+          <ellipse cx="150" cy="146" rx="40" ry="30" fill="url(#gMuzzle)"></ellipse>
+          <ellipse cx="150" cy="172" rx="20" ry="8" fill="#EFD0A0"></ellipse>
+          <path d="M139 160 C138 183 162 183 161 160 Z" fill="url(#gTongue)"></path>
+          <path d="M150 164 v10" stroke="#D9566F" stroke-width="1.6" stroke-linecap="round"></path>
+          <path d="M150 146 L150 157 M150 157 C142 166 129 165 122 156 M150 157 C158 166 171 165 178 156" stroke="#6B4A33" stroke-width="2.6" stroke-linecap="round" fill="none"></path>
+          <path d="M133 128 C133 119 167 119 167 128 C167 139 157 147 150 147 C143 147 133 139 133 128 Z" fill="url(#gNose)"></path>
+          <ellipse cx="143" cy="125" rx="6" ry="2.8" fill="#FFFFFF" opacity="0.45"></ellipse>
+          <path d="M141 133 q3 2 6 0 M153 133 q3 2 6 0" stroke="#000000" stroke-width="1.4" opacity="0.45" fill="none" stroke-linecap="round"></path>
+          <g fill="#BD8650"><circle cx="128" cy="146" r="1.4"></circle><circle cx="133" cy="153" r="1.4"></circle><circle cx="135" cy="143" r="1.4"></circle><circle cx="172" cy="146" r="1.4"></circle><circle cx="167" cy="153" r="1.4"></circle><circle cx="165" cy="143" r="1.4"></circle></g>
+          <ellipse cx="125" cy="86" rx="10" ry="4" fill="#F7D79C" opacity="0.75" transform="rotate(-12 125 86)"></ellipse>
+          <ellipse cx="175" cy="86" rx="10" ry="4" fill="#F7D79C" opacity="0.75" transform="rotate(12 175 86)"></ellipse>
+          <sc-if value="{{openEyes}}" hint-placeholder-val="{{ true }}">
+            <g class="dog-eyes">
+              <ellipse cx="127" cy="104" rx="12.5" ry="13" fill="#3B2412"></ellipse><ellipse cx="127" cy="104.5" rx="10.5" ry="11.5" fill="url(#gIris)"></ellipse><circle cx="127" cy="105" r="5.5" fill="#140A05"></circle><circle cx="131" cy="99.5" r="3.4" fill="#FFFFFF"></circle><circle cx="123.5" cy="109" r="1.6" fill="#FFFFFF" opacity="0.8"></circle>
+              <ellipse cx="173" cy="104" rx="12.5" ry="13" fill="#3B2412"></ellipse><ellipse cx="173" cy="104.5" rx="10.5" ry="11.5" fill="url(#gIris)"></ellipse><circle cx="173" cy="105" r="5.5" fill="#140A05"></circle><circle cx="177" cy="99.5" r="3.4" fill="#FFFFFF"></circle><circle cx="169.5" cy="109" r="1.6" fill="#FFFFFF" opacity="0.8"></circle>
+            </g>
+          </sc-if>
+          <sc-if value="{{happyEyes}}" hint-placeholder-val="{{ false }}">
+            <path d="M115 107 Q127 93 139 107" stroke="#3B2412" stroke-width="5" stroke-linecap="round" fill="none"></path>
+            <path d="M161 107 Q173 93 185 107" stroke="#3B2412" stroke-width="5" stroke-linecap="round" fill="none"></path>
+          </sc-if>
+          <g stroke="#F7D79C" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.8"><path d="M144 46 q4 8 2 16"></path><path d="M156 47 q-2 8 0 14"></path><path d="M150 44 q1 7 0 12"></path></g>
+          <path d="M106 62 C84 60 62 78 60 110 C58 142 66 170 84 180 C98 188 110 176 111 156 C113 128 116 92 106 62 Z" fill="url(#gEar)"></path>
+          <path d="M194 62 C216 60 238 78 240 110 C242 142 234 170 216 180 C202 188 190 176 189 156 C187 128 184 92 194 62 Z" fill="url(#gEar)"></path>
+          <g stroke="#D9A05A" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.55"><path d="M98 78 C90 102 88 132 92 162"></path><path d="M202 78 C210 102 212 132 208 162"></path><path d="M84 96 C78 120 78 144 84 166"></path><path d="M216 96 C222 120 222 144 216 166"></path></g>
+        </g>
+      </svg>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startSubject":{"editor":"enum","options":["math","space","russian","german","english"],"default":"math","section":"Прототип"},"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { subject: null, screen: 'menu', picked: null };
+  }
+
+  renderVals() {
+    var SUBJECTS = [
+      { id: 'math', name: 'Математика', glyph: '1+2', main: '#F07A2B', light: '#FFB067', deep: '#D95F12', tint: '#FFF3EA', ink: '#8A3D06',
+        tiles: [
+          { title: 'Сложение до 10', glyph: '+10', stars: 2, task: true },
+          { title: 'Сложение до 20', glyph: '+20', stars: 3, done: true },
+          { title: 'Вычитание до 10', glyph: '−10', stars: 1 },
+          { title: 'Вычитание до 20', glyph: '−20', stars: 0 },
+          { title: 'Сравни числа', glyph: '5>3', stars: 2 },
+          { title: 'Задачи', glyph: '2+?', stars: 0 },
+          { title: 'Деньги', glyph: '₽', stars: 1 }
+        ] },
+      { id: 'space', name: 'Пространство', glyph: '↻', main: '#14A898', light: '#4FD1C1', deep: '#0B8577', tint: '#E8F8F5', ink: '#0B5A51',
+        tiles: [
+          { title: 'Право и лево', glyph: 'Л·П', stars: 3 },
+          { title: 'Лево и право другого', glyph: 'П·Л', stars: 1 },
+          { title: 'Повороты', glyph: '↻', stars: 0 },
+          { title: 'Вид сверху', glyph: '◎', stars: 2 },
+          { title: 'Кубики', glyph: '▦', stars: 0 }
+        ] },
+      { id: 'russian', name: 'Русский', glyph: 'Аа', main: '#E2507E', light: '#FF8CAE', deep: '#C2335F', tint: '#FDEEF3', ink: '#86173F',
+        tiles: [
+          { title: 'Читаем слова', glyph: 'Аа', stars: 3, done: true },
+          { title: 'Читаем два слова', glyph: 'Аа Бб', stars: 2 },
+          { title: 'Читаем и ищем картинку', glyph: 'Ищи', stars: 1 },
+          { title: 'Собери предложение', glyph: '1·2·3', stars: 0 },
+          { title: 'Длинные предложения', glyph: 'Ааа', stars: 0 }
+        ] },
+      { id: 'german', name: 'Deutsch', glyph: 'Dd', main: '#7B5CF0', light: '#A892FF', deep: '#5E3FD6', tint: '#F2EFFF', ink: '#3F249E',
+        tiles: [
+          { title: 'Wörter lesen', glyph: 'Ww', stars: 2 },
+          { title: 'Zwei Wörter lesen', glyph: 'Ww Zz', stars: 1 },
+          { title: 'Lesen und Bild finden', glyph: 'Such', stars: 0 },
+          { title: 'Sätze bauen', glyph: '1·2·3', stars: 0 },
+          { title: 'Lange Sätze', glyph: 'Satz', stars: 0 },
+          { title: 'Der, die oder das?', glyph: 'der', stars: 1 }
+        ] },
+      { id: 'english', name: 'English', glyph: 'Hi', main: '#3A8DEB', light: '#74B5FF', deep: '#2369C7', tint: '#EAF3FF', ink: '#124A8F',
+        tiles: [
+          { title: 'Знакомство', glyph: 'Hi!', stars: 3 },
+          { title: 'Угадай слово', glyph: 'Abc', stars: 1 },
+          { title: 'Два слова', glyph: 'Aa Bb', stars: 0 },
+          { title: 'Слушаем предложения', glyph: '♪', stars: 0 }
+        ] }
+    ];
+    var self = this;
+    var currentId = this.state.subject || this.props.startSubject || 'math';
+    var current = SUBJECTS[0];
+    for (var i = 0; i < SUBJECTS.length; i++) { if (SUBJECTS[i].id === currentId) current = SUBJECTS[i]; }
+
+    var subjects = SUBJECTS.map(function (s) {
+      var on = s.id === current.id;
+      return {
+        name: s.name,
+        glyph: s.glyph,
+        pressed: on ? 'true' : 'false',
+        pick: function () { self.setState({ subject: s.id }); },
+        tabStyle: 'height: 64px; border-radius: 20px; display: flex; align-items: center; gap: 10px; padding: 0 12px; font-size: 18px; font-weight: 900; ' +
+          (on ? 'background: linear-gradient(145deg, ' + s.main + ', ' + s.deep + '); color: #FFFFFF; box-shadow: 0 10px 22px ' + s.main + '55;'
+              : 'background: transparent; color: ' + s.ink + ';'),
+        dotStyle: 'flex-shrink: 0; width: 40px; height: 40px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 900; transition: background-color .28s ease; ' +
+          (on ? 'background: rgba(255,255,255,0.25); color: #FFFFFF;' : 'background: linear-gradient(145deg, ' + s.light + ', ' + s.main + '); color: #FFFFFF;')
+      };
+    });
+
+    var doneCount = 0;
+    var tiles = current.tiles.map(function (t) {
+      if (t.done) doneCount++;
+      var stars = [0, 1, 2].map(function (k) {
+        return k < t.stars ? { fill: '#FFC93C', stroke: '#E8A900' } : { fill: '#F1EEF7', stroke: '#DCD6E8' };
+      });
+      var long = t.glyph.length > 3;
+      return {
+        title: t.title,
+        glyph: t.glyph,
+        done: !!t.done,
+        stars: stars,
+        starsLabel: 'Звёзд: ' + t.stars + ' из 3',
+        open: function () { if (t.task) self.setState({ screen: 'task', picked: null }); },
+        tileStyle: 'position: relative; border-radius: 26px; background: #FFFFFF; border: 1.5px solid ' + current.tint + '; box-shadow: 0 8px 22px rgba(51,40,92,.07), 0 1px 3px rgba(51,40,92,.04); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 14px;',
+        plateStyle: 'width: 92px; height: 92px; border-radius: 28px; background: linear-gradient(145deg, ' + current.light + ', ' + current.main + ' 55%, ' + current.deep + '); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: -0.5px; box-shadow: 0 10px 20px ' + current.main + '4D, inset 0 2px 0 rgba(255,255,255,.35); font-size: ' + (long ? 24 : 34) + 'px;',
+        titleStyle: 'font-size: 18px; font-weight: 800; color: #33285C; line-height: 1.2; text-align: center; min-height: 44px; display: flex; align-items: center;'
+      };
+    });
+
+    var n = current.tiles.length;
+    var word = n === 1 ? 'задание' : (n < 5 ? 'задания' : 'заданий');
+    var currentMeta = n + ' ' + word + (doneCount ? ' · пройдено ' + doneCount : '');
+
+    var picked = this.state.picked;
+    var CORRECT = 7;
+    var answers = [6, 7, 8].map(function (v) {
+      var base = 'height: 124px; border-radius: 32px; font-size: 68px; font-weight: 900; ';
+      var style;
+      if (picked === v && v === CORRECT) style = base + 'background: linear-gradient(145deg, #4CC57E, #2E9E5B); color: #FFFFFF; box-shadow: 0 16px 32px rgba(46,158,91,.35);';
+      else if (picked === v) style = base + 'background: #F1EEF7; color: #8A84A6; box-shadow: none;';
+      else style = base + 'background: #FFFFFF; color: #33285C; box-shadow: 0 12px 28px rgba(51,40,92,.10), 0 1px 3px rgba(51,40,92,.05);';
+      return { value: v, style: style, pick: function () { self.setState({ picked: v }); } };
+    });
+    var solved = picked === CORRECT;
+    var missed = picked !== null && picked !== CORRECT;
+
+    var paws = [];
+    for (var p = 0; p < 10; p++) {
+      paws.push({ fill: p < 3 || (p === 3 && solved) ? '#F07A2B' : (p === 3 ? '#FFC9A3' : '#E4E0EE') });
+    }
+
+    return {
+      showMenu: this.state.screen === 'menu',
+      showTask: this.state.screen === 'task',
+      subjects: subjects,
+      tiles: tiles,
+      currentName: current.name,
+      currentMeta: currentMeta,
+      goHome: function () { self.setState({ screen: 'menu', picked: null }); },
+      answers: answers,
+      paws: paws,
+      stepLabel: '4 / 10',
+      applesA: [1, 2, 3],
+      applesB: [1, 2, 3, 4],
+      answerShown: solved ? '7' : '?',
+      answerBoxStyle: solved
+        ? 'min-width: 144px; height: 144px; border-radius: 32px; background: linear-gradient(145deg, #4CC57E, #2E9E5B); color: #FFFFFF; display: flex; align-items: center; justify-content: center; box-shadow: 0 14px 28px rgba(46,158,91,.3); transition: all .35s cubic-bezier(.2,1.4,.4,1);'
+        : 'min-width: 144px; height: 144px; border-radius: 32px; background: #FFF4EA; color: #F07A2B; border: 4px dashed #FFC9A3; box-sizing: border-box; display: flex; align-items: center; justify-content: center; transition: all .35s ease;',
+      dogSays: solved ? 'Ура! Верно!' : (missed ? 'Почти! Попробуй ещё' : 'Посчитай яблочки!'),
+      bubbleStyle: 'position: relative; border-radius: 22px; padding: 14px 18px; font-size: 20px; font-weight: 900; text-align: center; line-height: 1.2; transition: background-color .3s ease, color .3s ease; ' +
+        (solved ? 'background: #2E9E5B; color: #FFFFFF; box-shadow: 0 12px 26px rgba(46,158,91,.3);' : 'background: #FFFFFF; color: #33285C; box-shadow: 0 12px 28px rgba(51,40,92,.10);'),
+      bubbleFill: solved ? '#2E9E5B' : '#FFFFFF',
+      happyEyes: solved,
+      openEyes: !solved
+    };
+  }
+}
+</script>
+</body>
+</html>

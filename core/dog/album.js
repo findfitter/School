@@ -5,6 +5,7 @@ import { h, button, format } from '../dom.js';
 import { STR } from '../strings.js';
 import { drawDog } from '../dogs.js';
 import { itemById } from '../dog-items.js';
+import { decorElement } from '../dog-art.js';
 
 const A = STR.dog.album;
 
@@ -24,11 +25,8 @@ export function renderScene(photo) {
     const item = id && itemById.get(id);
     const pos = DECOR_POSITIONS[slot];
     if (!item || !pos) continue;
-    const el = h('span', { class: 'photo-decor', text: item.icon });
-    el.style.left = `${pos.x}%`;
-    el.style.top = `${pos.y}%`;
-    el.style.fontSize = `${pos.size}cqw`;
-    scene.append(el);
+    const el = decorElement(id, pos, { name: photo.dogs[0]?.name || '', className: 'photo-decor' });
+    if (el) scene.append(el);
   }
   const slots = SLOTS[Math.min(3, photo.dogs.length)];
   photo.dogs.forEach((dog, i) => {

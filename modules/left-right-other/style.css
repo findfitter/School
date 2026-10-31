@@ -1,4 +1,6 @@
-/* Лево и право другого. Размеры в vh/vw, чтобы всё помещалось на экране Хромбука без прокрутки. */
+/* Лево и право другого, в стиле «сказочной книжки» (токены и общие классы — core/styles/base.css, book.css).
+   Размеры в vh/vw, чтобы всё помещалось на экране Хромбука без прокрутки. Прогресс серии рисует ядро (дорожка лапок),
+   собственные точки .lo-dots скрыты правилом ядра. Человечек и рука — SVG (index.js), предмет в руке — эмодзи-наклейка. */
 
 .leftother {
   height: 100%;
@@ -26,37 +28,40 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #d8dcee;
+  background: #e3d8c4;
 }
 
 .lo-dot.done {
-  background: var(--good, #52c47a);
+  background: var(--book-done);
 }
 
 .lo-dot.again {
-  border: 3px solid var(--primary, #4f8cff);
+  border: 3px solid var(--math-ribbon);
   background: transparent;
 }
 
 .lo-dot.again.done {
-  background: var(--primary, #4f8cff);
+  background: var(--math-ribbon);
 }
 
 .lo-repeat {
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: var(--card, #fff);
-  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  background: var(--book-card);
+  box-shadow: var(--book-shadow);
   font-size: 36px;
 }
 
+/* Вопрос — рукописный */
 .lo-prompt {
   flex: none;
   text-align: center;
-  font-size: clamp(26px, 5.4vh, 46px);
-  font-weight: 800;
-  line-height: 1.15;
+  font-family: var(--font-hand);
+  font-size: clamp(30px, 6.6vh, 54px);
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--book-ink);
 }
 
 /* Подсказка словами: место зарезервировано */
@@ -64,7 +69,7 @@
   flex: none;
   min-height: 2.4em;
   padding: 0 2vw;
-  color: var(--ink-soft, #6b6f85);
+  color: var(--book-ink-soft);
   font-size: clamp(16px, 3vh, 24px);
   line-height: 1.2;
   text-align: center;
@@ -98,9 +103,11 @@
   justify-content: center;
 }
 
+/* Предмет в руке — наклейка (белая кайма, тень); не крупнее 120 px: большие эмодзи на Хромбуке расплываются */
 .lo-item {
-  font-size: clamp(72px, 16vh, 140px);
+  font-size: clamp(60px, 14vh, 120px);
   line-height: 1;
+  filter: url(#stk);
 }
 
 .lo-middle {
@@ -111,13 +118,14 @@
 }
 
 .lo-figure {
-  font-size: clamp(100px, 25vh, 200px);
-  line-height: 1;
+  height: clamp(130px, 33vh, 270px);
+  aspect-ratio: 120 / 230;
 }
 
-/* Человек стоит спиной: тёмный силуэт */
-.lo-figure.back {
-  filter: brightness(0);
+.lo-person {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .lo-figure.hop {
@@ -126,32 +134,40 @@
 
 @keyframes lo-hop {
   0% { transform: translateY(0); }
-  40% { transform: translateY(-0.12em); }
+  40% { transform: translateY(-6%); }
   100% { transform: translateY(0); }
 }
 
+/* Подпись «лицом / спиной к тебе»: бумажный ярлычок */
 .lo-tag {
   padding: 2px 16px;
-  border-radius: 999px;
-  background: var(--soft, #e8eefc);
+  border-radius: 6px;
+  background: var(--book-card);
+  box-shadow: var(--book-shadow);
   font-size: clamp(16px, 3vh, 24px);
-  font-weight: 800;
+  font-weight: 700;
   white-space: nowrap;
+  transform: rotate(-1deg);
 }
 
 /* Руки, на которые можно нажать («покажи руку») */
 .lo-hand {
   width: 100%;
   height: 100%;
-  border-radius: 28px;
-  background: var(--card, #fff);
-  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
-  font-size: clamp(56px, 12vh, 100px);
-  line-height: 1;
+  padding: 10%;
+  border-radius: 8px;
+  background: var(--book-card);
+  box-shadow: var(--book-shadow), inset 0 0 0 2px #eadfcb;
   transition: opacity 0.2s, background 0.15s;
 }
 
-/* Ответы «в левой» / «в правой» */
+.lo-hand-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Ответы «в левой» / «в правой»: одинаковые бумажные плашки */
 .lo-answers {
   flex: none;
   display: flex;
@@ -164,31 +180,33 @@
 .lo-answer {
   min-width: clamp(220px, 28vw, 380px);
   height: clamp(80px, 15vh, 130px);
-  border-radius: 28px;
-  background: var(--primary, #4f8cff);
-  color: #fff;
-  font-size: clamp(32px, 6.4vh, 56px);
-  font-weight: 800;
-  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  border-radius: 8px;
+  background: var(--book-card);
+  box-shadow: var(--book-shadow), inset 0 0 0 3px #f2c4a8;
+  color: var(--book-ink);
+  font-family: var(--font-hand);
+  font-size: clamp(36px, 7.2vh, 62px);
+  font-weight: 700;
   transition: opacity 0.2s, background 0.15s;
 }
 
-.lo-answer:last-child {
-  background: #f08c4f;
-}
+.lo-answer:nth-child(odd) { transform: rotate(-0.8deg); }
+.lo-answer:nth-child(even) { transform: rotate(0.9deg); }
 
-/* Состояния ответа */
+/* Состояния ответа: верный — зелёное пятно, неверный — карточка бледнеет */
 .lo-hand.right {
-  background: #dff6e7;
-  outline: 5px solid var(--good, #52c47a);
+  background: #dcefe0;
+  box-shadow: var(--book-shadow), inset 0 0 0 4px var(--book-done);
 }
 
 .lo-answer.right {
-  background: var(--good, #52c47a);
+  background: #dcefe0;
+  box-shadow: var(--book-shadow), inset 0 0 0 4px var(--book-done);
 }
 
 .lo-hand.pressed,
 .lo-answer.pressed {
+  transform: scale(0.96);
   box-shadow: none;
 }
 
@@ -200,10 +218,18 @@
 
 .lo-hand.point,
 .lo-answer.point {
-  outline: 6px solid var(--accent, #ffd23f);
+  box-shadow: var(--book-shadow), 0 0 0 5px var(--book-gold);
   animation: lo-pulse 0.9s ease-in-out infinite;
 }
 
 @keyframes lo-pulse {
   50% { transform: scale(1.04); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lo-figure.hop,
+  .lo-hand.point,
+  .lo-answer.point {
+    animation: none;
+  }
 }

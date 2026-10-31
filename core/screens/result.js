@@ -1,37 +1,64 @@
 import { h, button, format } from '../dom.js';
 import { STR } from '../strings.js';
+import * as storage from '../storage.js';
+import { challengeProgress } from '../challenges.js';
+import { createBook, createIllustration, counters, guideDog } from './book.js';
+import { svgEl, starIcon, boneMark } from './book-art.js';
+
+const PATH_STARS = 5; // звёзд на тропинке иллюстрации (как на главном экране)
+
+// Разворот книги: слева собака ребёнка радуется на тропинке к косточке, справа — то, что показывает экран.
+function spread({ heading, caption, right }) {
+  const { have, need } = challengeProgress();
+  const dog = guideDog();
+  return createBook({
+    className: 'book-result',
+    top: [counters(storage.balance(), storage.bonesBalance())],
+    left: [
+      h('h1', { class: 'rs-praise hand', text: heading }),
+      createIllustration({ dog, pathDone: Math.floor((have * PATH_STARS) / need), joy: true, label: dog ? dog.name : '' }),
+      h('p', { class: 'rs-score hand', text: caption }),
+    ],
+    right,
+  });
+}
 
 export function renderResult(app, { manifest, result, stars, canBuy, locked, superSticker, newChallenges = [] }) {
   const lang = (STR.subjects[manifest.subject] || STR.subjects.other).lang;
   const t = STR.result[lang];
   const praise = t.praise[stars];
 
+  // Звёзды за серию: по одной, с отскоком; не заработанные — карандашным контуром.
   const starEls = [1, 2, 3].map((n) =>
-    h('span', { class: `star ${n <= stars ? 'earned' : 'empty'}`, style: `--i:${n}`, text: n <= stars ? '⭐' : '☆' })
-  );
+    h('span', { class: `rs-star ${n <= stars ? 'earned' : 'empty'}`, style: `--i:${n}` },
+      svgEl(n <= stars ? starIcon('#F4C34E', '#D9A21E') : starIcon('none', '#C4A57A'))));
 
-  // Подсказка про магазин, если на счету хватает звёзд хотя бы на одну наклейку.
-  const shop = canBuy && !superSticker
-    ? h('div', { class: 'shop-hint' }, '🛍️ ', t.shopHint)
-    : null;
+  const notes = [
+    // Подсказка про магазин, если на счету хватает звёзд хотя бы на одну наклейку.
+    canBuy && !superSticker ? h('div', { class: 'paper-card rs-note' }, '🛍️ ', t.shopHint) : null,
+    // Пройденное в круге задание закрыто: «ещё раз» не предлагаем.
+    locked ? h('div', { class: 'paper-card rs-note' }, t.nextTask) : null,
+    newChallenges.length
+      ? h('div', { class: 'paper-card rs-note' }, '🦴 ', format(t.newChallenge, { subject: newChallenges.map((s) => STR.subjects[s]?.title || s).join(', ') }))
+      : null,
+  ];
 
-  // Пройденное в круге задание закрыто: «ещё раз» не предлагаем.
   const buttons = locked
     ? [button('btn primary big', t.toMenu, () => app.go.menu())]
     : [button('btn primary big', t.again, () => app.go.play(manifest)),
        button('btn big', t.toMenu, () => app.go.menu())];
 
-  const screen = h('div', { class: 'screen result-screen' },
-    h('div', { class: 'stars' }, starEls),
-    h('h1', { text: praise }),
-    h('p', { class: 'score', text: format(t.score, result) }),
-    shop,
-    locked ? h('p', { class: 'score', text: t.nextTask }) : null,
-    newChallenges.length
-      ? h('div', { class: 'shop-hint' }, '🦴 ', format(t.newChallenge, { subject: newChallenges.map((s) => STR.subjects[s]?.title || s).join(', ') }))
-      : null,
-    h('div', { class: 'row' }, buttons)
-  );
+  const book = spread({
+    heading: praise,
+    caption: format(t.score, result),
+    right: [
+      h('div', { class: 'rs-stars' }, starEls),
+      stars > 0 ? h('span', { class: 'stamp rs-stamp', style: `animation-delay:${400 * stars + 300}ms`, text: t.stamp }) : null,
+      h('div', { class: 'rs-notes' }, notes),
+      h('div', { class: 'rs-actions' }, h('div', { class: 'row' }, buttons)),
+    ],
+  });
+  const screen = book.el;
 
   const timers = [];
   for (let n = 1; n <= stars; n++) {
@@ -54,19 +81,23 @@ export function renderResult(app, { manifest, result, stars, canBuy, locked, sup
 export function renderChallengeResult(app, { subject, bones }) {
   const lang = (STR.subjects[subject] || STR.subjects.other).lang;
   const t = STR.result[lang].challenge;
-  const screen = h('div', { class: 'screen result-screen' },
-    h('div', { class: 'bone-flyer', text: '🦴' }),
-    h('h1', { text: t.title }),
-    h('p', { class: 'score', text: t.text }),
-    h('p', { class: 'score', text: format(t.bonesNow, { n: bones }) }),
-    h('div', { class: 'row' },
-      button('btn primary big', `🐶 ${t.toDog}`, () => app.go.dog()),
-      button('btn big', t.toMenu, () => app.go.menu())));
+  const book = spread({
+    heading: t.title,
+    caption: format(t.bonesNow, { n: bones }),
+    right: [
+      h('div', { class: 'rs-bone' }, svgEl(boneMark())),
+      h('div', { class: 'rs-notes' }, h('p', { class: 'paper-card rs-note', text: t.text })),
+      h('div', { class: 'rs-actions' },
+        h('div', { class: 'row' },
+          button('btn primary big', `🐶 ${t.toDog}`, () => app.go.dog()),
+          button('btn big', t.toMenu, () => app.go.menu()))),
+    ],
+  });
   const timer = setTimeout(() => {
     app.services.sounds('done');
     app.services.speech.speak(`${t.title} ${t.text}`, lang);
   }, 500);
-  return { el: screen, onLeave: () => clearTimeout(timer) };
+  return { el: book.el, onLeave: () => clearTimeout(timer) };
 }
 
 const SPARKLES = ['✨', '💖', '⭐', '🌸', '💫'];

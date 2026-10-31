@@ -225,6 +225,24 @@ export function addStars(n) {
 // ---------- Время в приложении ----------
 
 // Ключ дня по местному времени: «2026-10-28».
+// Временные состояния интерфейса (например, выбранная глава на главном экране): живут, пока открыта вкладка,
+// в сохранение прогресса не попадают.
+export function uiState(key) {
+  try {
+    return sessionStorage.getItem(`school-ui-${key}`);
+  } catch {
+    return null;
+  }
+}
+
+export function setUiState(key, value) {
+  try {
+    sessionStorage.setItem(`school-ui-${key}`, String(value));
+  } catch {
+    // без sessionStorage состояние просто не запоминается
+  }
+}
+
 export function dayKey(date = new Date()) {
   const pad = (n) => String(n).padStart(2, '0');
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;

@@ -1,4 +1,4 @@
-/* Вид сверху. Размеры в vh/vw, чтобы всё помещалось на экране Хромбука без прокрутки. */
+/* Вид сверху. Размеры в vh/vw, чтобы всё помещалось на экране Хромбука без прокрутки. Стиль «сказочной книжки»: токены и общие классы — core/styles/base.css, book.css; прогресс серии рисует ядро (дорожка лапок), собственные точки скрыты. */
 
 .sv {
   height: 100%;
@@ -27,20 +27,20 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #d8dcee;
+  background: #e3d8c4;
 }
 
 .sv-dot.done {
-  background: var(--good, #52c47a);
+  background: var(--book-done);
 }
 
 .sv-dot.again {
-  border: 3px solid var(--primary, #4f8cff);
+  border: 3px solid var(--math-ribbon);
   background: transparent;
 }
 
 .sv-dot.again.done {
-  background: var(--primary, #4f8cff);
+  background: var(--math-ribbon);
 }
 
 .sv-prompt {
@@ -48,8 +48,11 @@
   min-height: 2.6em;
   display: flex;
   align-items: center;
-  font-size: clamp(20px, 4vh, 32px);
-  font-weight: 800;
+  font-family: var(--font-hand);
+  font-size: clamp(30px, 6.2vh, 50px);
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--book-ink);
   text-align: center;
 }
 
@@ -60,9 +63,9 @@
   justify-content: center;
   width: clamp(130px, 28vh, 240px);
   height: clamp(130px, 28vh, 240px);
-  border: 6px dashed #b9c3e6;
-  border-radius: 36px;
-  background: var(--card, #fff);
+  border: 4px solid #eadfcb;
+  border-radius: 8px;
+  background: var(--book-card);
 }
 
 .sv-front {
@@ -94,13 +97,13 @@
   justify-content: center;
   width: clamp(100px, 20vh, 180px);
   height: clamp(100px, 20vh, 180px);
-  border-radius: 28px;
-  background: var(--card, #fff);
-  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  border-radius: 8px;
+  background: var(--book-card);
+  box-shadow: var(--book-shadow);
 }
 
 .sv-option.pressed {
-  transform: translateY(4px);
+  transform: scale(0.96);
   box-shadow: none;
 }
 
@@ -109,7 +112,8 @@
 }
 
 .sv-option.right {
-  outline: 6px solid var(--good, #52c47a);
+  box-shadow: var(--book-shadow), inset 0 0 0 5px var(--book-done);
+  background: #dcefe0;
 }
 
 .sv-option.point {

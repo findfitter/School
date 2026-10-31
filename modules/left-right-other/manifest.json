@@ -3,6 +3,7 @@
   "title": "Лево и право другого",
   "subject": "orientation",
   "icon": "🧍",
+  "glyph": "П·Л",
   "description": "Где у него правая рука?",
   "version": "1.0.0",
   "styles": [

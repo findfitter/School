@@ -3,6 +3,7 @@
   "title": "Сложение до 20",
   "subject": "math",
   "icon": "➕",
+  "glyph": "+20",
   "description": "Складываем через десяток",
   "version": "1.0.0",
   "styles": [

@@ -3,6 +3,7 @@
   "title": "Читаем слова",
   "subject": "russian",
   "icon": "📚",
+  "glyph": "Аа",
   "description": "Найди слово к картинке",
   "version": "1.0.0",
   "styles": [

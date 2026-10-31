@@ -2,6 +2,8 @@
 
 import { h, button } from './dom.js';
 import { STR } from './strings.js';
+import { installFilters } from './art/filters.js';
+import { installTextures } from './art/textures.js';
 import { VOICE_ENABLED } from './config.js';
 import * as storage from './storage.js';
 import { createSpeech } from './speech.js';
@@ -19,7 +21,11 @@ import { renderDog } from './screens/dog.js';
 import { renderParent } from './screens/parent.js';
 import { renderLimit } from './screens/limit.js';
 import { renderGate } from './screens/gate.js';
+import { createSheet, homeTag } from './screens/book.js';
+import { createTrack } from './screens/series-track.js';
 
+installFilters(); // акварельные SVG-фильтры для всех экранов
+installTextures(); // фактура бумаги: картинка, нарисованная один раз
 const root = document.getElementById('app');
 document.title = STR.appTitle;
 
@@ -36,15 +42,22 @@ let runToken = 0;
 // ---------- Время в приложении и дневной лимит ----------
 const TICK_MS = 5000; // как часто считаем время
 const IDLE_MS = 90000; // без касаний дольше этого время не считается (ребёнок отошёл)
+const CALM_MS = 60000; // без касаний дольше этого бесконечные декоративные анимации замирают (класс app-idle)
 const GRACE_MIN = 5; // сколько минут сверх лимита дают закончить начатое задание
 
 let screenKind = 'menu'; // menu | stickers | dog | game | result | parent | limit | gate
 let lastActivity = Date.now();
 let lastTick = Date.now();
 
+const rootClasses = document.documentElement.classList;
 for (const type of ['pointerdown', 'keydown', 'touchstart']) {
-  document.addEventListener(type, () => { lastActivity = Date.now(); }, { passive: true, capture: true });
+  document.addEventListener(type, () => {
+    lastActivity = Date.now();
+    rootClasses.remove('app-idle'); // касание оживляет собаку и иллюстрации сразу
+  }, { passive: true, capture: true });
 }
+// Скрытая вкладка: бесконечные анимации стоят (экономим процессор и батарею).
+document.addEventListener('visibilitychange', () => rootClasses.toggle('app-hidden', document.visibilityState !== 'visible'));
 
 function limitReached(graceMinutes = 0) {
   const limit = storage.todayLimit();
@@ -55,6 +68,7 @@ function tick() {
   const now = Date.now();
   const elapsed = Math.min((now - lastTick) / 1000, (TICK_MS * 2) / 1000);
   lastTick = now;
+  rootClasses.toggle('app-idle', now - lastActivity > CALM_MS);
   if (document.visibilityState !== 'visible') return;
   // Экран для родителей, проверка для взрослых и экран отдыха время не считают.
   if (screenKind !== 'parent' && screenKind !== 'limit' && screenKind !== 'gate' && now - lastActivity < IDLE_MS) {
@@ -128,12 +142,15 @@ async function play(manifest, opts = {}) {
   const challenge = manifest.challenge ? challengeInfo(app, opts.subject) : null;
   if (manifest.challenge && !challenge) return showMenu(); // задания уже нет (например, пройдено в другом окне)
   const container = h('div', { class: 'game-container' });
-  const home = button('btn home-btn', '🏠', () => showMenu());
-  home.setAttribute('aria-label', STR.common.home);
+  const home = homeTag(STR.common.home, () => showMenu());
+  // Дорожка лапок вместо точек модуля: у сложного задания (один вопрос) и у модулей без серии ("series": false) её нет.
+  const track = manifest.challenge || manifest.series === false ? null : createTrack(storage.settings().seriesLength);
+  const sheet = createSheet({ className: `game-screen${track ? ' has-track' : ''}` });
+  sheet.el.append(container, home, track ? track.el : null);
   const styles = attachStyles(manifest);
   let stopModule = null;
   let session = null; // запись в журнале серий (core/journal.js)
-  show(h('div', { class: 'screen game-screen' }, container, home), () => {
+  show(sheet.el, () => {
     if (typeof stopModule === 'function') stopModule();
     styles.detach();
     journal.abandon(session); // вышли, не закончив серию (после finish — ничего не делает)
@@ -148,7 +165,10 @@ async function play(manifest, opts = {}) {
       manifest,
       services,
       challenge,
-      onTask: (info) => journal.task(session, info),
+      onTask: (info) => {
+        journal.task(session, info);
+        if (track) track.advance();
+      },
       onFinish: (result) => {
         if (mine !== runToken) return;
         journal.finish(session, result);

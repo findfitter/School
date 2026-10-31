@@ -3,6 +3,7 @@
   "title": "Hello! Два слова",
   "subject": "english",
   "icon": "🎨",
+  "glyph": "Aa Bb",
   "description": "Слушаем: какого цвета и кто это?",
   "version": "1.0.0",
   "voice": true,

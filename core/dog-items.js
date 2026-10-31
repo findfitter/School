@@ -29,10 +29,10 @@ export const ITEMS = [
   { id: 'sun', kind: 'outfit', slot: 'glasses', icon: '🕶️', title: 'Тёмные очки', price: 2 },
   { id: 'heart', kind: 'outfit', slot: 'glasses', icon: '😍', title: 'Очки-сердечки', price: 2 },
   // ошейники (красный у собаки с самого начала)
-  { id: 'collar-blue', kind: 'outfit', slot: 'collar', icon: '🔵', title: 'Синий ошейник', price: 1, fill: '#3b82f6' },
-  { id: 'collar-green', kind: 'outfit', slot: 'collar', icon: '🟢', title: 'Зелёный ошейник', price: 1, fill: '#3fb06a' },
-  { id: 'collar-pink', kind: 'outfit', slot: 'collar', icon: '🩷', title: 'Розовый ошейник', price: 1, fill: '#f472b6' },
-  { id: 'collar-gold', kind: 'outfit', slot: 'collar', icon: '🟡', title: 'Золотой ошейник', price: 3, fill: '#f2c230' },
+  { id: 'collar-blue', kind: 'outfit', slot: 'collar', icon: '🔵', title: 'Синий ошейник', price: 1, colors: ['#5B97F5', '#2F6AD0'] },
+  { id: 'collar-green', kind: 'outfit', slot: 'collar', icon: '🟢', title: 'Зелёный ошейник', price: 1, colors: ['#5CC584', '#2E8E54'] },
+  { id: 'collar-pink', kind: 'outfit', slot: 'collar', icon: '🩷', title: 'Розовый ошейник', price: 1, colors: ['#F78DC3', '#D9559A'] },
+  { id: 'collar-gold', kind: 'outfit', slot: 'collar', icon: '🟡', title: 'Золотой ошейник', price: 3, colors: ['#F7D35A', '#D4A20E'] },
   // украшения
   { id: 'bow', kind: 'outfit', slot: 'extra', icon: '🎀', title: 'Бантик', price: 1 },
   { id: 'scarf', kind: 'outfit', slot: 'extra', icon: '🧣', title: 'Шарф', price: 2 },
@@ -83,33 +83,47 @@ export function cleanDecor(raw = {}) {
   return out;
 }
 
-// ---------- Рисунок наряда на собаке (части SVG; координаты головы собаки в drawDog) ----------
-const INK = '#2b1b17';
+// ---------- Рисунок наряда на собаке (design/sketch/Pup.dc.html) ----------
+// Координаты — системы эскиза 300×340, в которой нарисована собака (core/dogs.js, drawDog).
 
-export function outfitSvg(outfit = {}) {
-  const hat = {
-    cap: `<path d="M84 74 Q120 26 156 74 Z" fill="#4f8cff"/><rect x="82" y="70" width="76" height="9" rx="4" fill="#2f6be0"/><path d="M148 74 Q180 70 184 82 L148 82 Z" fill="#2f6be0"/><circle cx="120" cy="34" r="5" fill="#ffd23f"/>`,
-    party: `<polygon points="120,8 90,74 150,74" fill="#ff6fb1"/><circle cx="108" cy="52" r="5" fill="#ffd23f"/><circle cx="128" cy="40" r="4" fill="#4f8cff"/><circle cx="124" cy="62" r="5" fill="#fff"/><circle cx="120" cy="8" r="7" fill="#ffd23f"/>`,
-    tophat: `<rect x="92" y="30" width="56" height="44" rx="4" fill="#2b2d42"/><rect x="80" y="70" width="80" height="10" rx="5" fill="#2b2d42"/><rect x="92" y="58" width="56" height="9" fill="#e5484d"/>`,
-    crown: `<path d="M86 74 L90 36 L106 54 L120 28 L134 54 L150 36 L154 74 Z" fill="#ffd23f" stroke="#e0a800" stroke-width="3" stroke-linejoin="round"/><circle cx="120" cy="52" r="5" fill="#e5484d"/><circle cx="100" cy="62" r="4" fill="#4f8cff"/><circle cx="140" cy="62" r="4" fill="#3fb06a"/>`,
-  }[outfit.hat] || '';
+// Цвета ошейника по умолчанию (красно-розовый) — пока ничего не надето в слоте collar.
+const COLLAR_DEFAULT = ['#E46A7E', '#B33E56'];
+
+// Сдвиг шапок по породе: у пуделя кудрявая макушка выше, у уиппета голова ниже.
+const HAT_SHIFT = { poodle: -24, whippet: 6 };
+
+// Части наряда для drawDog. u — префикс id градиентов собаки (нужен медали: золото жетона); breed — порода.
+//   collar — цвета ошейника; tag — рисовать ли жетон (шарф и медаль прячут его);
+//   neck — шарф или медаль (рисуются под подбородком, до головы);
+//   glasses, hat — на голове (шапка сдвигается по породе); top — бантик или цветок у уха, поверх шапки.
+export function outfitSvg(outfit = {}, { breed = 'labrador', u = '' } = {}) {
+  const collarItem = itemById.get(outfit.collar);
+  const collar = collarItem?.colors || COLLAR_DEFAULT;
 
   const glasses = {
-    round: `<circle cx="96" cy="102" r="16" fill="rgba(255,255,255,0.35)" stroke="${INK}" stroke-width="4"/><circle cx="144" cy="102" r="16" fill="rgba(255,255,255,0.35)" stroke="${INK}" stroke-width="4"/><path d="M112 102 L128 102" stroke="${INK}" stroke-width="4"/>`,
-    sun: `<rect x="78" y="90" width="36" height="24" rx="10" fill="#1f2230"/><rect x="126" y="90" width="36" height="24" rx="10" fill="#1f2230"/><path d="M114 98 L126 98" stroke="#1f2230" stroke-width="4"/><path d="M84 96 L96 94" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity="0.6"/>`,
-    heart: `<path d="M96 116 C76 104 76 88 88 88 C93 88 96 92 96 95 C96 92 99 88 104 88 C116 88 116 104 96 116 Z" fill="#f43f7e" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M144 116 C124 104 124 88 136 88 C141 88 144 92 144 95 C144 92 147 88 152 88 C164 88 164 104 144 116 Z" fill="#f43f7e" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M110 98 L130 98" stroke="${INK}" stroke-width="3"/>`,
+    round: `<circle cx="127" cy="104" r="18" fill="#DDF0FF" fill-opacity="0.22" stroke="#3B2F2F" stroke-width="3.5"/><circle cx="173" cy="104" r="18" fill="#DDF0FF" fill-opacity="0.22" stroke="#3B2F2F" stroke-width="3.5"/><path d="M145 101 Q150 95 155 101 M109 100 L94 94 M191 100 L206 94" stroke="#3B2F2F" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+    sun: `<rect x="105" y="91" width="42" height="27" rx="11" fill="#2B2633"/><rect x="153" y="91" width="42" height="27" rx="11" fill="#2B2633"/><path d="M147 100 h6 M105 98 L92 92 M195 98 L208 92" stroke="#2B2633" stroke-width="4" stroke-linecap="round"/><path d="M112 98 h11 M160 98 h11" stroke="#FFFFFF" stroke-width="2.5" opacity="0.45" stroke-linecap="round"/>`,
+    heart: `<path transform="translate(127 93)" d="M0 7 C0 -6 -19 -8 -19 5 C-19 15 -6 21 0 27 C6 21 19 15 19 5 C19 -8 0 -6 0 7 Z" fill="#E5577A" fill-opacity="0.88" stroke="#B8304F" stroke-width="2"/><path transform="translate(173 93)" d="M0 7 C0 -6 -19 -8 -19 5 C-19 15 -6 21 0 27 C6 21 19 15 19 5 C19 -8 0 -6 0 7 Z" fill="#E5577A" fill-opacity="0.88" stroke="#B8304F" stroke-width="2"/><path d="M145 101 Q150 96 155 101" stroke="#B8304F" stroke-width="3" fill="none"/><path d="M118 98 q4 -4 8 -2 M164 98 q4 -4 8 -2" stroke="#FFFFFF" stroke-width="2" fill="none" opacity="0.6" stroke-linecap="round"/>`,
   }[outfit.glasses] || '';
 
-  // Украшения: бантик, шарф, медаль у шеи (вне головы), цветок у уха (на голове).
-  const headExtra = outfit.extra === 'flower'
-    ? `<g transform="translate(76 84)"><circle cx="0" cy="-9" r="7" fill="#f9a8d4"/><circle cx="9" cy="0" r="7" fill="#f9a8d4"/><circle cx="0" cy="9" r="7" fill="#f9a8d4"/><circle cx="-9" cy="0" r="7" fill="#f9a8d4"/><circle cx="0" cy="0" r="5" fill="#ffd23f"/></g>`
-    : '';
-  const neckExtra = {
-    bow: `<polygon points="120,180 92,168 92,192" fill="#e5484d"/><polygon points="120,180 148,168 148,192" fill="#e5484d"/><circle cx="120" cy="180" r="7" fill="#b91c1c"/>`,
-    scarf: `<path d="M80 168 Q120 192 160 168 L160 182 Q120 206 80 182 Z" fill="#3b82f6"/><path d="M80 172 Q120 196 160 172" stroke="#fff" stroke-width="4" fill="none" stroke-dasharray="8 8"/><rect x="138" y="184" width="16" height="34" rx="6" fill="#3b82f6"/>`,
-    medal: `<path d="M104 176 L120 204 L136 176" stroke="#ef4444" stroke-width="7" fill="none"/><circle cx="120" cy="208" r="12" fill="#ffd23f" stroke="#e0a800" stroke-width="3"/><text x="120" y="213" text-anchor="middle" font-size="14" font-weight="700" fill="#b45309">1</text>`,
+  const hatArt = {
+    cap: `<path d="M102 64 C100 24 200 24 198 64 Z" fill="#4372B8"/><path d="M150 28 V62" stroke="#2F5A9A" stroke-width="2" opacity="0.6"/><circle cx="150" cy="28" r="5" fill="#2F5A9A"/><path d="M96 62 Q150 82 204 62 L208 72 Q150 98 92 72 Z" fill="#2F5A9A"/>`,
+    party: `<g transform="rotate(12 150 56)"><path d="M118 56 L150 -14 L182 56 Z" fill="#F4C34E"/><g fill="#E0604E"><circle cx="141" cy="40" r="4.5"/><circle cx="161" cy="30" r="4.5"/><circle cx="150" cy="10" r="4"/><circle cx="163" cy="48" r="4.5"/><circle cx="134" cy="52" r="3.5"/></g><circle cx="150" cy="-16" r="10" fill="#E58AA0"/><ellipse cx="150" cy="56" rx="34" ry="6" fill="#E0A800"/></g>`,
+    tophat: `<rect x="116" y="-6" width="68" height="58" rx="6" fill="#2E2A3A"/><rect x="116" y="34" width="68" height="10" fill="#B8485F"/><path d="M126 2 v26" stroke="#FFFFFF" stroke-width="3" opacity="0.22" stroke-linecap="round"/><ellipse cx="150" cy="54" rx="58" ry="10" fill="#211E2A"/>`,
+    crown: `<path d="M110 60 L108 22 L128 40 L140 10 L150 34 L160 10 L172 40 L192 22 L190 60 Z" fill="#F2C230" stroke="#C99400" stroke-width="2" stroke-linejoin="round"/><rect x="110" y="50" width="80" height="10" fill="#E0A800"/><circle cx="150" cy="44" r="5.5" fill="#E0604E"/><circle cx="128" cy="47" r="4" fill="#7FB3D5"/><circle cx="172" cy="47" r="4" fill="#8CCB98"/><g fill="#FFF6D6"><circle cx="140" cy="10" r="3.5"/><circle cx="160" cy="10" r="3.5"/><circle cx="108" cy="22" r="3"/><circle cx="192" cy="22" r="3"/></g>`,
+  }[outfit.hat] || '';
+  const hat = hatArt ? `<g transform="translate(0 ${HAT_SHIFT[breed] || 0})">${hatArt}</g>` : '';
+
+  // Бантик и цветок — поверх шапки.
+  const top = {
+    bow: `<path d="M198 58 L174 42 L176 72 Z" fill="#E58AA0"/><path d="M198 58 L222 42 L220 72 Z" fill="#E58AA0"/><circle cx="198" cy="58" r="8" fill="#C9506E"/>`,
+    flower: `<g transform="translate(98 70)"><g fill="#F2B5C3"><circle cx="0" cy="-10" r="8"/><circle cx="10" cy="-3" r="8"/><circle cx="6" cy="9" r="8"/><circle cx="-6" cy="9" r="8"/><circle cx="-10" cy="-3" r="8"/></g><circle cx="0" cy="0" r="6" fill="#F4C34E"/><ellipse cx="14" cy="14" rx="8" ry="3.5" transform="rotate(35 14 14)" fill="#6BAE5E"/></g>`,
   }[outfit.extra] || '';
 
-  const collarItem = itemById.get(outfit.collar);
-  return { hat, glasses, headExtra, neckExtra, collar: collarItem?.fill || '#e5484d' };
+  const neck = {
+    scarf: `<path d="M100 164 C126 194 174 194 200 164 L206 186 C174 216 126 216 94 186 Z" fill="#E0604E"/><path d="M110 178 L118 198 M130 186 L136 206 M150 188 L152 208 M170 186 L166 206 M190 178 L182 198" stroke="#FFFDF6" stroke-width="4.5" opacity="0.75"/><path d="M164 194 L184 256 L162 262 L152 198 Z" fill="#E86A55"/><path d="M168 256 l2 11 M174 254 l3 11 M180 252 l3 10" stroke="#C94A3A" stroke-width="2.5" stroke-linecap="round"/>`,
+    medal: `<path d="M138 192 L150 224 L162 192" stroke="#4372B8" stroke-width="9" stroke-linejoin="round" fill="none"/><circle cx="150" cy="236" r="15" fill="url(#${u}g)" stroke="#C99400" stroke-width="2.5"/><path transform="translate(150 236)" d="M0 -8 l2.4 5 5.6 .7 -4 3.8 1.1 5.5 -5.1 -2.8 -5.1 2.8 1.1 -5.5 -4 -3.8 5.6 -.7 z" fill="#FFF6D6"/>`,
+  }[outfit.extra] || '';
+
+  return { collar, tag: outfit.extra !== 'medal' && outfit.extra !== 'scarf', neck, glasses, hat, top };
 }

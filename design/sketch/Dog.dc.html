@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Моя школа — двор Бобика</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&amp;family=Caveat:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3B2F2F;text-decoration:none}a:hover{color:#1F1717}
+button{font:inherit;border:0;cursor:pointer;padding:0;color:inherit;background:none;-webkit-tap-highlight-color:transparent}
+.hand{font-family:'Caveat',cursive}
+.card{transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s cubic-bezier(.2,.8,.2,1)}
+.card:hover{transform:rotate(0deg) translateY(-4px) scale(1.03)!important;box-shadow:0 16px 28px rgba(80,55,30,.18),0 2px 4px rgba(80,55,30,.08)!important}
+.card:active{transform:rotate(0deg) scale(.97)!important;transition-duration:.12s}
+.ribbon{transition:height .45s cubic-bezier(.2,1.3,.4,1),transform .3s ease}
+.ribbon:hover{transform:translateY(5px)}
+.soft{transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.soft:hover{transform:translateY(-3px) scale(1.04)}
+.soft:active{transform:scale(.95);transition-duration:.12s}
+.turn{transform-origin:0 50%;animation:turn .8s cubic-bezier(.2,.8,.2,1) both}
+.fade{animation:fadeUp .7s .15s cubic-bezier(.2,.8,.2,1) both}
+.bubble-in{animation:bubbleIn .45s cubic-bezier(.2,1.5,.4,1) both}
+.pop{transform-box:fill-box;transform-origin:50% 100%;animation:popIn .5s cubic-bezier(.2,1.6,.4,1) both}
+.float{animation:floatUp 2.6s ease-in infinite}
+.dog-tail{transform-box:fill-box;transform-origin:0% 100%;animation:wag 1.1s ease-in-out infinite}
+.dog-tail-slow{transform-box:fill-box;transform-origin:0% 100%;animation:wag 3s ease-in-out infinite}
+.dog-body{transform-box:fill-box;transform-origin:50% 100%;animation:breathe 3.6s ease-in-out infinite}
+.dog-body-sleep{transform-box:fill-box;transform-origin:50% 100%;animation:breathe 5s ease-in-out infinite}
+.dog-head{transform-box:fill-box;transform-origin:50% 90%;animation:tilt 7s ease-in-out infinite}
+.dog-eyes{transform-box:fill-box;transform-origin:50% 50%;animation:blink 5s infinite}
+.sparkle{transform-box:fill-box;transform-origin:50% 50%;animation:twinkle 2.4s ease-in-out infinite}
+@keyframes turn{from{opacity:0;transform:perspective(1800px) rotateY(-55deg)}60%{opacity:1}to{opacity:1;transform:perspective(1800px) rotateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes bubbleIn{from{opacity:0;transform:scale(.7) translateY(10px)}to{opacity:1;transform:none}}
+@keyframes popIn{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
+@keyframes floatUp{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(-46px);opacity:0}}
+@keyframes wag{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(9deg)}}
+@keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.012,1.022)}}
+@keyframes tilt{0%,100%{transform:rotate(0)}30%{transform:rotate(-3deg)}60%{transform:rotate(2deg)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.08)}}
+@keyframes twinkle{0%,100%{transform:scale(.6);opacity:.4}50%{transform:scale(1.15);opacity:1}}
+@media (prefers-reduced-motion:reduce){.card,.ribbon,.soft,.turn,.fade,.bubble-in,.pop,.float,.dog-tail,.dog-tail-slow,.dog-body,.dog-body-sleep,.dog-head,.dog-eyes,.sparkle{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+
+<div style="width: 1280px; height: 800px; position: relative; overflow: hidden; background: #E4ECE6; font-family: 'Andika', system-ui, sans-serif; color: #3B2F2F;">
+
+  <svg aria-hidden="true" width="0" height="0" style="position: absolute;">
+    <defs>
+      <filter id="wc" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" seed="4" result="n"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap>
+        <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="9" result="g"></feTurbulence>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.9 0 0 0 0.45" result="ga"></feColorMatrix>
+        <feComposite in="d" in2="ga" operator="in" result="t"></feComposite>
+        <feMorphology in="d" operator="erode" radius="1.6" result="er"></feMorphology>
+        <feComposite in="d" in2="er" operator="out" result="edge"></feComposite>
+        <feColorMatrix in="edge" type="matrix" values="0.72 0 0 0 0  0 0.72 0 0 0  0 0 0.72 0 0  0 0 0 0.55 0" result="ed"></feColorMatrix>
+        <feMerge><feMergeNode in="t"></feMergeNode><feMergeNode in="ed"></feMergeNode></feMerge>
+      </filter>
+      <filter id="wc2" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="3" seed="11" result="n"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="22" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap>
+        <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="2" seed="3" result="g"></feTurbulence>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1 0 0 0 0.35" result="ga"></feColorMatrix>
+        <feComposite in="d" in2="ga" operator="in" result="t"></feComposite>
+        <feMorphology in="d" operator="erode" radius="2" result="er"></feMorphology>
+        <feComposite in="d" in2="er" operator="out" result="edge"></feComposite>
+        <feColorMatrix in="edge" type="matrix" values="0.75 0 0 0 0  0 0.75 0 0 0  0 0 0.75 0 0  0 0 0 0.5 0" result="ed"></feColorMatrix>
+        <feMerge><feMergeNode in="t"></feMergeNode><feMergeNode in="ed"></feMergeNode></feMerge>
+      </filter>
+      <filter id="wcS" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.08" numOctaves="2" seed="6" result="n"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap>
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="2" result="g"></feTurbulence>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.9 0 0 0 0.5" result="ga"></feColorMatrix>
+        <feComposite in="d" in2="ga" operator="in" result="t"></feComposite>
+        <feMorphology in="d" operator="erode" radius="1" result="er"></feMorphology>
+        <feComposite in="d" in2="er" operator="out" result="edge"></feComposite>
+        <feColorMatrix in="edge" type="matrix" values="0.7 0 0 0 0  0 0.7 0 0 0  0 0 0.7 0 0  0 0 0 0.6 0" result="ed"></feColorMatrix>
+        <feMerge><feMergeNode in="t"></feMergeNode><feMergeNode in="ed"></feMergeNode></feMerge>
+      </filter>
+      <filter id="wcDog" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="5" result="n"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap>
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="g"></feTurbulence>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.6 0 0 0 0.65" result="ga"></feColorMatrix>
+        <feComposite in="d" in2="ga" operator="in" result="t"></feComposite>
+        <feMorphology in="d" operator="erode" radius="1.2" result="er"></feMorphology>
+        <feComposite in="d" in2="er" operator="out" result="edge"></feComposite>
+        <feColorMatrix in="edge" type="matrix" values="0.45 0 0 0 0  0 0.4 0 0 0  0 0 0.38 0 0  0 0 0 0.75 0" result="ed"></feColorMatrix>
+        <feMerge><feMergeNode in="t"></feMergeNode><feMergeNode in="ed"></feMergeNode></feMerge>
+      </filter>
+      <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="1" result="n"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+      </filter>
+      <filter id="paper" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="2"></feTurbulence>
+        <feColorMatrix type="matrix" values="0 0 0 0 0.45  0 0 0 0 0.36  0 0 0 0 0.25  0.24 0 0 0 -0.05"></feColorMatrix>
+      </filter>
+      <linearGradient id="gBody" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C4863D"></stop><stop offset="0.3" stop-color="#E2A653"></stop><stop offset="0.62" stop-color="#EBB767"></stop><stop offset="1" stop-color="#BC7E37"></stop></linearGradient>
+      <radialGradient id="gHead" cx="0.42" cy="0.32" r="0.72"><stop offset="0" stop-color="#F4C981"></stop><stop offset="0.55" stop-color="#E2A756"></stop><stop offset="1" stop-color="#C38640"></stop></radialGradient>
+      <linearGradient id="gEar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C8893F"></stop><stop offset="1" stop-color="#9A6128"></stop></linearGradient>
+      <radialGradient id="gMuzzle" cx="0.5" cy="0.35" r="0.7"><stop offset="0" stop-color="#FCEFD6"></stop><stop offset="1" stop-color="#EDCB96"></stop></radialGradient>
+      <radialGradient id="gChest" cx="0.5" cy="0.28" r="0.75"><stop offset="0" stop-color="#FBE9C9"></stop><stop offset="0.65" stop-color="#F0CC8F"></stop><stop offset="1" stop-color="#E7B56A" stop-opacity="0"></stop></radialGradient>
+      <linearGradient id="gLeg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C08139"></stop><stop offset="0.5" stop-color="#E9B466"></stop><stop offset="1" stop-color="#C08139"></stop></linearGradient>
+      <radialGradient id="gPaw" cx="0.5" cy="0.3" r="0.8"><stop offset="0" stop-color="#F8E2B9"></stop><stop offset="1" stop-color="#DDAF6C"></stop></radialGradient>
+      <linearGradient id="gTail" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#B9793A"></stop><stop offset="0.6" stop-color="#E0A453"></stop><stop offset="1" stop-color="#F1C27C"></stop></linearGradient>
+      <radialGradient id="gNose" cx="0.4" cy="0.3" r="0.8"><stop offset="0" stop-color="#5E4840"></stop><stop offset="1" stop-color="#1A1310"></stop></radialGradient>
+      <radialGradient id="gIris" cx="0.5" cy="0.55" r="0.6"><stop offset="0" stop-color="#A06A34"></stop><stop offset="0.65" stop-color="#4E2D11"></stop><stop offset="1" stop-color="#2A1608"></stop></radialGradient>
+      <linearGradient id="gTongue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFA3B2"></stop><stop offset="1" stop-color="#E5677F"></stop></linearGradient>
+      <linearGradient id="gCollar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D9667F"></stop><stop offset="1" stop-color="#A8405A"></stop></linearGradient>
+      <radialGradient id="gTag" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#FFE69A"></stop><stop offset="1" stop-color="#E0A800"></stop></radialGradient>
+    </defs>
+  </svg>
+
+  <svg aria-hidden="true" width="1280" height="800" viewBox="0 0 1280 800" style="position: absolute; left: 0; top: 0;">
+    <ellipse cx="160" cy="80" rx="260" ry="120" fill="#CFE2D8" filter="url(#wc2)"></ellipse>
+    <ellipse cx="1160" cy="760" rx="300" ry="140" fill="#F1DEC4" filter="url(#wc2)"></ellipse>
+    <ellipse cx="1220" cy="60" rx="160" ry="90" fill="#E7D7EC" opacity="0.8" filter="url(#wc2)"></ellipse>
+    <rect width="1280" height="800" filter="url(#paper)"></rect>
+  </svg>
+
+  <!-- Верх стола -->
+  <a href="Storybook.dc.html" class="soft hand" style="position: absolute; left: 44px; top: 14px; height: 48px; padding: 0 18px 0 12px; border-radius: 12px; background: #FFFDF6; display: flex; align-items: center; gap: 8px; font-size: 28px; font-weight: 700; box-shadow: 0 6px 14px rgba(80,55,30,.12); z-index: 3;">
+    <svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#C9623A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11 L12 4 l8.5 7"></path><path d="M6 9.5 V20 h12 V9.5"></path><path d="M10 20 v-5 h4 v5"></path></svg>
+    Домой
+  </a>
+  <a href="Wardrobe.dc.html" class="soft hand" style="position: absolute; left: 200px; top: 14px; height: 48px; padding: 0 20px 0 14px; border-radius: 10px; background: #FFFDF6; display: flex; align-items: center; gap: 8px; font-size: 28px; font-weight: 700; color: #8A2A42; text-decoration: none; box-shadow: 0 6px 14px rgba(80,55,30,.12); z-index: 3;">
+    <span aria-hidden="true" style="position: absolute; left: 50%; top: -9px; margin-left: -28px; width: 56px; height: 18px; background: rgba(217,102,127,0.45); transform: rotate(-3deg);"></span>
+    <svg aria-hidden="true" width="28" height="28" viewBox="0 0 48 48"><g filter="url(#wcS)"><path d="M24 24 L8 13 v22z M24 24 L40 13 v22z" fill="#E58AA0"></path><circle cx="24" cy="24" r="5" fill="#C9506E"></circle></g></svg>
+    Наряды и породы
+  </a>
+  <div style="position: absolute; right: 36px; top: 14px; height: 48px; padding: 0 6px; border-radius: 24px; background: #FFFDF6; display: flex; align-items: center; box-shadow: 0 6px 14px rgba(80,55,30,.12); z-index: 3;">
+    <span style="display: flex; align-items: center; gap: 6px; padding: 0 12px 0 8px; font-size: 21px; font-weight: 700;" aria-label="{{bonesLabel}}">
+      <svg aria-hidden="true" width="32" height="32" viewBox="0 0 36 36"><g fill="#EBD3A8" filter="url(#wcS)"><circle cx="9" cy="13" r="5"></circle><circle cx="9" cy="23" r="5"></circle><circle cx="27" cy="13" r="5"></circle><circle cx="27" cy="23" r="5"></circle><rect x="9" y="13" width="18" height="10"></rect></g></svg>{{bones}}
+    </span>
+  </div>
+
+  <div style="position: absolute; left: 28px; top: 76px; width: 1224px; height: 712px; border-radius: 22px; background: #4A5A8A; box-shadow: 0 26px 50px rgba(50,40,40,.28), inset 0 0 0 3px rgba(255,255,255,.08);"></div>
+
+  <!-- ЛЕВАЯ СТРАНИЦА: двор -->
+  <div style="position: absolute; left: 44px; top: 88px; width: 596px; height: 688px; border-radius: 16px 0 0 16px; background: linear-gradient(90deg, #FBF5E8 0%, #FBF5E8 86%, #EBDFC6 100%); box-shadow: -3px 2px 0 #F1E8D6, -6px 4px 0 #E3D6BC;">
+    <div class="fade" style="position: absolute; inset: 0;">
+      <div style="position: absolute; left: 48px; top: 18px; right: 48px; display: flex; align-items: baseline; justify-content: space-between;">
+        <h1 class="hand" style="margin: 0; font-size: 62px; font-weight: 700; line-height: 1;">Бобик</h1>
+        <span style="font-size: 18px; font-weight: 700; color: #7A6A5C;">лабрадор · 3 года</span>
+      </div>
+
+      <svg role="img" aria-label="{{sceneLabel}}" width="516" height="440" viewBox="0 0 516 440" style="position: absolute; left: 40px; top: 94px;">
+        <defs><filter id="deckleR" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="1" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter><mask id="deckleL" maskUnits="userSpaceOnUse" x="0" y="0" width="516" height="440"><rect x="8" y="8" width="500" height="424" rx="6" fill="#FFFFFF" filter="url(#deckleR)"></rect></mask></defs><g mask="url(#deckleL)">
+          <rect x="0" y="0" width="516" height="440" fill="#D3E6F2" filter="url(#wc2)"></rect>
+          <g fill="#FFFFFF" opacity="0.7" filter="url(#wc)"><ellipse cx="380" cy="60" rx="56" ry="16"></ellipse><ellipse cx="408" cy="50" rx="30" ry="18"></ellipse><ellipse cx="120" cy="90" rx="40" ry="12"></ellipse></g>
+          <g fill="#E8C99A" filter="url(#wcS)">
+            <rect x="0" y="176" width="22" height="90" rx="4"></rect><rect x="34" y="170" width="22" height="96" rx="4"></rect><rect x="68" y="176" width="22" height="90" rx="4"></rect><rect x="102" y="170" width="22" height="96" rx="4"></rect><rect x="136" y="176" width="22" height="90" rx="4"></rect><rect x="170" y="170" width="22" height="96" rx="4"></rect><rect x="204" y="176" width="22" height="90" rx="4"></rect><rect x="238" y="170" width="22" height="96" rx="4"></rect><rect x="272" y="176" width="22" height="90" rx="4"></rect><rect x="306" y="170" width="22" height="96" rx="4"></rect><rect x="340" y="176" width="22" height="90" rx="4"></rect><rect x="374" y="170" width="22" height="96" rx="4"></rect><rect x="408" y="176" width="22" height="90" rx="4"></rect><rect x="442" y="170" width="22" height="96" rx="4"></rect><rect x="476" y="176" width="22" height="90" rx="4"></rect><rect x="510" y="170" width="22" height="96" rx="4"></rect>
+          </g>
+          <g fill="#D9B27E" filter="url(#wcS)"><rect x="0" y="194" width="516" height="10"></rect><rect x="0" y="236" width="516" height="10"></rect></g>
+          <path d="M0 256 C140 242 360 250 516 242 L516 440 L0 440 Z" fill="#9CCB82" filter="url(#wc2)"></path>
+          <path d="M0 330 C160 316 340 330 516 318 L516 440 L0 440 Z" fill="#8BC172" opacity="0.8" filter="url(#wc)"></path>
+
+          <g filter="url(#wcS)">
+            <rect x="38" y="204" width="124" height="104" fill="#C9623A"></rect>
+            <path d="M24 212 L100 140 L176 212 Z" fill="#8A3A22"></path>
+            <path d="M74 308 V262 a26 26 0 0 1 52 0 V308 Z" fill="#4A2E22"></path>
+            <rect x="76" y="222" width="48" height="18" rx="3" fill="#F3E6CF"></rect>
+          </g>
+          <text x="100" y="236" text-anchor="middle" font-family="Caveat, cursive" font-size="17" font-weight="700" fill="#6B3A22">БОБИК</text>
+
+          <sc-if value="{{flags}}" hint-placeholder-val="{{ false }}">
+            <g class="pop">
+              <path d="M30 206 Q100 236 170 206" stroke="#7A6A5C" stroke-width="2" fill="none"></path>
+              <g filter="url(#wcS)"><path d="M44 212 l10 16 6 -14 z" fill="#F4C34E"></path><path d="M70 220 l8 17 8 -15 z" fill="#7FB3D5"></path><path d="M96 223 l6 17 8 -17 z" fill="#E58AA0"></path><path d="M122 220 l6 17 10 -15 z" fill="#8CCB98"></path><path d="M146 213 l4 16 10 -12 z" fill="#C6BCEA"></path></g>
+            </g>
+          </sc-if>
+
+          <sc-if value="{{rug}}" hint-placeholder-val="{{ false }}">
+            <g class="pop"><ellipse cx="318" cy="392" rx="128" ry="26" fill="#C6BCEA" filter="url(#wcS)"></ellipse><ellipse cx="318" cy="392" rx="104" ry="17" fill="none" stroke="#6E5DB8" stroke-width="2.5" stroke-dasharray="4 5"></ellipse></g>
+          </sc-if>
+
+          <sc-if value="{{flowers}}" hint-placeholder-val="{{ true }}">
+            <g filter="url(#wcS)">
+              <circle cx="24" cy="402" r="9" fill="#E58AA0"></circle><circle cx="52" cy="416" r="8" fill="#F4C34E"></circle><circle cx="186" cy="420" r="8" fill="#C6BCEA"></circle><circle cx="482" cy="410" r="9" fill="#E58AA0"></circle><circle cx="500" cy="384" r="7" fill="#F4C34E"></circle>
+            </g>
+          </sc-if>
+
+          <g filter="url(#wcS)"><circle cx="478" cy="318" r="18" fill="#7FB3D5"></circle></g>
+          <path d="M462 312 q16 10 32 0" stroke="#FFFDF6" stroke-width="3" fill="none"></path>
+
+          <sc-if value="{{poop}}" hint-placeholder-val="{{ true }}">
+            <g filter="url(#wcS)"><ellipse cx="200" cy="336" rx="15" ry="7" fill="#8A5A3A"></ellipse><ellipse cx="200" cy="328" rx="11" ry="6" fill="#8A5A3A"></ellipse><ellipse cx="201" cy="321" rx="6" ry="5" fill="#8A5A3A"></ellipse></g>
+            <g stroke="#9C8C7A" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.6"><path d="M190 312 q-3 -6 0 -12"></path><path d="M210 310 q3 -6 0 -12"></path></g>
+          </sc-if>
+
+          <g filter="url(#wcS)">
+            <path d="M190 388 h70 a35 14 0 0 1 -70 0 z" fill="#D9667F"></path>
+            <ellipse cx="225" cy="388" rx="35" ry="8" fill="#B8485F"></ellipse>
+          </g>
+          <sc-if value="{{fed}}" hint-placeholder-val="{{ false }}">
+            <g class="pop" filter="url(#wcS)"><ellipse cx="214" cy="384" rx="9" ry="6" fill="#9A6B48"></ellipse><ellipse cx="230" cy="382" rx="9" ry="6" fill="#B07A50"></ellipse><ellipse cx="244" cy="385" rx="8" ry="5" fill="#9A6B48"></ellipse></g>
+          </sc-if>
+
+          <g transform="translate(208 118) scale(0.7533)">
+            <g filter="url(#wcDog)">
+              <ellipse cx="150" cy="327" rx="108" ry="10" fill="#4A6B3A" opacity="0.25"></ellipse>
+              <g class="{{tailClass}}"><path d="M200 300 C236 300 262 278 266 238 C268 220 262 206 254 200 C256 222 250 250 230 268 C220 278 208 284 196 286 Z" fill="url(#gTail)"></path></g>
+              <ellipse cx="96" cy="282" rx="50" ry="42" fill="url(#gBody)"></ellipse>
+              <ellipse cx="204" cy="282" rx="50" ry="42" fill="url(#gBody)"></ellipse>
+              <ellipse cx="70" cy="316" rx="27" ry="12" fill="url(#gPaw)"></ellipse>
+              <ellipse cx="230" cy="316" rx="27" ry="12" fill="url(#gPaw)"></ellipse>
+              <g class="{{bodyClass}}">
+                <path d="M106 150 C90 190 84 244 94 304 L206 304 C216 244 210 190 194 150 Z" fill="url(#gBody)"></path>
+                <path d="M116 168 C108 204 110 240 120 272 C130 282 140 270 150 282 C160 270 170 282 180 272 C190 240 192 204 184 168 Z" fill="url(#gChest)"></path>
+              </g>
+              <rect x="111" y="222" width="30" height="92" rx="15" fill="url(#gLeg)"></rect>
+              <rect x="159" y="222" width="30" height="92" rx="15" fill="url(#gLeg)"></rect>
+              <ellipse cx="126" cy="314" rx="23" ry="13" fill="url(#gPaw)"></ellipse>
+              <ellipse cx="174" cy="314" rx="23" ry="13" fill="url(#gPaw)"></ellipse>
+              <sc-if value="{{dirty}}" hint-placeholder-val="{{ true }}">
+                <g fill="#7A5236" opacity="0.55"><ellipse cx="88" cy="276" rx="14" ry="9"></ellipse><ellipse cx="200" cy="292" rx="12" ry="8"></ellipse><ellipse cx="128" cy="300" rx="9" ry="6"></ellipse><ellipse cx="176" cy="240" rx="8" ry="6"></ellipse></g>
+              </sc-if>
+              <path d="M108 172 C128 188 172 188 192 172 L194 186 C172 204 128 204 106 186 Z" fill="url(#gCollar)"></path>
+              <circle cx="150" cy="204" r="10" fill="url(#gTag)"></circle>
+              <g class="dog-head">
+                <path d="M150 40 C190 40 216 68 218 104 C220 138 204 164 182 176 C172 182 160 184 150 184 C140 184 128 182 118 176 C96 164 80 138 82 104 C84 68 110 40 150 40 Z" fill="url(#gHead)"></path>
+                <ellipse cx="150" cy="70" rx="28" ry="16" fill="#F7D79C" opacity="0.45"></ellipse>
+                <ellipse cx="150" cy="146" rx="40" ry="30" fill="url(#gMuzzle)"></ellipse>
+                <sc-if value="{{tongue}}" hint-placeholder-val="{{ true }}">
+                  <path d="M139 160 C138 183 162 183 161 160 Z" fill="url(#gTongue)"></path>
+                </sc-if>
+                <path d="M150 146 L150 157 M150 157 C142 166 129 165 122 156 M150 157 C158 166 171 165 178 156" stroke="#6B4A33" stroke-width="3" stroke-linecap="round" fill="none"></path>
+                <path d="M133 128 C133 119 167 119 167 128 C167 139 157 147 150 147 C143 147 133 139 133 128 Z" fill="url(#gNose)"></path>
+                <ellipse cx="143" cy="125" rx="6" ry="2.8" fill="#FFFFFF" opacity="0.5"></ellipse>
+                <sc-if value="{{eyesOpen}}" hint-placeholder-val="{{ true }}">
+                  <g class="dog-eyes">
+                    <ellipse cx="127" cy="104" rx="12.5" ry="13" fill="#3B2412"></ellipse><ellipse cx="127" cy="104.5" rx="10.5" ry="11.5" fill="url(#gIris)"></ellipse><circle cx="127" cy="105" r="5.5" fill="#140A05"></circle><circle cx="131" cy="99.5" r="3.6" fill="#FFFFFF"></circle>
+                    <ellipse cx="173" cy="104" rx="12.5" ry="13" fill="#3B2412"></ellipse><ellipse cx="173" cy="104.5" rx="10.5" ry="11.5" fill="url(#gIris)"></ellipse><circle cx="173" cy="105" r="5.5" fill="#140A05"></circle><circle cx="177" cy="99.5" r="3.6" fill="#FFFFFF"></circle>
+                  </g>
+                </sc-if>
+                <sc-if value="{{eyesHappy}}" hint-placeholder-val="{{ false }}">
+                  <path d="M115 107 Q127 93 139 107" stroke="#3B2412" stroke-width="5.5" stroke-linecap="round" fill="none"></path>
+                  <path d="M161 107 Q173 93 185 107" stroke="#3B2412" stroke-width="5.5" stroke-linecap="round" fill="none"></path>
+                </sc-if>
+                <sc-if value="{{eyesSleep}}" hint-placeholder-val="{{ false }}">
+                  <path d="M115 104 Q127 113 139 104" stroke="#3B2412" stroke-width="5" stroke-linecap="round" fill="none"></path>
+                  <path d="M161 104 Q173 113 185 104" stroke="#3B2412" stroke-width="5" stroke-linecap="round" fill="none"></path>
+                </sc-if>
+                <sc-if value="{{dirty}}" hint-placeholder-val="{{ true }}">
+                  <ellipse cx="186" cy="74" rx="9" ry="6" fill="#7A5236" opacity="0.5"></ellipse>
+                </sc-if>
+                <path d="M106 62 C84 60 62 78 60 110 C58 142 66 170 84 180 C98 188 110 176 111 156 C113 128 116 92 106 62 Z" fill="url(#gEar)"></path>
+                <path d="M194 62 C216 60 238 78 240 110 C242 142 234 170 216 180 C202 188 190 176 189 156 C187 128 184 92 194 62 Z" fill="url(#gEar)"></path>
+                <sc-if value="{{wearBow}}" hint-placeholder-val="{{ false }}">
+                  <g class="pop"><path d="M196 58 L172 42 L174 72 Z" fill="#D9667F"></path><path d="M196 58 L220 42 L218 72 Z" fill="#D9667F"></path><circle cx="196" cy="58" r="8" fill="#B8485F"></circle></g>
+                </sc-if>
+                <sc-if value="{{wearHat}}" hint-placeholder-val="{{ false }}">
+                  <g class="pop"><path d="M108 56 L150 0 L192 56 Z" fill="#6E5DB8"></path><path d="M122 38 L178 38 M115 48 L185 48" stroke="#F4C34E" stroke-width="5"></path><ellipse cx="150" cy="56" rx="54" ry="10" fill="#47388F"></ellipse><circle cx="150" cy="2" r="10" fill="#F4C34E"></circle></g>
+                </sc-if>
+              </g>
+            </g>
+          </g>
+
+          <sc-if value="{{washed}}" hint-placeholder-val="{{ false }}">
+            <g fill="#BFE3F2" stroke="#7FB3D5" stroke-width="1.5" opacity="0.85">
+              <circle class="float" cx="230" cy="250" r="9"></circle><circle class="float" style="animation-delay: .5s;" cx="420" cy="230" r="7"></circle><circle class="float" style="animation-delay: 1s;" cx="300" cy="200" r="6"></circle><circle class="float" style="animation-delay: 1.6s;" cx="380" cy="300" r="10"></circle>
+            </g>
+            <path class="sparkle" d="M440 170 l4 9 9 4 -9 4 -4 9 -4 -9 -9 -4 9 -4 z" fill="#F7D774"></path>
+          </sc-if>
+
+          <sc-if value="{{sleeping}}" hint-placeholder-val="{{ false }}">
+            <rect x="0" y="0" width="516" height="440" fill="#24325E" opacity="0.38"></rect>
+            <path d="M470 34 a28 28 0 1 0 18 48 a22 22 0 0 1 -18 -48 z" fill="#F7E6A6" filter="url(#wcS)"></path>
+            <g fill="#FFF6D6"><circle class="sparkle" cx="60" cy="40" r="3"></circle><circle class="sparkle" style="animation-delay: .7s;" cx="160" cy="70" r="2.5"></circle><circle class="sparkle" style="animation-delay: 1.4s;" cx="300" cy="36" r="3"></circle><circle class="sparkle" style="animation-delay: 2s;" cx="380" cy="96" r="2"></circle></g>
+            <g font-family="Caveat, cursive" font-weight="700" fill="#FFFDF6"><text class="float" x="396" y="150" font-size="34">z</text><text class="float" style="animation-delay: .9s;" x="414" y="128" font-size="26">z</text><text class="float" style="animation-delay: 1.8s;" x="430" y="110" font-size="20">z</text></g>
+          </sc-if>
+        </g>
+      </svg>
+
+      <div class="hand bubble-in" style="position: absolute; left: 44px; top: 108px; max-width: 250px; padding: 10px 18px 12px; background: #FFFDF6; border: 2.5px solid #5A4636; border-radius: 30px 36px 28px 24px / 26px 22px 32px 28px; font-size: 27px; font-weight: 700; line-height: 1.05; text-align: center; box-sizing: border-box; z-index: 2;">
+        {{say}}
+        <svg aria-hidden="true" width="34" height="26" viewBox="0 0 34 26" style="position: absolute; right: 26px; bottom: -22px; transform: scaleX(-1);"><path d="M4 0 C10 10 8 18 2 24 C14 20 22 12 26 0" fill="#FFFDF6" stroke="#5A4636" stroke-width="2.5" stroke-linejoin="round"></path><rect x="3" y="-3" width="25" height="5" fill="#FFFDF6"></rect></svg>
+      </div>
+
+      <div style="position: absolute; left: 48px; right: 48px; top: 552px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 28px; row-gap: 12px;">
+        <sc-for list="{{stats}}" as="st" hint-placeholder-count="4">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+              <span class="hand" style="font-size: 26px; font-weight: 700;">{{st.name}}</span>
+              <span style="font-size: 15px; font-weight: 700; color: #7A6A5C;">{{st.word}}</span>
+            </div>
+            <svg role="img" aria-label="{{st.label}}" width="236" height="22" viewBox="0 0 236 22" style="display: block;">
+              <rect x="4" y="5" height="12" rx="6" fill="{{st.color}}" filter="url(#wcS)" style="{{st.barStyle}}"></rect>
+              <rect x="2" y="3" width="232" height="16" rx="8" fill="none" stroke="#5A4636" stroke-width="1.8" filter="url(#rough)"></rect>
+            </svg>
+          </div>
+        </sc-for>
+      </div>
+      <span class="hand" style="position: absolute; left: 0; right: 0; bottom: 8px; text-align: center; font-size: 20px; color: #A08E7C;">— 12 —</span>
+    </div>
+  </div>
+
+  <!-- ПРАВАЯ СТРАНИЦА: вкладки и дела -->
+  <div style="position: absolute; left: 640px; top: 88px; width: 596px; height: 688px; border-radius: 0 16px 16px 0; background: linear-gradient(90deg, #E8DCC3 0%, #FBF5E8 13%); box-shadow: 3px 2px 0 #F1E8D6, 6px 4px 0 #E3D6BC; z-index: 1;">
+    <div class="turn" style="position: absolute; inset: 0;">
+      <nav aria-label="Разделы" style="position: absolute; left: 48px; top: -18px; display: flex; gap: 12px; align-items: flex-start; filter: drop-shadow(0 4px 3px rgba(50,35,25,.25)); z-index: 4;">
+        <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="5">
+          <button type="button" class="ribbon" onClick="{{tb.pick}}" aria-pressed="{{tb.pressed}}" style="{{tb.style}}">
+            <span aria-hidden="true" style="position: absolute; top: 0; bottom: 16px; left: 7px; right: 7px; border-left: 1.5px dashed rgba(255,255,255,.45); border-right: 1.5px dashed rgba(255,255,255,.45);"></span>
+            <svg aria-hidden="true" width="34" height="34" viewBox="0 0 48 48" style="position: relative;">
+              <sc-if value="{{tb.ic.paw}}" hint-placeholder-val="{{ false }}"><g fill="#FFFDF6"><ellipse cx="24" cy="31" rx="10" ry="8.5"></ellipse><circle cx="12" cy="20" r="4.5"></circle><circle cx="20" cy="13" r="4.5"></circle><circle cx="28" cy="13" r="4.5"></circle><circle cx="36" cy="20" r="4.5"></circle></g></sc-if>
+              <sc-if value="{{tb.ic.ball}}" hint-placeholder-val="{{ false }}"><circle cx="24" cy="24" r="15" fill="#FFFDF6"></circle><path d="M10 20 q14 8 28 0" stroke="#3A8D82" stroke-width="3" fill="none"></path></sc-if>
+              <sc-if value="{{tb.ic.bow}}" hint-placeholder-val="{{ false }}"><path d="M24 24 L8 13 v22z M24 24 L40 13 v22z" fill="#FFFDF6"></path><circle cx="24" cy="24" r="5" fill="#FFFDF6"></circle></sc-if>
+              <sc-if value="{{tb.ic.house}}" hint-placeholder-val="{{ false }}"><path d="M6 24 L24 8 L42 24 Z M11 22 h26 v18 h-26 z" fill="#FFFDF6"></path><path d="M20 40 v-9 a4 4 0 0 1 8 0 v9z" fill="#6E5DB8"></path></sc-if>
+              <sc-if value="{{tb.ic.shop}}" hint-placeholder-val="{{ false }}"><path d="M10 18 h28 l-3 22 h-22 z" fill="#FFFDF6"></path><path d="M17 18 c0 -10 14 -10 14 0" stroke="#FFFDF6" stroke-width="3" fill="none"></path></sc-if>
+            </svg>
+            <span style="position: relative; font-size: 15px; font-weight: 700; margin-top: 2px;">{{tb.name}}</span>
+          </button>
+        </sc-for>
+      </nav>
+
+      <div style="position: absolute; left: 48px; right: 48px; top: 124px;">
+        <div class="hand" style="{{tabTitleStyle}}">{{tabTitle}}</div>
+        <p style="margin: 4px 0 0; font-size: 19px; font-weight: 700; color: #7A6A5C;">{{tabHint}}</p>
+      </div>
+
+      <div style="position: absolute; left: 48px; right: 48px; top: 230px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 188px; column-gap: 22px; row-gap: 22px;">
+        <sc-for list="{{cards}}" as="c" hint-placeholder-count="4">
+          <button type="button" class="card" onClick="{{c.act}}" style="{{c.style}}">
+            <span aria-hidden="true" style="{{c.tapeStyle}}"></span>
+            <span style="position: relative; width: 92px; height: 92px; display: flex; align-items: center; justify-content: center;">
+              <svg aria-hidden="true" width="92" height="92" viewBox="0 0 92 92" style="position: absolute; inset: 0;"><circle cx="46" cy="46" r="40" fill="{{c.blob}}" filter="url(#wcS)"></circle></svg>
+              <svg aria-hidden="true" width="54" height="54" viewBox="0 0 48 48" style="position: relative;">
+                <g filter="url(#wcS)">
+                  <sc-if value="{{c.ic.bowl}}" hint-placeholder-val="{{ false }}"><path d="M6 24 h36 a18 13 0 0 1 -36 0z" fill="#D9667F"></path><ellipse cx="24" cy="24" rx="18" ry="4.5" fill="#8A5A3A"></ellipse></sc-if>
+                  <sc-if value="{{c.ic.bag}}" hint-placeholder-val="{{ false }}"><path d="M12 16 h24 l3 26 h-30z" fill="#7FB3D5"></path><path d="M18 16 c0 -8 12 -8 12 0" stroke="#4A6E8A" stroke-width="3" fill="none"></path></sc-if>
+                  <sc-if value="{{c.ic.soap}}" hint-placeholder-val="{{ false }}"><rect x="8" y="22" width="32" height="18" rx="7" fill="#F2B5C3"></rect><circle cx="15" cy="15" r="5" fill="#BFE3F2"></circle><circle cx="27" cy="10" r="6" fill="#BFE3F2"></circle><circle cx="36" cy="17" r="4" fill="#BFE3F2"></circle></sc-if>
+                  <sc-if value="{{c.ic.moon}}" hint-placeholder-val="{{ false }}"><path d="M28 6 a18 18 0 1 0 14 30 a14 14 0 0 1 -14 -30z" fill="#F4C34E"></path></sc-if>
+                  <sc-if value="{{c.ic.ball}}" hint-placeholder-val="{{ false }}"><circle cx="24" cy="24" r="16" fill="#E0604E"></circle><path d="M9 20 q15 9 30 0" stroke="#FFFDF6" stroke-width="3.5" fill="none"></path></sc-if>
+                  <sc-if value="{{c.ic.paw}}" hint-placeholder-val="{{ false }}"><g fill="#9A6B48"><ellipse cx="24" cy="31" rx="10" ry="8.5"></ellipse><circle cx="12" cy="20" r="4.5"></circle><circle cx="20" cy="13" r="4.5"></circle><circle cx="28" cy="13" r="4.5"></circle><circle cx="36" cy="20" r="4.5"></circle></g></sc-if>
+                  <sc-if value="{{c.ic.tree}}" hint-placeholder-val="{{ false }}"><rect x="21" y="26" width="6" height="18" rx="2" fill="#9A6B48"></rect><circle cx="24" cy="18" r="13" fill="#6FAE6B"></circle><circle cx="14" cy="26" r="8" fill="#7FBF73"></circle><circle cx="34" cy="26" r="8" fill="#7FBF73"></circle></sc-if>
+                  <sc-if value="{{c.ic.star}}" hint-placeholder-val="{{ false }}"><path transform="translate(2 2) scale(1.8)" d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.1l-5.9 3.2 1.3-6.5L2.5 9.3l6.6-.8z" fill="#F4C34E"></path></sc-if>
+                  <sc-if value="{{c.ic.bow}}" hint-placeholder-val="{{ false }}"><path d="M24 24 L8 13 v22z M24 24 L40 13 v22z" fill="#D9667F"></path><circle cx="24" cy="24" r="5" fill="#B8485F"></circle></sc-if>
+                  <sc-if value="{{c.ic.hat}}" hint-placeholder-val="{{ false }}"><path d="M12 34 L24 6 L36 34 Z" fill="#6E5DB8"></path><ellipse cx="24" cy="35" rx="17" ry="5" fill="#47388F"></ellipse><circle cx="24" cy="7" r="4" fill="#F4C34E"></circle></sc-if>
+                  <sc-if value="{{c.ic.none}}" hint-placeholder-val="{{ false }}"><circle cx="24" cy="24" r="14" fill="none" stroke="#A08E7C" stroke-width="3.5"></circle><path d="M14 34 L34 14" stroke="#A08E7C" stroke-width="3.5"></path></sc-if>
+                  <sc-if value="{{c.ic.flower}}" hint-placeholder-val="{{ false }}"><path d="M24 44 V26" stroke="#5E9E52" stroke-width="3"></path><g fill="#E58AA0"><circle cx="24" cy="10" r="6"></circle><circle cx="33" cy="17" r="6"></circle><circle cx="30" cy="27" r="6"></circle><circle cx="18" cy="27" r="6"></circle><circle cx="15" cy="17" r="6"></circle></g><circle cx="24" cy="19" r="5" fill="#F4C34E"></circle></sc-if>
+                  <sc-if value="{{c.ic.flags}}" hint-placeholder-val="{{ false }}"><path d="M4 12 Q24 24 44 12" stroke="#7A6A5C" stroke-width="2" fill="none"></path><path d="M8 14 l4 14 6 -11z" fill="#F4C34E"></path><path d="M19 18 l3 14 6 -13z" fill="#7FB3D5"></path><path d="M30 17 l2 14 7 -13z" fill="#E58AA0"></path></sc-if>
+                  <sc-if value="{{c.ic.rug}}" hint-placeholder-val="{{ false }}"><ellipse cx="24" cy="28" rx="20" ry="11" fill="#C6BCEA"></ellipse><ellipse cx="24" cy="28" rx="13" ry="6" fill="none" stroke="#6E5DB8" stroke-width="2" stroke-dasharray="3 3"></ellipse></sc-if>
+                  <sc-if value="{{c.ic.bottle}}" hint-placeholder-val="{{ false }}"><rect x="15" y="16" width="18" height="28" rx="6" fill="#8CCB98"></rect><rect x="20" y="6" width="8" height="11" rx="2" fill="#3A8D82"></rect></sc-if>
+                </g>
+              </svg>
+            </span>
+            <span style="font-size: 21px; font-weight: 700; line-height: 1.15; text-align: center;">{{c.title}}</span>
+            <span style="{{c.subStyle}}">{{c.sub}}</span>
+          </button>
+        </sc-for>
+      </div>
+      <span class="hand" style="position: absolute; left: 0; right: 0; bottom: 8px; text-align: center; font-size: 20px; color: #A08E7C;">— 13 —</span>
+    </div>
+  </div>
+
+  <div aria-hidden="true" style="position: absolute; left: 606px; top: 88px; width: 68px; height: 688px; background: linear-gradient(90deg, rgba(120,90,50,0) 0%, rgba(120,90,50,.16) 46%, rgba(90,65,35,.3) 50%, rgba(120,90,50,.16) 54%, rgba(120,90,50,0) 100%); pointer-events: none; z-index: 2;"></div>
+  <svg aria-hidden="true" width="1192" height="688" viewBox="0 0 1192 688" style="position: absolute; left: 44px; top: 88px; pointer-events: none; z-index: 2; mix-blend-mode: multiply;"><rect width="1192" height="688" filter="url(#paper)"></rect></svg>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      tab: 'care', full: 35, mood: 70, clean: 45, energy: 30,
+      food: 2, bags: 1, shampoo: 1, bones: 3,
+      poop: true, dirty: true, fed: false, sleeping: false, washed: false, happy: false,
+      outfit: 'none', flowers: true, flags: false, rug: false,
+      say: 'Привет! Я немножко проголодался…'
+    };
+  }
+
+  renderVals() {
+    var self = this;
+    var s = this.state;
+    function cap(v) { return Math.max(0, Math.min(100, v)); }
+    function set(patch) { self.setState(patch); }
+    var ICONS = ['paw', 'ball', 'bow', 'house', 'shop', 'bowl', 'bag', 'soap', 'moon', 'tree', 'star', 'hat', 'none', 'flower', 'flags', 'rug', 'bottle'];
+    function ic(name) { var o = {}; ICONS.forEach(function (k) { o[k] = k === name; }); return o; }
+
+    var TABS = [
+      { id: 'care', name: 'Уход', icon: 'paw', color: '#C9623A', blob: '#F2C4A8', tape: 'rgba(224,122,79,.45)', title: 'Уход', ink: '#8C3A1C' },
+      { id: 'play', name: 'Игры', icon: 'ball', color: '#3A8D82', blob: '#BFE3DA', tape: 'rgba(79,165,154,.45)', title: 'Поиграем?', ink: '#1F5D55' },
+      { id: 'outfit', name: 'Наряды', icon: 'bow', color: '#B8485F', blob: '#F3C6D0', tape: 'rgba(217,102,127,.45)', title: 'Наряды', ink: '#8A2A42' },
+      { id: 'home', name: 'Дом', icon: 'house', color: '#6E5DB8', blob: '#D9D1F2', tape: 'rgba(140,123,209,.45)', title: 'Двор и будка', ink: '#47388F' },
+      { id: 'shop', name: 'Лавка', icon: 'shop', color: '#4372B8', blob: '#C7D8F1', tape: 'rgba(91,143,214,.45)', title: 'Лавка', ink: '#234C8A' }
+    ];
+    var cur = TABS[0];
+    TABS.forEach(function (t) { if (t.id === s.tab) cur = t; });
+
+    var tabs = TABS.map(function (t) {
+      var on = t.id === cur.id;
+      return {
+        name: t.name, ic: ic(t.icon), pressed: on ? 'true' : 'false',
+        pick: function () { set({ tab: t.id }); },
+        style: 'position: relative; width: 86px; height: ' + (on ? 124 : 96) + 'px; background: linear-gradient(90deg, rgba(0,0,0,.10), rgba(255,255,255,.06) 30%, rgba(255,255,255,0) 70%, rgba(0,0,0,.10)), ' + t.color + '; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 86%, 0 100%); display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 22px; box-sizing: border-box; color: #FFFFFF;'
+      };
+    });
+
+    var tired = s.energy < 20;
+    var items = [];
+    if (cur.id === 'care') {
+      items = [
+        { title: 'Покормить', icon: 'bowl', sub: 'Корма: ' + s.food, act: function () {
+            if (s.sleeping) return set({ say: 'Тсс… Бобик спит' });
+            if (s.food < 1) return set({ say: 'Корм закончился — загляни в лавку!' });
+            set({ food: s.food - 1, full: 100, mood: cap(s.mood + 10), fed: true, happy: true, say: 'Ням-ням! Вкусно!' });
+          } },
+        { title: 'Убрать', icon: 'bag', sub: 'Пакетиков: ' + s.bags, act: function () {
+            if (!s.poop) return set({ say: 'Во дворе и так чисто!' });
+            if (s.bags < 1) return set({ say: 'Пакетики закончились — загляни в лавку' });
+            set({ bags: s.bags - 1, poop: false, mood: cap(s.mood + 5), say: 'Чистый двор! Спасибо!' });
+          } },
+        { title: 'Помыть', icon: 'soap', sub: 'Шампуня: ' + s.shampoo, act: function () {
+            if (s.sleeping) return set({ say: 'Тсс… Бобик спит' });
+            if (s.shampoo < 1) return set({ say: 'Шампунь закончился — загляни в лавку' });
+            set({ shampoo: s.shampoo - 1, clean: 100, dirty: false, washed: true, happy: true, say: 'Я блестящий!' });
+          } },
+        { title: s.sleeping ? 'Разбудить' : 'Уложить спать', icon: 'moon', sub: s.sleeping ? 'Доброе утро!' : 'Силы вернутся', act: function () {
+            if (s.sleeping) return set({ sleeping: false, happy: true, say: 'Я выспался! Гав!' });
+            set({ sleeping: true, energy: 100, washed: false, happy: false, say: 'Хр-р… Спокойной ночи' });
+          } }
+      ];
+    } else if (cur.id === 'play') {
+      var play = function (line) {
+        return function () {
+          if (s.sleeping) return set({ say: 'Тсс… Бобик спит' });
+          if (s.energy < 20) return set({ say: 'Я устал… Давай поспим' });
+          set({ energy: cap(s.energy - 25), mood: cap(s.mood + 15), happy: true, say: line });
+        };
+      };
+      items = [
+        { title: 'Принеси мяч', icon: 'ball', sub: 'Настроение +15', act: play('Побежали за мячом!') },
+        { title: 'Прятки', icon: 'paw', sub: 'Настроение +15', act: play('Раз, два, три… Ищу!') },
+        { title: 'Прогулка', icon: 'tree', sub: 'Настроение +15', act: play('Ура, гулять!') },
+        { title: 'Фокусы', icon: 'star', sub: 'Настроение +15', act: play('Смотри: дай лапу!') }
+      ];
+    } else if (cur.id === 'outfit') {
+      var wear = function (o, line) { return function () { set({ outfit: o, happy: true, say: line }); }; };
+      items = [
+        { title: 'Бантик', icon: 'bow', sub: s.outfit === 'bow' ? 'Надето' : 'Надеть', on: s.outfit === 'bow', act: wear('bow', 'Красиво!') },
+        { title: 'Колпак', icon: 'hat', sub: s.outfit === 'hat' ? 'Надето' : 'Надеть', on: s.outfit === 'hat', act: wear('hat', 'Я волшебник!') },
+        { title: 'Без наряда', icon: 'none', sub: s.outfit === 'none' ? 'Сейчас так' : 'Снять', on: s.outfit === 'none', act: wear('none', 'Так тоже хорошо') }
+      ];
+    } else if (cur.id === 'home') {
+      var tog = function (k, onLine, offLine) { return function () { var p = {}; p[k] = !s[k]; p.say = s[k] ? offLine : onLine; p.happy = true; set(p); }; };
+      items = [
+        { title: 'Цветы', icon: 'flower', sub: s.flowers ? 'Растут во дворе' : 'Посадить', on: s.flowers, act: tog('flowers', 'Как пахнет!', 'Цветы убрали') },
+        { title: 'Флажки', icon: 'flags', sub: s.flags ? 'Висят на будке' : 'Повесить', on: s.flags, act: tog('flags', 'Праздник!', 'Флажки сняли') },
+        { title: 'Коврик', icon: 'rug', sub: s.rug ? 'Лежит' : 'Постелить', on: s.rug, act: tog('rug', 'Мягко!', 'Коврик убрали') }
+      ];
+    } else {
+      var buy = function (key, add, price, line) {
+        return function () {
+          if (s.bones < price) return set({ say: 'Нужно больше косточек' });
+          var p = { bones: s.bones - price, say: line }; p[key] = s[key] + add; set(p);
+        };
+      };
+      items = [
+        { title: 'Корм', icon: 'bowl', sub: '3 банки · 1 косточка', act: buy('food', 3, 1, 'Ура, еда!') },
+        { title: 'Пакетики', icon: 'bag', sub: '3 штуки · 1 косточка', act: buy('bags', 3, 1, 'Будет чисто!') },
+        { title: 'Шампунь', icon: 'bottle', sub: '2 флакона · 2 косточки', act: buy('shampoo', 2, 2, 'Пахнет цветами!') }
+      ];
+    }
+
+    var rot = [-1.2, 1.1, 0.9, -1, 1.3];
+    var tr = [3, -4, 5, -3, 2];
+    var cards = items.map(function (it, k) {
+      return {
+        title: it.title, sub: it.sub, ic: ic(it.icon), blob: cur.blob, act: it.act,
+        style: 'position: relative; border-radius: 6px; background: ' + (it.on ? '#FFF8E6' : '#FFFDF6') + '; box-shadow: 0 6px 14px rgba(80,55,30,.12), 0 1px 2px rgba(80,55,30,.1)' + (it.on ? ', inset 0 0 0 3px ' + cur.color : '') + '; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 12px; transform: rotate(' + rot[k] + 'deg);',
+        tapeStyle: 'position: absolute; left: 50%; top: -9px; margin-left: -32px; width: 64px; height: 18px; background: ' + cur.tape + '; transform: rotate(' + tr[k] + 'deg);',
+        subStyle: 'font-size: 16px; font-weight: 700; color: ' + (it.on ? cur.ink : '#7A6A5C') + ';'
+      };
+    });
+
+    function word(v) { return v >= 80 ? 'отлично' : (v >= 50 ? 'хорошо' : (v >= 25 ? 'маловато' : 'очень мало')); }
+    var stats = [
+      { name: 'Сытость', v: s.full, color: '#E59A5E' },
+      { name: 'Настроение', v: s.mood, color: '#E58AA0' },
+      { name: 'Чистота', v: s.clean, color: '#7FB3D5' },
+      { name: 'Силы', v: s.energy, color: '#8CCB98' }
+    ].map(function (x) {
+      return {
+        name: x.name, color: x.color, word: word(x.v), label: x.name + ': ' + x.v + ' из 100',
+        barStyle: 'width: ' + Math.max(12, Math.round(228 * x.v / 100)) + 'px; transition: width .7s cubic-bezier(.2,.8,.2,1);'
+      };
+    });
+
+    var hint;
+    if (cur.id === 'care') {
+      if (s.full < 50) hint = 'Бобик проголодался';
+      else if (s.poop) hint = 'Во дворе надо прибраться';
+      else if (s.clean < 50) hint = 'Бобик испачкался';
+      else if (s.energy < 50) hint = 'Бобик устал';
+      else hint = 'Бобику хорошо!';
+    } else if (cur.id === 'play') hint = tired ? 'Бобик устал — сначала поспим' : 'Игры поднимают настроение';
+    else if (cur.id === 'outfit') hint = 'Нажми, чтобы примерить';
+    else if (cur.id === 'home') hint = 'Укрась двор для Бобика';
+    else hint = 'Покупаем за косточки';
+
+    return {
+      tabs: tabs, cards: cards, stats: stats,
+      tabTitle: cur.title, tabHint: hint,
+      tabTitleStyle: 'font-size: 60px; font-weight: 700; line-height: 0.95; color: #3B2F2F;',
+      bones: s.bones, bonesLabel: 'Косточки: ' + s.bones,
+      say: s.say,
+      poop: s.poop, fed: s.fed, dirty: s.dirty, washed: s.washed && !s.sleeping, sleeping: s.sleeping,
+      flowers: s.flowers, flags: s.flags, rug: s.rug,
+      wearBow: s.outfit === 'bow', wearHat: s.outfit === 'hat',
+      eyesSleep: s.sleeping, eyesHappy: !s.sleeping && s.happy, eyesOpen: !s.sleeping && !s.happy,
+      tongue: !s.sleeping,
+      tailClass: s.sleeping ? 'dog-tail-slow' : 'dog-tail',
+      bodyClass: s.sleeping ? 'dog-body-sleep' : 'dog-body',
+      sceneLabel: 'Двор Бобика' + (s.sleeping ? ': Бобик спит' : '')
+    };
+  }
+}
+</script>
+</body>
+</html>

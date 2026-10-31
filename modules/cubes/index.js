@@ -25,7 +25,7 @@ const INPUT_FROM_LEVEL = 1; // с этого уровня счёта ответ 
 const CLEAN_TO_LEVEL_UP = 3; // верных подряд до повышения уровня
 const WRONG_BEFORE_POINTING = 2; // после стольких ошибок верный вариант подсвечивается
 const NS = 'http://www.w3.org/2000/svg';
-const COLORS = { top: '#bfdbfe', left: '#60a5fa', right: '#2563eb', line: '#1e3a8a' };
+const COLORS = { top: '#cfe6f2', left: '#7fb3d5', right: '#4372b8', line: '#2f4a7a' }; // акварельные синие тона книги
 
 // ---------- Случайные числа и постройки ----------
 function rngOf(seed) {

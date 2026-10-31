@@ -3,6 +3,7 @@
   "title": "Сложение до 10",
   "subject": "math",
   "icon": "➕",
+  "glyph": "+10",
   "description": "Считаем и складываем",
   "version": "1.0.0",
   "styles": [

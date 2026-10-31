@@ -4,7 +4,7 @@
 import { h, button, format } from '../dom.js';
 import { STR } from '../strings.js';
 import { drawDog } from '../dogs.js';
-import { itemById } from '../dog-items.js';
+import { drawDecor } from '../dog-art.js';
 
 const S = STR.dog.sleep;
 const SLEEP_MS = 5000;
@@ -14,7 +14,7 @@ export function createSleepGame({ app, store, dog, alive, wait, exit }) {
   const bedId = store.decor().bed;
   const art = drawDog({ ...store.dogs().find((d) => d.id === dog.id) });
   const wrap = h('div', { class: 'dog-wrap sleep-dog' }, art);
-  const bed = h('div', { class: 'sleep-bed', text: bedId ? itemById.get(bedId).icon : '🧺' });
+  const bed = h('div', { class: 'sleep-bed' }, drawDecor(bedId || 'cushion'));
   const zzz = h('div', { class: 'sleep-zzz', hidden: true }, h('span', { text: 'Z' }), h('span', { text: 'z' }), h('span', { text: 'z' }));
   const sky = h('div', { class: 'sleep-sky' }, h('span', { class: 'sleep-moon', text: '🌙' }),
     ...[8, 22, 38, 60, 78, 90].map((x, i) => {

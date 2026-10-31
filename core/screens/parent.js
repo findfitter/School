@@ -5,11 +5,13 @@ import { STR } from '../strings.js';
 import * as storage from '../storage.js';
 import { moduleIcon } from '../registry.js';
 import { buildReport, reportFileName, hasData } from '../report.js';
+import { createSheet } from './book.js';
 
 const P = STR.parent;
 
 export function renderParent(app) {
-  const screen = h('div', { class: 'screen parent-screen' });
+  // Для родителя — та же бумага, но строже и мельче: одна страница с прокруткой внутри (createSheet).
+  const screen = createSheet({ className: 'parent-screen service-sheet' }).el;
   const status = h('p', { class: 'status', 'aria-live': 'polite' });
 
   const body = h('main', { class: 'scroll content parent-body' },

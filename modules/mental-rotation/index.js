@@ -16,7 +16,7 @@ const LEVELS = [
 ];
 const CLEAN_TO_LEVEL_UP = 3; // верных подряд до повышения уровня
 const WRONG_BEFORE_POINTING = 2; // после стольких ошибок верный вариант подсвечивается
-const COLORS = ['#4f8cff', '#ef6f8f', '#3fb06a', '#f59e0b', '#8e6bd8'];
+const COLORS = ['#c9623a', '#3a8d82', '#b8485f', '#6e5db8', '#4372b8']; // цвета разделов книги
 const NS = 'http://www.w3.org/2000/svg';
 
 // ---------- Случайные числа и фигуры ----------
@@ -159,11 +159,11 @@ function shapeSvg(cells, N, color, className) {
   svg.setAttribute('class', className);
   svg.setAttribute('aria-hidden', 'true');
   const frame = document.createElementNS(NS, 'rect');
-  for (const [name, value] of Object.entries({ x: -0.15, y: -0.15, width: N + 0.3, height: N + 0.3, rx: 0.25, fill: '#ffffff', stroke: '#c9d1ee', 'stroke-width': 0.06 })) frame.setAttribute(name, value);
+  for (const [name, value] of Object.entries({ x: -0.15, y: -0.15, width: N + 0.3, height: N + 0.3, rx: 0.25, fill: '#fffdf6', stroke: '#eadfcb', 'stroke-width': 0.06 })) frame.setAttribute(name, value);
   svg.append(frame);
   for (const [r, c] of cells) {
     const rect = document.createElementNS(NS, 'rect');
-    for (const [name, value] of Object.entries({ x: c + 0.04, y: r + 0.04, width: 0.92, height: 0.92, rx: 0.14, fill: color, stroke: 'rgba(0,0,0,0.18)', 'stroke-width': 0.04 })) rect.setAttribute(name, value);
+    for (const [name, value] of Object.entries({ x: c + 0.04, y: r + 0.04, width: 0.92, height: 0.92, rx: 0.14, fill: color, stroke: 'rgba(80,55,30,0.28)', 'stroke-width': 0.04 })) rect.setAttribute(name, value);
     svg.append(rect);
   }
   return svg;

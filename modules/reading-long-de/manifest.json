@@ -3,6 +3,7 @@
   "title": "Lange Sätze",
   "subject": "german",
   "icon": "📜",
+  "glyph": "Satz",
   "description": "Sätze aus sechs Wörtern",
   "version": "1.0.0",
   "styles": ["style.css"],

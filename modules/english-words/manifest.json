@@ -3,6 +3,8 @@
   "title": "Hello! Знакомство",
   "subject": "english",
   "icon": "👋",
+  "glyph": "Hi!",
+  "series": false,
   "description": "Слушаем и запоминаем английские слова",
   "version": "1.0.0",
   "voice": true,

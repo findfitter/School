@@ -78,6 +78,29 @@ function spokenText(task) {
   return { text: `${TEXT.walkIntro}: ${commands}. ${TEXT.walkAsk}`, key: `walk3-${task.steps.join('').toLowerCase()}` };
 }
 
+// Рисунки: пчёлка и стрелки команд — плоская акварель вместо эмодзи (фильтр wcS общий, core/art/filters.js).
+const SVG_NS = 'xmlns="http://www.w3.org/2000/svg"';
+function svg(markup, className) {
+  const doc = new DOMParser().parseFromString(markup, 'image/svg+xml');
+  const node = document.importNode(doc.documentElement, true);
+  if (className) node.setAttribute('class', className);
+  return node;
+}
+
+const beeSvg = () => svg(`<svg ${SVG_NS} viewBox="0 0 100 100" aria-hidden="true"><g filter="url(#wcS)">
+  <ellipse cx="38" cy="34" rx="15" ry="22" transform="rotate(-28 38 34)" fill="#CFE6F2"/>
+  <ellipse cx="62" cy="30" rx="15" ry="22" transform="rotate(24 62 30)" fill="#E3F0F8"/>
+  <path d="M16 62 L26 56 L26 68 Z" fill="#8A5A2A"/>
+  <ellipse cx="50" cy="62" rx="30" ry="23" fill="#F4C34E"/>
+  <ellipse cx="42" cy="62" rx="5.5" ry="21" fill="#8A5A2A"/><ellipse cx="58" cy="62" rx="5.5" ry="21" fill="#8A5A2A"/>
+  <circle cx="80" cy="56" r="13" fill="#F4C34E"/>
+  <circle cx="84" cy="52" r="3" fill="#3B2412"/>
+  <path d="M82 44 q4 -10 10 -12 M76 44 q0 -10 4 -14" stroke="#8A5A2A" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+</g></svg>`, 'lr-bee');
+
+// Стрелка команды (направо); поворот — классом d-L, d-U, d-D в style.css.
+const arrowSvg = (dir) => svg(`<svg ${SVG_NS} viewBox="0 0 48 48" aria-hidden="true"><path d="M6 19 H26 V9 L43 24 L26 39 V29 H6 Z" fill="#C9623A" stroke="#C9623A" stroke-width="2" stroke-linejoin="round"/></svg>`, `lr-arrow d-${dir}`);
+
 function el(tag, className, text) {
   const node = document.createElement(tag);
   if (className) node.className = className;
@@ -158,12 +181,18 @@ export function start(ctx) {
       stage.classList.remove('show-sides');
       stage.replaceChildren();
 
-      const commandEls = task.steps.map((s) => el('span', 'lr-cmd', TEXT.arrows[s]));
+      const commandEls = task.steps.map((s) => {
+        const cmd = el('span', 'lr-cmd');
+        cmd.append(arrowSvg(s));
+        cmd.setAttribute('aria-label', TEXT.go[s]);
+        return cmd;
+      });
       const commands = el('div', 'lr-commands');
       commands.append(...commandEls);
       const grid = el('div', 'lr-grid');
       for (let i = 0; i < GRID * GRID; i++) {
-        const cell = el('button', 'lr-cell', i === task.start ? BEE : '');
+        const cell = el('button', 'lr-cell');
+        if (i === task.start) cell.append(beeSvg());
         cell.type = 'button';
         onTap(cell, () => choose(i, cell));
         grid.append(cell);

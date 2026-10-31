@@ -15,6 +15,7 @@ const add = (kind, where, text) => problems.push(`[${kind}] ${where}: ${text}`);
 function walk(dir, out = []) {
   for (const name of readdirSync(dir)) {
     if (name === '.git' || name === 'node_modules') continue;
+    if (dir === ROOT && name === 'design') continue; // эскизы дизайна — справочник, не часть приложения
     const p = join(dir, name);
     statSync(p).isDirectory() ? walk(p, out) : out.push(p);
   }
@@ -112,6 +113,7 @@ for (const id of registry) {
   const m = JSON.parse(read(`${dir}/manifest.json`));
   if (m.id !== id) add('МАНИФЕСТ', id, `id «${m.id}» не совпадает с папкой`);
   for (const k of ['title', 'subject', 'icon', 'description', 'version']) if (!m[k]) add('МАНИФЕСТ', id, `нет поля ${k}`);
+  if (m.glyph !== undefined && (typeof m.glyph !== 'string' || !m.glyph.trim() || [...m.glyph].length > 6)) add('МАНИФЕСТ', id, 'glyph — короткий знак (1–6 символов)');
   if (!m.challenge && !knownSubjects.includes(m.subject)) add('МАНИФЕСТ', id, `неизвестный раздел ${m.subject}`);
   if (m.challenge) for (const subject of Object.keys(m.challenge.subjects || {})) if (!knownSubjects.includes(subject)) add('МАНИФЕСТ', id, `сложное задание: неизвестный раздел ${subject}`);
   if (!existsSync(`${dir}/index.js`)) add('МАНИФЕСТ', id, 'нет index.js');

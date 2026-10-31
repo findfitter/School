@@ -3,6 +3,7 @@
   "title": "Собери предложение",
   "subject": "russian",
   "icon": "🧩",
+  "glyph": "1·2·3",
   "description": "Составь предложение из слов",
   "version": "1.0.0",
   "styles": ["style.css"],

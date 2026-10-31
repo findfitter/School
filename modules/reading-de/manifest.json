@@ -3,6 +3,7 @@
   "title": "Wörter lesen",
   "subject": "german",
   "icon": "📚",
+  "glyph": "Ww",
   "description": "Finde das Wort zum Bild",
   "version": "1.0.0",
   "styles": ["style.css"],

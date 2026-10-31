@@ -42,6 +42,12 @@ export function syncChallenges(app) {
   return granted;
 }
 
+// Дорожка к следующему сложному заданию: сколько звёзд набрано из 25 и сколько осталось (главный экран).
+export function challengeProgress() {
+  const have = storage.stars() % STARS_PER_CHALLENGE;
+  return { have, need: STARS_PER_CHALLENGE, left: STARS_PER_CHALLENGE - have };
+}
+
 export const isPending = (subject) => Boolean(storage.challenges().pending[subject]);
 
 // Что передать модулю: раздел, зерно (чтобы после выхода из задания текст остался тем же) и уже пройденные тексты.

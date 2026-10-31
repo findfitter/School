@@ -3,6 +3,7 @@
   "title": "Задачи",
   "subject": "math",
   "icon": "📝",
+  "glyph": "2+?",
   "description": "Прочитай и реши",
   "version": "1.0.0",
   "styles": [

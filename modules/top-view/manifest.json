@@ -3,6 +3,7 @@
   "title": "Вид сверху",
   "subject": "orientation",
   "icon": "🛰️",
+  "glyph": "◎",
   "description": "Как предмет выглядит сверху?",
   "version": "0.2.0",
   "styles": ["style.css"],

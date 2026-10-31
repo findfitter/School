@@ -3,6 +3,7 @@
   "title": "Сравни числа",
   "subject": "math",
   "icon": "⚖️",
+  "glyph": "5>3",
   "description": "Больше, меньше или равно",
   "version": "1.0.0",
   "styles": [

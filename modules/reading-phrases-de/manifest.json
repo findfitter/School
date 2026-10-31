@@ -3,6 +3,7 @@
   "title": "Zwei Wörter lesen",
   "subject": "german",
   "icon": "🎨",
+  "glyph": "Ww Zz",
   "description": "Welche Farbe? Wer ist das?",
   "version": "1.0.0",
   "styles": ["style.css"],

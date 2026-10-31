@@ -1,0 +1,344 @@
+/* Экран «Наклейки» в стиле «сказочной книжки» (design/sketch/Stickers.dc.html). Разметку задаёт core/screens/stickers.js,
+   закладки и заголовок страницы общие с экраном собаки (.dog-tabs, .dog-tab-*, dog-book.css). Размеры — в «пикселях
+   эскиза» (--u). Отклик на касание — :active и .pressed, без :hover. */
+
+/* ---------- Наклейка и набросок ---------- */
+.st-emoji,
+.scene-item {
+  display: inline-block;
+  line-height: 1;
+}
+
+/* Купленная наклейка: акварель, белая кайма, мягкая тень (фильтр stk, core/art/filters.js) */
+.st-emoji.owned,
+.scene-item.owned {
+  filter: url(#stk);
+}
+
+/* Ещё не купленная: карандашный набросок того же эмодзи (фильтр pencil), без пунктирных кружков */
+.st-emoji.sketch,
+.scene-item.sketch {
+  filter: url(#pencil);
+}
+
+.st-emoji.pop {
+  animation: st-bounce 0.8s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+
+@keyframes st-bounce {
+  0% { opacity: 0; transform: scale(0.2) rotate(-25deg); }
+  60% { opacity: 1; transform: scale(1.3) rotate(6deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+.st-sparks {
+  position: absolute;
+  left: -30%;
+  top: -30%;
+  width: 160%;
+  height: 160%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* ---------- Левая страница: мир супер-наклеек ---------- */
+.st-left,
+.st-side {
+  position: absolute;
+  inset: 0;
+}
+
+.st-counters {
+  display: contents;
+}
+
+.st-scene {
+  position: absolute;
+  left: calc(var(--u) * 40);
+  top: calc(var(--u) * 84);
+  width: calc(var(--u) * 516);
+  height: calc(var(--u) * 360);
+  container-type: inline-size;
+}
+
+/* Небо и холм — акварельные пятна: фильтр wc2 даёт неровные края и зерно бумаги */
+.scene-paint {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  filter: url(#wc2);
+}
+
+.scene-sky {
+  position: absolute;
+  inset: 0;
+}
+
+.scene-hill {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: -26%;
+  height: 50%;
+  border-radius: 50%;
+}
+
+.scene-item {
+  position: absolute;
+  translate: -50% -50%;
+}
+
+.st-world-row {
+  position: absolute;
+  left: calc(var(--u) * 40);
+  right: calc(var(--u) * 40);
+  top: calc(var(--u) * 456);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.st-caption {
+  flex: 1;
+  margin: 0;
+  text-align: center;
+  font-size: max(20px, calc(var(--u) * 30));
+  line-height: 1.1;
+}
+
+.st-extras {
+  position: absolute;
+  left: calc(var(--u) * 48);
+  right: calc(var(--u) * 48);
+  top: calc(var(--u) * 560);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: calc(var(--u) * 36);
+}
+
+.st-arrow {
+  flex: none;
+  width: max(64px, calc(var(--u) * 64));
+  height: max(64px, calc(var(--u) * 64));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: max(34px, calc(var(--u) * 40));
+  line-height: 1;
+  color: var(--book-ink);
+  --rot: 0deg;
+}
+
+.st-arrow:disabled {
+  opacity: 0.3;
+}
+
+/* ---------- Правая страница ---------- */
+.st-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.st-head-row .dog-tab-title {
+  min-width: 0;
+  overflow: hidden;
+  font-size: calc(var(--u) * 36);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.st-nav {
+  flex: none;
+  display: flex;
+  gap: 8px;
+}
+
+.st-say {
+  font-family: var(--font-hand);
+  font-size: max(17px, calc(var(--u) * 24));
+  font-weight: 700;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.st-say.yay { color: var(--book-done); }
+.st-say.miss { color: #9a4a2a; }
+
+.st-album-name {
+  position: absolute;
+  left: calc(var(--u) * 48);
+  right: calc(var(--u) * 48);
+  top: calc(var(--u) * 214);
+  margin: 0;
+  font-size: max(13px, calc(var(--u) * 16));
+  color: var(--book-ink-soft);
+}
+
+.st-grid {
+  position: absolute;
+  left: calc(var(--u) * 40);
+  right: calc(var(--u) * 40);
+  display: grid;
+  padding: calc(var(--u) * 14) calc(var(--u) * 8) 0;
+  gap: calc(var(--u) * 10);
+}
+
+/* Страница альбома: клеточки с наклейками; число столбцов --cols (6 для альбома на 24, иначе 4) задаёт stickers.js */
+.st-album {
+  --cols: 6;
+  top: calc(var(--u) * 206);
+  bottom: calc(var(--u) * 30);
+  grid-template-columns: repeat(var(--cols, 6), minmax(0, 1fr));
+  align-content: start;
+}
+
+.st-slot {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(255, 253, 246, 0.7);
+  box-shadow: inset 0 0 0 1.5px #eadfcb;
+  font-size: calc(var(--u) * 240 / var(--cols, 6));
+}
+
+/* Лавка: три карточки в ряд, четыре ряда */
+.st-shop {
+  top: calc(var(--u) * 224);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(4, minmax(0, calc(var(--u) * 76)));
+  gap: calc(var(--u) * 12) calc(var(--u) * 14);
+}
+
+.st-card {
+  min-height: 64px;
+  padding: 0 calc(var(--u) * 10);
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 8);
+  --s-tape: rgba(244, 195, 78, 0.55);
+}
+
+.st-card.owned {
+  background: #f7f2e6;
+  --stamp-gap: #f7f2e6;
+}
+
+.st-card.selected {
+  box-shadow: var(--book-shadow), 0 0 0 3px #4372b8;
+}
+
+.st-card-pic {
+  position: relative;
+  flex: none;
+  width: calc(var(--u) * 62);
+  display: flex;
+  justify-content: center;
+  font-size: calc(var(--u) * 44);
+}
+
+.st-price {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px 2px 7px;
+  border-radius: 12px;
+  background: #fff1c9;
+  color: #6b4a00;
+  font-size: max(15px, calc(var(--u) * 18));
+  font-weight: 700;
+}
+
+.st-card.far .st-price {
+  background: #f1eae0;
+  color: #8a7a6a;
+}
+
+.st-price-star {
+  width: max(16px, calc(var(--u) * 18));
+  height: max(16px, calc(var(--u) * 18));
+}
+
+.st-stamp {
+  --stamp-size: max(50px, calc(var(--u) * 56));
+  position: absolute;
+  right: calc(var(--u) * 4);
+  top: 50%;
+  margin-top: calc(var(--stamp-size) / -2);
+  font-size: max(14px, calc(var(--u) * 17));
+}
+
+.st-buy {
+  position: absolute;
+  left: calc(var(--u) * 48);
+  right: calc(var(--u) * 48);
+  bottom: calc(var(--u) * 16);
+  min-height: max(68px, calc(var(--u) * 72));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.st-buy-pic {
+  font-size: calc(var(--u) * 52);
+}
+
+.st-side .btn.primary {
+  background: #c9623a;
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(201, 98, 58, 0.3);
+}
+
+/* ---------- Поздравления (супер-наклейка, покупка собаки): бумажная карточка на скотче ---------- */
+.overlay.super-popup {
+  background: radial-gradient(circle, rgba(255, 246, 218, 0.94), rgba(199, 214, 236, 0.9));
+}
+
+.super-card {
+  padding: 28px 36px 24px;
+  border-radius: 8px;
+  background: var(--book-card);
+  box-shadow: 0 18px 40px rgba(80, 55, 30, 0.22), 0 2px 4px rgba(80, 55, 30, 0.1);
+  transform: rotate(-0.8deg);
+}
+
+.super-card::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -14px;
+  width: 96px;
+  height: 28px;
+  margin-left: -48px;
+  background: rgba(244, 195, 78, 0.6);
+  transform: rotate(3deg);
+}
+
+.super-card h2 {
+  font-family: var(--font-hand);
+  font-size: 2.1em;
+  line-height: 1;
+}
+
+.super-card .btn.primary {
+  background: #c9623a;
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(201, 98, 58, 0.3);
+}
+
+.super-card .super-flyer {
+  filter: url(#stk);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st-emoji.pop {
+    animation: none;
+  }
+}

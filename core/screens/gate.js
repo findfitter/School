@@ -4,6 +4,7 @@
 
 import { h, button, format } from '../dom.js';
 import { STR } from '../strings.js';
+import { createSheet } from './book.js';
 
 const G = STR.gate;
 const MAX_WRONG = 3; // столько ошибок подряд — и пауза
@@ -101,8 +102,10 @@ export function renderGate(app, { onPass, onCancel }) {
   };
   document.addEventListener('keydown', onKey);
 
-  const screen = h('div', { class: 'screen gate-screen' },
-    h('h1', { text: G.title }),
+  // Одна бумажная страница книги (createSheet), как у экрана задания.
+  const screen = createSheet({ className: 'gate-screen service-sheet' }).el;
+  screen.append(
+    h('h1', { class: 'hand', text: G.title }),
     messageEl,
     questionEl,
     answerEl,

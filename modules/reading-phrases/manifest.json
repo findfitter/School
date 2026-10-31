@@ -3,6 +3,7 @@
   "title": "Читаем два слова",
   "subject": "russian",
   "icon": "🎨",
+  "glyph": "Аа Бб",
   "description": "Какого цвета и кто это?",
   "version": "1.0.0",
   "styles": [

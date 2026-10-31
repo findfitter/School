@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Моя школа — наклейки</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&amp;family=Caveat:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3B2F2F;text-decoration:none}a:hover{color:#1F1717}
+button{font:inherit;border:0;cursor:pointer;padding:0;color:inherit;background:none;-webkit-tap-highlight-color:transparent}
+.hand{font-family:'Caveat',cursive}
+.card{transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s cubic-bezier(.2,.8,.2,1)}
+.card:hover{transform:rotate(0deg) translateY(-4px) scale(1.04)!important;box-shadow:0 16px 28px rgba(80,55,30,.18),0 2px 4px rgba(80,55,30,.08)!important}
+.card:active{transform:rotate(0deg) scale(.96)!important;transition-duration:.12s}
+.soft{transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.soft:hover{transform:translateY(-3px) scale(1.04)}
+.turn{transform-origin:0 50%;animation:turn .8s cubic-bezier(.2,.8,.2,1) both}
+.fade{animation:fadeUp .7s .15s cubic-bezier(.2,.8,.2,1) both}
+.pop{transform-box:fill-box;transform-origin:50% 50%;animation:popIn .7s cubic-bezier(.2,1.6,.4,1) both}
+.stamp{animation:stamp .45s cubic-bezier(.2,1.6,.4,1) both}
+.sparkle{transform-box:fill-box;transform-origin:50% 50%;animation:twinkle 2.4s ease-in-out infinite}
+.say-in{animation:fadeUp .45s cubic-bezier(.2,.8,.2,1) both}
+.drift{animation:drift 7s ease-in-out infinite}
+@keyframes turn{from{opacity:0;transform:perspective(1800px) rotateY(-55deg)}60%{opacity:1}to{opacity:1;transform:perspective(1800px) rotateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes popIn{0%{opacity:0;transform:scale(.2) rotate(-25deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes stamp{from{opacity:0;transform:scale(1.9) rotate(-28deg)}to{opacity:.9;transform:scale(1) rotate(-12deg)}}
+@keyframes twinkle{0%,100%{transform:scale(.6);opacity:.4}50%{transform:scale(1.15);opacity:1}}
+@keyframes drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@media (prefers-reduced-motion:reduce){.card,.soft,.turn,.fade,.pop,.stamp,.sparkle,.say-in,.drift{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+
+<div style="width: 1280px; height: 800px; position: relative; overflow: hidden; background: #E4ECE6; font-family: 'Andika', system-ui, sans-serif; color: #3B2F2F;">
+
+  <svg aria-hidden="true" width="0" height="0" style="position: absolute;">
+    <defs>
+      <filter id="wc" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" seed="4" result="n"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap>
+        <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="9" result="g"></feTurbulence>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.9 0 0 0 0.45" result="ga"></feColorMatrix>
+        <feComposite in="d" in2="ga" operator="in" result="t"></feComposite>
+        <feMorphology in="d" operator="erode" radius="1.6" result="er"></feMorphology>
+        <feComposite in="d" in2="er" operator="out" result="edge"></feComposite>
+        <feColorMatrix in="edge" type="matrix" values="0.72 0 0 0 0  0 0.72 0 0 0  0 0 0.72 0 0  0 0 0 0.55 0" result="ed"></feColorMatrix>
+        <feMerge><feMergeNode in="t"></feMergeNode><feMergeNode in="ed"></feMergeNode></feMerge>
+      </filter>
+      <filter id="wc2" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="3" seed="11" result="n"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="22" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap>
+        <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="2" seed="3" result="g"></feTurbulence>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1 0 0 0 0.35" result="ga"></feColorMatrix>
+        <feComposite in="d" in2="ga" operator="in" result="t"></feComposite>
+        <feMorphology in="d" operator="erode" radius="2" result="er"></feMorphology>
+        <feComposite in="d" in2="er" operator="out" result="edge"></feComposite>
+        <feColorMatrix in="edge" type="matrix" values="0.75 0 0 0 0  0 0.75 0 0 0  0 0 0.75 0 0  0 0 0 0.5 0" result="ed"></feColorMatrix>
+        <feMerge><feMergeNode in="t"></feMergeNode><feMergeNode in="ed"></feMergeNode></feMerge>
+      </filter>
+      <filter id="wcS" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.08" numOctaves="2" seed="6" result="n"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap>
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="2" result="g"></feTurbulence>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.9 0 0 0 0.5" result="ga"></feColorMatrix>
+        <feComposite in="d" in2="ga" operator="in" result="t"></feComposite>
+        <feMorphology in="d" operator="erode" radius="1" result="er"></feMorphology>
+        <feComposite in="d" in2="er" operator="out" result="edge"></feComposite>
+        <feColorMatrix in="edge" type="matrix" values="0.7 0 0 0 0  0 0.7 0 0 0  0 0 0.7 0 0  0 0 0 0.6 0" result="ed"></feColorMatrix>
+        <feMerge><feMergeNode in="t"></feMergeNode><feMergeNode in="ed"></feMergeNode></feMerge>
+      </filter>
+      <!-- Наклейка: акварель + белая вырубка + тень -->
+      <filter id="stk" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" seed="6" result="n"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap>
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="2" result="g"></feTurbulence>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.7 0 0 0 0.6" result="ga"></feColorMatrix>
+        <feComposite in="d" in2="ga" operator="in" result="t"></feComposite>
+        <feMorphology in="SourceAlpha" operator="dilate" radius="3.5" result="dil"></feMorphology>
+        <feFlood flood-color="#FFFDF8" result="white"></feFlood>
+        <feComposite in="white" in2="dil" operator="in" result="border"></feComposite>
+        <feGaussianBlur in="dil" stdDeviation="2.5" result="bl"></feGaussianBlur>
+        <feOffset in="bl" dy="3" result="off"></feOffset>
+        <feFlood flood-color="#5A4636" flood-opacity="0.3" result="sc"></feFlood>
+        <feComposite in="sc" in2="off" operator="in" result="shadow"></feComposite>
+        <feMerge><feMergeNode in="shadow"></feMergeNode><feMergeNode in="border"></feMergeNode><feMergeNode in="t"></feMergeNode></feMerge>
+      </filter>
+      <!-- Ещё не наклеено: карандашный набросок -->
+      <filter id="pencil" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+        <feMorphology in="SourceAlpha" operator="dilate" radius="1.3" result="dil"></feMorphology>
+        <feComposite in="dil" in2="SourceAlpha" operator="out" result="ring"></feComposite>
+        <feTurbulence type="fractalNoise" baseFrequency="0.12" numOctaves="2" seed="8" result="n"></feTurbulence>
+        <feDisplacementMap in="ring" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G" result="wob"></feDisplacementMap>
+        <feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="1" seed="4" result="g"></feTurbulence>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  1.6 0 0 0 -0.2" result="ga"></feColorMatrix>
+        <feComposite in="wob" in2="ga" operator="in" result="grainy"></feComposite>
+        <feFlood flood-color="#8C7B68" flood-opacity="0.85" result="lead"></feFlood>
+        <feComposite in="lead" in2="grainy" operator="in" result="line"></feComposite>
+        <feFlood flood-color="#E9DFCC" flood-opacity="0.35" result="tint"></feFlood>
+        <feComposite in="tint" in2="SourceAlpha" operator="in" result="fill"></feComposite>
+        <feMerge><feMergeNode in="fill"></feMergeNode><feMergeNode in="line"></feMergeNode></feMerge>
+      </filter>
+      <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="1" result="n"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+      </filter>
+      <filter id="stampInk" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="12" result="g"></feTurbulence>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  2.2 0 0 0 -0.55" result="ga"></feColorMatrix>
+        <feComposite in="SourceGraphic" in2="ga" operator="in"></feComposite>
+      </filter>
+      <filter id="paper" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="2"></feTurbulence>
+        <feColorMatrix type="matrix" values="0 0 0 0 0.45  0 0 0 0 0.36  0 0 0 0 0.25  0.24 0 0 0 -0.05"></feColorMatrix>
+      </filter>
+
+      <!-- 12 наклеек -->
+      <symbol id="s-rainbow" viewBox="0 0 80 80"><path d="M6 64 a34 34 0 0 1 68 0" stroke="#E0604E" stroke-width="7" fill="none"></path><path d="M13 64 a27 27 0 0 1 54 0" stroke="#F4C34E" stroke-width="7" fill="none"></path><path d="M20 64 a20 20 0 0 1 40 0" stroke="#8CCB98" stroke-width="7" fill="none"></path><path d="M27 64 a13 13 0 0 1 26 0" stroke="#7FB3D5" stroke-width="7" fill="none"></path><g fill="#DDEAF3"><circle cx="8" cy="66" r="7"></circle><circle cx="17" cy="68" r="6"></circle><circle cx="72" cy="66" r="7"></circle><circle cx="63" cy="68" r="6"></circle></g></symbol>
+      <symbol id="s-castle" viewBox="0 0 80 80"><rect x="18" y="34" width="44" height="40" fill="#C6BCEA"></rect><rect x="8" y="22" width="16" height="52" fill="#AFA2DF"></rect><rect x="56" y="22" width="16" height="52" fill="#AFA2DF"></rect><path d="M6 24 L16 6 L26 24z M54 24 L64 6 L74 24z" fill="#D9667F"></path><path d="M34 74 v-14 a6 6 0 0 1 12 0 v14z" fill="#6E5DB8"></path><path d="M40 34 V16 l12 5 -12 5" fill="#F4C34E" stroke="#7A6A5C" stroke-width="1.5"></path></symbol>
+      <symbol id="s-tree" viewBox="0 0 80 80"><rect x="35" y="44" width="10" height="32" rx="3" fill="#9A6B48"></rect><circle cx="40" cy="28" r="20" fill="#6FAE6B"></circle><circle cx="25" cy="40" r="14" fill="#7FBF73"></circle><circle cx="55" cy="40" r="14" fill="#7FBF73"></circle><circle cx="32" cy="24" r="3" fill="#E0604E"></circle><circle cx="50" cy="34" r="3" fill="#E0604E"></circle></symbol>
+      <symbol id="s-flower" viewBox="0 0 80 80"><path d="M40 78 V40" stroke="#5E9E52" stroke-width="4"></path><ellipse cx="50" cy="60" rx="9" ry="4" transform="rotate(-30 50 60)" fill="#6BAE5E"></ellipse><g fill="#F2B5C3"><circle cx="40" cy="16" r="10"></circle><circle cx="54" cy="27" r="10"></circle><circle cx="49" cy="43" r="10"></circle><circle cx="31" cy="43" r="10"></circle><circle cx="26" cy="27" r="10"></circle></g><circle cx="40" cy="31" r="8" fill="#F4C34E"></circle></symbol>
+      <symbol id="s-butterfly" viewBox="0 0 80 80"><ellipse cx="25" cy="30" rx="16" ry="18" fill="#E58AA0"></ellipse><ellipse cx="55" cy="30" rx="16" ry="18" fill="#E58AA0"></ellipse><ellipse cx="28" cy="54" rx="11" ry="12" fill="#F2B5C3"></ellipse><ellipse cx="52" cy="54" rx="11" ry="12" fill="#F2B5C3"></ellipse><rect x="37" y="20" width="6" height="44" rx="3" fill="#5A4636"></rect><path d="M38 20 q-6 -12 -12 -14 M42 20 q6 -12 12 -14" stroke="#5A4636" stroke-width="2" fill="none"></path></symbol>
+      <symbol id="s-mushroom" viewBox="0 0 80 80"><rect x="30" y="38" width="20" height="36" rx="8" fill="#F3E6CF"></rect><path d="M8 42 a32 26 0 0 1 64 0z" fill="#E0604E"></path><g fill="#FFF6E8"><circle cx="26" cy="28" r="5"></circle><circle cx="46" cy="22" r="6"></circle><circle cx="58" cy="34" r="4"></circle></g></symbol>
+      <symbol id="s-house" viewBox="0 0 80 80"><rect x="16" y="36" width="48" height="38" fill="#F2D3A0"></rect><path d="M8 38 L40 10 L72 38z" fill="#C9623A"></path><rect x="34" y="52" width="13" height="22" fill="#9A6B48"></rect><rect x="21" y="44" width="10" height="10" fill="#AFC8EC"></rect><rect x="51" y="44" width="10" height="10" fill="#AFC8EC"></rect><rect x="54" y="14" width="8" height="14" fill="#9A6B48"></rect></symbol>
+      <symbol id="s-bird" viewBox="0 0 80 80"><ellipse cx="36" cy="44" rx="24" ry="17" fill="#7FB3D5"></ellipse><circle cx="58" cy="32" r="11" fill="#7FB3D5"></circle><path d="M67 31 l10 4 -10 4z" fill="#F4C34E"></path><path d="M24 42 q10 -20 22 -4z" fill="#4372B8"></path><circle cx="61" cy="29" r="2.5" fill="#2A1E16"></circle><path d="M12 44 l-8 -6 2 12z" fill="#4372B8"></path></symbol>
+      <symbol id="s-fish" viewBox="0 0 80 80"><ellipse cx="34" cy="40" rx="25" ry="15" fill="#F4A65E"></ellipse><path d="M56 40 l18 -14 v28z" fill="#F4A65E"></path><path d="M30 26 q8 -10 16 0" fill="#E0804A"></path><circle cx="20" cy="36" r="3.5" fill="#2A1E16"></circle><path d="M34 32 v16 M42 30 v20" stroke="#E0804A" stroke-width="2"></path></symbol>
+      <symbol id="s-balloon" viewBox="0 0 80 80"><ellipse cx="40" cy="28" rx="21" ry="25" fill="#D9667F"></ellipse><ellipse cx="32" cy="18" rx="5" ry="8" fill="#F2B5C3"></ellipse><path d="M40 53 l-5 6 h10z" fill="#B8485F"></path><path d="M40 59 q-8 9 0 19" stroke="#7A6A5C" stroke-width="2" fill="none"></path></symbol>
+      <symbol id="s-rabbit" viewBox="0 0 80 80"><ellipse cx="40" cy="58" rx="20" ry="17" fill="#EFE5D6"></ellipse><circle cx="40" cy="34" r="13" fill="#EFE5D6"></circle><ellipse cx="33" cy="13" rx="5.5" ry="14" fill="#EFE5D6"></ellipse><ellipse cx="47" cy="13" rx="5.5" ry="14" fill="#EFE5D6"></ellipse><ellipse cx="33" cy="14" rx="2.5" ry="9" fill="#F2B5C3"></ellipse><ellipse cx="47" cy="14" rx="2.5" ry="9" fill="#F2B5C3"></ellipse><circle cx="35" cy="32" r="2.2" fill="#2A1E16"></circle><circle cx="45" cy="32" r="2.2" fill="#2A1E16"></circle><circle cx="40" cy="38" r="2" fill="#E58AA0"></circle><circle cx="58" cy="62" r="5" fill="#FFFDF6"></circle></symbol>
+      <symbol id="s-boat" viewBox="0 0 80 80"><path d="M8 54 h64 l-12 16 h-40z" fill="#C9623A"></path><path d="M40 8 v46" stroke="#7A6A5C" stroke-width="3"></path><path d="M43 10 l24 38 h-24z" fill="#F3E6CF"></path><path d="M37 16 l-20 32 h20z" fill="#7FB3D5"></path><path d="M40 8 l10 4 -10 4z" fill="#E0604E"></path></symbol>
+    </defs>
+  </svg>
+
+  <svg aria-hidden="true" width="1280" height="800" viewBox="0 0 1280 800" style="position: absolute; left: 0; top: 0;">
+    <ellipse cx="160" cy="80" rx="260" ry="120" fill="#CFE2D8" filter="url(#wc2)"></ellipse>
+    <ellipse cx="1160" cy="760" rx="300" ry="140" fill="#F1DEC4" filter="url(#wc2)"></ellipse>
+    <ellipse cx="1220" cy="60" rx="160" ry="90" fill="#E7D7EC" opacity="0.8" filter="url(#wc2)"></ellipse>
+    <rect width="1280" height="800" filter="url(#paper)"></rect>
+  </svg>
+
+  <a href="Storybook.dc.html" class="soft hand" style="position: absolute; left: 44px; top: 14px; height: 48px; padding: 0 18px 0 12px; border-radius: 12px; background: #FFFDF6; display: flex; align-items: center; gap: 8px; font-size: 28px; font-weight: 700; box-shadow: 0 6px 14px rgba(80,55,30,.12); z-index: 3;">
+    <svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#C9623A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11 L12 4 l8.5 7"></path><path d="M6 9.5 V20 h12 V9.5"></path><path d="M10 20 v-5 h4 v5"></path></svg>
+    Домой
+  </a>
+  <div style="position: absolute; right: 36px; top: 14px; height: 48px; padding: 0 18px 0 10px; border-radius: 24px; background: #FFFDF6; display: flex; align-items: center; gap: 6px; font-size: 21px; font-weight: 700; box-shadow: 0 6px 14px rgba(80,55,30,.12); z-index: 3;" aria-label="{{starsLabel}}">
+    <svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.1l-5.9 3.2 1.3-6.5L2.5 9.3l6.6-.8z" fill="#F4C34E" filter="url(#wcS)"></path></svg>{{stars}}
+  </div>
+
+  <div style="position: absolute; left: 28px; top: 76px; width: 1224px; height: 712px; border-radius: 22px; background: #4A5A8A; box-shadow: 0 26px 50px rgba(50,40,40,.28), inset 0 0 0 3px rgba(255,255,255,.08);"></div>
+
+  <!-- ЛЕВАЯ СТРАНИЦА: сказка -->
+  <div style="position: absolute; left: 44px; top: 88px; width: 596px; height: 688px; border-radius: 16px 0 0 16px; background: linear-gradient(90deg, #FBF5E8 0%, #FBF5E8 86%, #EBDFC6 100%); box-shadow: -3px 2px 0 #F1E8D6, -6px 4px 0 #E3D6BC;">
+    <div class="fade" style="position: absolute; inset: 0;">
+      <div style="position: absolute; left: 48px; top: 18px; right: 48px; display: flex; align-items: baseline; justify-content: space-between;">
+        <h1 class="hand" style="margin: 0; font-size: 62px; font-weight: 700; line-height: 1;">Моя сказка</h1>
+        <span style="font-size: 18px; font-weight: 700; color: #7A6A5C;">{{countLabel}}</span>
+      </div>
+
+      <svg role="img" aria-label="{{sceneLabel}}" width="516" height="470" viewBox="0 0 516 470" style="position: absolute; left: 40px; top: 94px;">
+        <defs><filter id="deckleR" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="1" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter><mask id="deckleL" maskUnits="userSpaceOnUse" x="0" y="0" width="516" height="470"><rect x="8" y="8" width="500" height="454" rx="6" fill="#FFFFFF" filter="url(#deckleR)"></rect></mask></defs><g mask="url(#deckleL)">
+          <rect x="0" y="0" width="516" height="470" fill="#D6E8F2" filter="url(#wc2)"></rect>
+          <g class="drift" fill="#FFFFFF" opacity="0.7" filter="url(#wc)"><ellipse cx="150" cy="40" rx="50" ry="14"></ellipse><ellipse cx="174" cy="30" rx="28" ry="16"></ellipse></g>
+          <path d="M0 250 C100 210 200 222 280 244 C360 266 440 214 516 226 L516 470 L0 470 Z" fill="#B9D99A" opacity="0.9" filter="url(#wc2)"></path>
+          <path d="M0 330 C120 300 260 318 360 340 C430 356 480 344 516 336 L516 470 L0 470 Z" fill="#8FC27A" opacity="0.9" filter="url(#wc)"></path>
+          <path d="M150 470 C170 420 200 370 240 330" stroke="#D7B07A" stroke-width="22" stroke-linecap="round" fill="none" opacity="0.6" filter="url(#wcS)"></path>
+          <ellipse cx="410" cy="434" rx="110" ry="34" fill="#9CC7E0" opacity="0.9" filter="url(#wc)"></ellipse>
+          <sc-for list="{{slots}}" as="sl" hint-placeholder-count="12">
+            <use href="#{{sl.sym}}" x="{{sl.x}}" y="{{sl.y}}" width="{{sl.size}}" height="{{sl.size}}" filter="{{sl.filter}}" class="{{sl.cls}}" opacity="{{sl.opacity}}"></use>
+          </sc-for>
+          <sc-if value="{{hasNew}}" hint-placeholder-val="{{ false }}">
+            <g transform="{{sparkA}}"><path class="sparkle" d="M0 -12 l4 8 8 4 -8 4 -4 8 -4 -8 -8 -4 8 -4 z" fill="#F7D774"></path></g>
+            <g transform="{{sparkB}}"><path class="sparkle" style="animation-delay: .6s;" d="M0 -9 l3 6 6 3 -6 3 -3 6 -3 -6 -6 -3 6 -3 z" fill="#F7D774"></path></g>
+          </sc-if>
+        </g>
+      </svg>
+
+      <p class="hand" style="position: absolute; left: 48px; right: 48px; top: 582px; margin: 0; font-size: 30px; font-weight: 700; line-height: 1.1; text-align: center;">{{caption}}</p>
+      <span class="hand" style="position: absolute; left: 0; right: 0; bottom: 8px; text-align: center; font-size: 20px; color: #A08E7C;">— 20 —</span>
+    </div>
+  </div>
+
+  <!-- ПРАВАЯ СТРАНИЦА: лавка -->
+  <div style="position: absolute; left: 640px; top: 88px; width: 596px; height: 688px; border-radius: 0 16px 16px 0; background: linear-gradient(90deg, #E8DCC3 0%, #FBF5E8 13%); box-shadow: 3px 2px 0 #F1E8D6, 6px 4px 0 #E3D6BC; z-index: 1;">
+    <div class="turn" style="position: absolute; inset: 0;">
+      <div style="position: absolute; left: 48px; right: 48px; top: 26px;">
+        <h2 class="hand" style="margin: 0; font-size: 60px; font-weight: 700; line-height: 1;">Лавка наклеек</h2>
+        <p style="margin: 6px 0 0; font-size: 18px; font-weight: 700; color: #7A6A5C;">Наклейки покупаются за звёзды из заданий</p>
+      </div>
+      <p class="hand say-in" style="{{sayStyle}}">{{say}}</p>
+
+      <div style="position: absolute; left: 48px; right: 48px; top: 186px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 104px; column-gap: 14px; row-gap: 12px;">
+        <sc-for list="{{shop}}" as="it" hint-placeholder-count="12">
+          <button type="button" class="card" onClick="{{it.buy}}" aria-label="{{it.label}}" style="{{it.style}}">
+            <svg aria-hidden="true" width="58" height="58" viewBox="0 0 58 58" style="flex-shrink: 0; overflow: visible;"><use href="#{{it.sym}}" x="3" y="3" width="52" height="52" filter="url(#stk)"></use></svg>
+            <span style="display: flex; flex-direction: column; gap: 5px; align-items: flex-start; min-width: 0;">
+              <span style="font-size: 16px; font-weight: 700; line-height: 1.1;">{{it.name}}</span>
+              <sc-if value="{{it.forSale}}" hint-placeholder-val="{{ true }}">
+                <span style="{{it.priceStyle}}">
+                  <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.1l-5.9 3.2 1.3-6.5L2.5 9.3l6.6-.8z" fill="{{it.starFill}}"></path></svg>{{it.price}}
+                </span>
+              </sc-if>
+            </span>
+            <sc-if value="{{it.owned}}" hint-placeholder-val="{{ false }}">
+              <span class="stamp hand" style="position: absolute; right: 4px; top: 6px; width: 54px; height: 54px; border-radius: 27px; border: 2.5px solid #2F7D4F; box-shadow: inset 0 0 0 2px #FFFDF6, inset 0 0 0 4px #2F7D4F; color: #2F7D4F; display: flex; align-items: center; justify-content: center; font-size: 19px; font-weight: 700; filter: url(#stampInk);">Есть!</span>
+            </sc-if>
+          </button>
+        </sc-for>
+      </div>
+      <span class="hand" style="position: absolute; left: 0; right: 0; bottom: 8px; text-align: center; font-size: 20px; color: #A08E7C;">— 21 —</span>
+    </div>
+  </div>
+
+  <div aria-hidden="true" style="position: absolute; left: 606px; top: 88px; width: 68px; height: 688px; background: linear-gradient(90deg, rgba(120,90,50,0) 0%, rgba(120,90,50,.16) 46%, rgba(90,65,35,.3) 50%, rgba(120,90,50,.16) 54%, rgba(120,90,50,0) 100%); pointer-events: none; z-index: 2;"></div>
+  <svg aria-hidden="true" width="1192" height="688" viewBox="0 0 1192 688" style="position: absolute; left: 44px; top: 88px; pointer-events: none; z-index: 2; mix-blend-mode: multiply;"><rect width="1192" height="688" filter="url(#paper)"></rect></svg>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      stars: 12,
+      owned: { rainbow: true, tree: true, flower: true, mushroom: true, house: true },
+      last: null,
+      say: 'Выбери наклейку — она появится в сказке!',
+      mood: 'idle'
+    };
+  }
+
+  renderVals() {
+    var self = this;
+    var s = this.state;
+    var ITEMS = [
+      { id: 'rainbow', name: 'Радуга', price: 4, x: 290, y: 22, size: 140 },
+      { id: 'castle', name: 'Замок', price: 6, x: 384, y: 132, size: 112 },
+      { id: 'balloon', name: 'Шарик', price: 4, x: 40, y: 26, size: 88 },
+      { id: 'bird', name: 'Птичка', price: 4, x: 196, y: 66, size: 66 },
+      { id: 'tree', name: 'Дерево', price: 3, x: 12, y: 166, size: 134 },
+      { id: 'house', name: 'Домик', price: 5, x: 158, y: 190, size: 112 },
+      { id: 'butterfly', name: 'Бабочка', price: 3, x: 298, y: 226, size: 64 },
+      { id: 'rabbit', name: 'Зайчик', price: 5, x: 226, y: 318, size: 94 },
+      { id: 'mushroom', name: 'Грибок', price: 3, x: 386, y: 300, size: 80 },
+      { id: 'flower', name: 'Цветок', price: 2, x: 66, y: 330, size: 80 },
+      { id: 'boat', name: 'Кораблик', price: 5, x: 318, y: 372, size: 82 },
+      { id: 'fish', name: 'Рыбка', price: 3, x: 430, y: 398, size: 58 }
+    ];
+
+    var ownedCount = 0;
+    ITEMS.forEach(function (it) { if (s.owned[it.id]) ownedCount++; });
+
+    var slots = ITEMS.map(function (it) {
+      var have = !!s.owned[it.id];
+      return {
+        sym: 's-' + it.id, x: it.x, y: it.y, size: it.size,
+        filter: have ? 'url(#stk)' : 'url(#pencil)',
+        cls: s.last === it.id ? 'pop' : '',
+        opacity: have ? 1 : 0.9
+      };
+    });
+
+    var rot = [-1.5, 1.2, -0.8, 1.4, -1.1, 0.9];
+    var shop = ITEMS.map(function (it, k) {
+      var have = !!s.owned[it.id];
+      var can = s.stars >= it.price;
+      return {
+        sym: 's-' + it.id, name: it.name, price: it.price, owned: have, forSale: !have,
+        label: have ? it.name + ': уже есть' : it.name + ': ' + it.price + ' звёзд',
+        starFill: can ? '#F4C34E' : '#D8C9AE',
+        priceStyle: 'display: flex; align-items: center; gap: 4px; padding: 2px 10px 2px 7px; border-radius: 12px; font-size: 16px; font-weight: 700; ' + (can ? 'background: #FFF1C9; color: #6B4A00;' : 'background: #F1EAE0; color: #8A7A6A;'),
+        style: 'position: relative; border-radius: 6px; background: ' + (have ? '#F7F2E6' : '#FFFDF6') + '; box-shadow: 0 6px 14px rgba(80,55,30,.12), 0 1px 2px rgba(80,55,30,.1); display: flex; align-items: center; gap: 8px; padding: 0 10px; text-align: left; transform: rotate(' + rot[k % rot.length] + 'deg);',
+        buy: function () {
+          if (have) return self.setState({ say: it.name + ' уже живёт в сказке', mood: 'idle' });
+          if (!can) return self.setState({ say: 'Не хватает звёзд — реши ещё пару заданий!', mood: 'miss' });
+          var owned = {}; for (var key in s.owned) owned[key] = s.owned[key];
+          owned[it.id] = true;
+          self.setState({ owned: owned, stars: s.stars - it.price, last: it.id, say: 'Ура! ' + it.name + ' теперь в сказке!', mood: 'yay' });
+        }
+      };
+    });
+
+    var lastItem = null;
+    ITEMS.forEach(function (it) { if (it.id === s.last) lastItem = it; });
+    var left = ITEMS.length - ownedCount;
+
+    return {
+      slots: slots, shop: shop,
+      stars: s.stars, starsLabel: 'Звёзды: ' + s.stars,
+      countLabel: ownedCount + ' из ' + ITEMS.length + ' наклеек',
+      sceneLabel: 'Сказочная поляна: наклеено ' + ownedCount + ' из ' + ITEMS.length,
+      caption: left ? 'Каждая наклейка дорисовывает сказку. Ещё ' + left + ' ждут тебя!' : 'Сказка готова! Ты собрал все наклейки!',
+      say: s.say,
+      sayStyle: 'position: absolute; left: 48px; right: 48px; top: 126px; margin: 0; font-size: 30px; font-weight: 700; color: ' + (s.mood === 'yay' ? '#2F7D4F' : (s.mood === 'miss' ? '#9A4A2A' : '#7A6A5C')) + ';',
+      hasNew: !!lastItem,
+      sparkA: lastItem ? 'translate(' + (lastItem.x + lastItem.size - 6) + ' ' + (lastItem.y + 8) + ')' : 'translate(0 0)',
+      sparkB: lastItem ? 'translate(' + (lastItem.x + 4) + ' ' + (lastItem.y + lastItem.size * 0.4) + ')' : 'translate(0 0)'
+    };
+  }
+}
+</script>
+</body>
+</html>

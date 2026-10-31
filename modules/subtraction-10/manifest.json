@@ -3,6 +3,7 @@
   "title": "Вычитание до 10",
   "subject": "math",
   "icon": "➖",
+  "glyph": "−10",
   "description": "Считаем, сколько осталось",
   "version": "1.0.0",
   "styles": [

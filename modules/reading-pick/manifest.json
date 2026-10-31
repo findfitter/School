@@ -3,6 +3,7 @@
   "title": "Читаем и ищем картинку",
   "subject": "russian",
   "icon": "🔎",
+  "glyph": "Ищи",
   "description": "Прочитай и найди картинку",
   "version": "1.0.0",
   "styles": [
