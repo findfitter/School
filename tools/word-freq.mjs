@@ -12,10 +12,10 @@ import { fileURLToPath } from 'node:url';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 export const BANKS = [
-  { id: 'reading-sentences', lang: 'ru', function: ['и', 'на', 'в', 'по', 'под', 'за', 'у', 'из', 'к', 'с'] },
-  { id: 'reading-long', lang: 'ru', function: ['и', 'на', 'в', 'по', 'под', 'за', 'у', 'из', 'к', 'с'] },
-  { id: 'reading-sentences-de', lang: 'de', function: ['und', 'im', 'am', 'in', 'auf', 'an', 'unter', 'mit', 'der', 'die', 'das', 'dem', 'den', 'ein', 'eine'] },
-  { id: 'reading-long-de', lang: 'de', function: ['und', 'im', 'am', 'in', 'auf', 'an', 'unter', 'mit', 'der', 'die', 'das', 'dem', 'den', 'ein', 'eine'] },
+  { id: 'reading-sentences', lang: 'ru', function: ['и', 'на', 'в', 'во', 'по', 'под', 'за', 'у', 'из', 'к', 'с', 'для', 'до', 'над', 'а', 'но', 'потому', 'что', 'чем', 'очень', 'где', 'кто', 'куда', 'почему', 'сколько', 'когда', 'какая', 'какой', 'какого', 'сначала', 'потом', 'перед', 'после'] },
+  { id: 'reading-long', lang: 'ru', function: ['и', 'на', 'в', 'во', 'по', 'под', 'за', 'у', 'из', 'к', 'с', 'для', 'до', 'над', 'а', 'но', 'потому', 'что', 'чем', 'очень', 'где', 'кто', 'куда', 'почему', 'сколько', 'когда', 'какая', 'какой', 'какого', 'сначала', 'потом', 'перед', 'после'] },
+  { id: 'reading-sentences-de', lang: 'de', function: ['und', 'im', 'am', 'in', 'auf', 'an', 'unter', 'mit', 'der', 'die', 'das', 'dem', 'den', 'ein', 'eine', 'einen', 'zur', 'zum', 'ist', 'sind', 'hat', 'aber', 'denn', 'weil', 'als', 'wo', 'wer', 'was', 'wie', 'wann', 'warum', 'wohin', 'dann', 'zuerst', 'vor', 'nach'] },
+  { id: 'reading-long-de', lang: 'de', function: ['und', 'im', 'am', 'in', 'auf', 'an', 'unter', 'mit', 'der', 'die', 'das', 'dem', 'den', 'ein', 'eine', 'einen', 'zur', 'zum', 'ist', 'sind', 'hat', 'aber', 'denn', 'weil', 'als', 'wo', 'wer', 'was', 'wie', 'wann', 'warum', 'wohin', 'dann', 'zuerst', 'vor', 'nach'] },
 ];
 
 export const MAX_SHARE = 0.10; // самое частое «настоящее» слово — не больше 10% предложений банка (ориентир — до 8%; check.mjs ругается выше 10%)
@@ -29,7 +29,7 @@ export function frequency(sentences, functionWords) {
   const skip = new Set(functionWords);
   const counts = new Map();
   for (const s of sentences) {
-    const seen = new Set(s.words.map((w) => w.toLowerCase()));
+    const seen = new Set(s.words.map((w) => w.toLowerCase().replace(/[,.!?;:]+$/, '')));
     for (const w of seen) counts.set(w, (counts.get(w) || 0) + 1);
   }
   const rows = [...counts].map(([word, n]) => ({ word, n, share: n / sentences.length, function: skip.has(word) }));

@@ -1,7 +1,10 @@
 // (немецкий) Lange Sätze. Длинные предложения: как «Sätze bauen», но 6 слов. Слова лежат вперемешку,
 // ребёнок ставит их по порядку (касанием или перетаскиванием на рамку). Рядом картинка-подсказка.
-// Уровни: 0 — «Die Katze trinkt Milch und schläft»; 1 — «Der große Hund läuft im Wald» (с прилагательным);
-// 2 — «Hund und Katze spielen im Garten»; 3 — любые, плюс одно лишнее слово.
+// Фразы разных видов (data.js), чтобы не всегда «кто-то делает что-то»; по уровням:
+// 0 — действие и второе действие («Die Katze trinkt Milch und schläft») или описание («Der Elefant hat einen langen Rüssel»);
+// 1 — с прилагательным («Der große Hund läuft im Wald»), вопрос («Wo schläft die kleine Katze?»), двое и место;
+// 2 — сравнение («Elefanten sind größer als Mäuse»), «aber» («Hunde bellen, aber Katzen miauen»), порядок («Zuerst kommt der
+// Winter, dann Frühling»), причина («Mia weint, denn sie ist traurig»); 3 — все виды вперемешку, плюс одно лишнее слово там, где оно есть.
 // После ошибки уровень падает, после двух верных подряд растёт.
 // Предложения, в которых ошибались, повторяются в конце серии.
 // Предложения выбирает picker.js: слова не повторяются слишком часто (в серии и между сериями), иногда попадаются
@@ -13,8 +16,9 @@ import { createPicker } from '../reading-sentences/picker.js';
 
 // Служебные слова не считаются при контроле повторов; ns — префикс учёта слов («dsw:слово»)
 const NS = 'dsw';
-const IGNORE = ['und', 'im', 'am', 'in', 'auf', 'an', 'unter', 'mit', 'der', 'die', 'das', 'dem', 'den', 'ein', 'eine', 'einen', 'zur', 'zum', 'für', 'durch', 'über', 'aus', 'nach', 'zu', 'bis', 'aufs'];
-const LEVEL_KINDS = [['two'], ['adj'], ['pair'], ['two', 'adj', 'pair']];
+const IGNORE = ['und', 'im', 'am', 'in', 'auf', 'an', 'unter', 'mit', 'der', 'die', 'das', 'dem', 'den', 'ein', 'eine', 'einen', 'zur', 'zum', 'für', 'durch', 'über', 'aus', 'nach', 'zu', 'bis', 'aufs', 'ist', 'sind', 'hat', 'aber', 'denn', 'weil', 'als', 'wo', 'wer', 'was', 'wie', 'wann', 'warum', 'wohin', 'dann', 'zuerst', 'vor'];
+const LEVEL_KINDS = [['two', 'have'], ['adj', 'ask', 'pair'], ['compare', 'contrast', 'order', 'because'],
+  ['two', 'have', 'adj', 'ask', 'pair', 'compare', 'contrast', 'order', 'because']];
 const EXTRA_CHIP_LEVEL = 3; // с этого уровня добавляется лишнее слово
 const CLEAN_TO_LEVEL_UP = 3; // верных подряд до повышения уровня
 const GHOST_AFTER_WRONG = 2; // после стольких ошибок на слоте показываем первую букву

@@ -4,6 +4,13 @@
 //   adj  — «Der große Hund läuft im Wald»            (Adjektiv beim Nomen)
 //   pair — «Hund und Katze spielen im Garten»        (zwei Wesen, Tätigkeit und Ort)
 //   free — «Anna und Max gehen zur Schule»           (5–6 Wörter, OHNE Bild)
+//   have     — «Der Elefant hat einen langen Rüssel»       (Beschreibung: wer was hat; mit Bild)
+//   ask      — «Wo schläft die kleine Katze?»               (Frage mit «?»)
+//   because  — «Mia weint, denn sie ist traurig»            (Grund, Komma am Wort)
+//   contrast — «Hunde bellen, aber Katzen miauen»           (Gegensatz)
+//   compare  — «Elefanten sind größer als Mäuse»            (Vergleich)
+//   order    — «Zuerst kommt der Winter, dann Frühling»     (Reihenfolge)
+// Die Arten sind in index.js (LEVEL_KINDS) auf die Stufen verteilt, damit die Übung nicht nur «jemand tut etwas» ist.
 // Zusätzliche Wörter für die höchste Stufe passen nicht (falsche Form, Zahl) oder widersprechen
 // dem Bild, deshalb gibt es keine zweite richtige Lösung.
 // Wer was kann steht in ../reading-sentences-de/data.js (HEROES): ein neues Tier, dort eingetragen, kommt auch hierher.
@@ -98,6 +105,77 @@ const FREE = `
   Abends isst die ganze Familie zusammen|
 `.split('|').map((t) => t.trim()).filter(Boolean);
 
+// ---------- verschiedene Satzarten: damit es nicht immer «Jemand tut etwas und etwas» ist ----------
+// Satzzeichen stehen am Ende des Wortes («schläft,», «Katze?») — auf dem Kärtchen sind sie zu sehen, das Kind übt Komma und Fragezeichen.
+// Ein Bild gibt es nur dort, wo es hilft (have, ask); alles andere ist ohne Bild. Zusätzliche Wörter gibt es bei diesen Arten nicht.
+
+// have — Beschreibung: wer was hat («Der Elefant hat einen langen Rüssel»): Akkusativ, Endungen der Adjektive. Wesen → Satz.
+const HAVE = [
+  ['Elefant', 'Der Elefant hat einen langen Rüssel'], ['Giraffe', 'Die Giraffe hat einen langen Hals'], ['Hase', 'Der Hase hat lange Ohren'],
+  ['Fuchs', 'Der Fuchs hat einen buschigen Schwanz'], ['Eule', 'Die Eule hat große runde Augen'], ['Känguru', 'Das Känguru hat einen Beutel'],
+  ['Krokodil', 'Das Krokodil hat scharfe Zähne'], ['Pfau', 'Der Pfau hat bunte Federn'], ['Kamel', 'Das Kamel hat zwei Höcker'],
+  ['Nashorn', 'Das Nashorn hat ein Horn'], ['Zebra', 'Das Zebra hat schwarze Streifen'], ['Tiger', 'Der Tiger hat scharfe Krallen'],
+  ['Löwe', 'Der Löwe hat eine große Mähne'], ['Hirsch', 'Der Hirsch hat ein großes Geweih'], ['Pinguin', 'Der Pinguin hat kurze Beine'],
+  ['Schwan', 'Der Schwan hat einen langen Hals'], ['Hund', 'Der Hund hat eine kalte Nase'], ['Katze', 'Die Katze hat weiche Pfoten'],
+  ['Biene', 'Die Biene hat vier kleine Flügel'], ['Spinne', 'Die Spinne hat acht Beine'], ['Krebs', 'Der Krebs hat zwei Scheren'],
+  ['Schnecke', 'Die Schnecke hat ein Haus'], ['Maus', 'Die Maus hat einen langen Schwanz'],
+  ['Eichhörnchen', 'Das Eichhörnchen hat einen buschigen Schwanz'], ['Wal', 'Der Wal hat eine große Flosse'], ['Wolf', 'Der Wolf hat scharfe Zähne'],
+  ['Bär', 'Der Bär hat dicke Pfoten'], ['Pferd', 'Das Pferd hat eine lange Mähne'], ['Schildkröte', 'Die Schildkröte hat einen harten Panzer'],
+  ['Hahn', 'Der Hahn hat einen roten Kamm'], ['Schwein', 'Das Schwein hat einen Ringelschwanz'], ['Affe', 'Der Affe hat lange Arme'],
+  ['Panda', 'Der Panda hat schwarze Ohren'], ['Delfin', 'Der Delfin hat eine glatte Haut'], ['Papagei', 'Der Papagei hat bunte Federn'],
+  ['Ente', 'Die Ente hat einen flachen Schnabel'], ['Kuh', 'Die Kuh hat zwei Hörner'], ['Schaf', 'Das Schaf hat weiche Wolle'],
+  ['Ziege', 'Die Ziege hat einen kleinen Bart'],
+];
+
+// ask — Fragen (Fragewort «Wo», «Wer», «Was» …, am Ende «?»); das Bild zeigt, worum es geht
+const ASK = [
+  ['Wo schläft die kleine Katze?', ['🐱', '💤']], ['Was frisst der Hase gern?', ['🐇', '🥕']], ['Wer wohnt im dunklen Wald?', ['🌲']],
+  ['Wo wohnt der große Bär?', ['🐻']], ['Was machen die Kinder im Winter?', ['⛄']], ['Wie ist das Wetter heute?', ['🌤️']],
+  ['Wohin fliegen die Vögel im Herbst?', ['🐦']], ['Wann geht die Sonne auf?', ['🌅']], ['Warum weint das kleine Baby?', ['👶', '😢']],
+  ['Wer ist schneller, Hase oder Schildkröte?', ['🐇', '🐢']], ['Wie viele Beine hat eine Spinne?', ['🕷️']],
+  ['Was trinkt die Katze am liebsten?', ['🐱', '🥛']], ['Wer baut ein Haus für Menschen?', ['👷', '🏠']],
+  ['Wo wachsen süße Beeren im Wald?', ['🍓']], ['Was macht man vor dem Essen?', ['🍽️']], ['Wer bewacht nachts unser Haus?', ['🐶', '🏠']],
+  ['Was malt der Maler auf Papier?', ['🧑‍🎨', '🖼️']], ['Wer backt leckere Kuchen für uns?', ['👵', '🍰']], ['Wo leben Fische und Wale?', ['🐟', '🌊']],
+  ['Wer sammelt Honig aus Blumen?', ['🐝', '🍯']], ['Was scheint tagsüber am Himmel?', ['☀️']], ['Was wächst am hohen Baum?', ['🌳']],
+  ['Wie viele Beine hat ein Hund?', ['🐶', '🐾']], ['Wann scheint der Mond am Himmel?', ['🌙']],
+];
+
+// because — Grund («…, denn …», «…, weil …»)
+const BECAUSE = `
+  Mia weint, denn sie ist traurig|Max lacht, denn es ist lustig|Ben trinkt, denn er hat Durst|Tom friert, denn es ist kalt|
+  Lena schläft, denn sie ist müde|Anna lacht, denn sie ist froh|Tim trinkt, weil er Durst hat|Eva isst, weil sie Hunger hat|
+  Ich friere, weil es kalt ist|Ich lache, weil es lustig ist|Paul schläft, weil er müde ist|Hasen rennen, denn sie haben Angst|
+  Vögel fliegen, weil es Winter wird|Bären schlafen, weil es Winter ist|Kinder tragen Mäntel, denn es regnet|
+  Lisa trinkt Tee, denn sie friert|Schnee schmilzt, denn die Sonne scheint|Blumen wachsen, denn die Sonne scheint
+`.split('|').map((t) => t.trim()).filter(Boolean);
+
+// contrast — Gegensatz («…, aber …»)
+const CONTRAST = `
+  Elefanten sind groß, Mäuse klein|Hasen sind schnell, Schnecken langsam|Hunde bellen, aber Katzen miauen|
+  Vögel fliegen, aber Fische schwimmen|Zitronen sind sauer, Zucker ist süß|Eis ist kalt, aber Tee heiß|
+  Papa trinkt Kaffee, Mama Tee|Max malt, aber Lena liest|Tage sind hell, Nächte dunkel|
+  Kinder spielen, aber Erwachsene arbeiten|Sommer ist warm, Winter kalt|Hasen sind klein, Bären groß|
+  Katzen mögen Milch, Hunde Knochen|Eulen schlafen tags, fliegen nachts|Winter ist kalt, aber Sommer heiß
+`.split('|').map((t) => t.trim()).filter(Boolean);
+
+// compare — Vergleich («… größer als …»)
+const COMPARE = `
+  Elefanten sind größer als Mäuse|Hasen sind schneller als Schnecken|Berge sind höher als Häuser|
+  Giraffen sind größer als Pferde|Wale sind größer als Fische|Zucker ist süßer als Zitronen|
+  Eis ist kälter als Tee|Mäuse sind kleiner als Katzen|Pferde laufen schneller als Menschen|
+  Bäume sind höher als Blumen|Steine sind schwerer als Federn|Tage sind heller als Nächte|
+  Winter ist kälter als Sommer|Adler fliegen höher als Spatzen
+`.split('|').map((t) => t.trim()).filter(Boolean);
+
+// order — Reihenfolge («Zuerst …, dann …», «Vor dem … …»)
+const ORDER = `
+  Zuerst kommt der Winter, dann Frühling|Vor dem Essen Hände waschen|Morgens putze ich die Zähne|
+  Abends lesen wir ein Buch|Nach der Schule gehen wir spielen|Nach dem Regen kommt die Sonne|
+  Zuerst Regen, dann kommt der Regenbogen|Zuerst frühstücken wir, dann spielen|Zuerst die Raupe, dann der Schmetterling|
+  Zuerst ein Ei, dann das Küken|Zuerst Wolken, dann kommt der Regen|Vor dem Schlafen Zähne putzen|
+  Nach dem Essen spielen wir wieder|Zuerst wird es Herbst, dann Winter
+`.split('|').map((t) => t.trim()).filter(Boolean);
+
 function build() {
   const sentences = [];
   const seenScene = new Set();
@@ -141,6 +219,19 @@ function build() {
       add('pair', [first, 'und', second, plural, prep, place], [HEROES[first].e, HEROES[second].e, emoji], [single]);
     }
   }
+
+  // have / ask: mit Bild; because / contrast / compare / order: ohne Bild (nopic) und ohne zusätzliche Wörter
+  for (const [hero, text] of HAVE) {
+    if (HEROES[hero]) add('have', text.split(' '), [HEROES[hero].e], []);
+  }
+  for (const [text, scene] of ASK) add('ask', text.split(' '), scene, []);
+  const plain = (kind, list) => {
+    for (const text of list) sentences.push({ key: text, kind, words: text.split(' '), scene: [], extras: [], nopic: true });
+  };
+  plain('because', BECAUSE);
+  plain('contrast', CONTRAST);
+  plain('compare', COMPARE);
+  plain('order', ORDER);
 
   // free: ohne Bild und ohne zusätzliche Wörter
   for (const text of FREE) {

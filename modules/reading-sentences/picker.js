@@ -9,7 +9,8 @@
 //      с ним предложения без ошибок (STATUS_PENALTY: «выучено» — реже) и если слово стоит во многих предложениях банка
 //      (SHARE_PENALTY: частые слова реже, редкие чаще);
 //   3. после предложения, собранного без ошибок, каждое слово отмечается в учёте слов ядра (ключ `<ns>:<слово>`).
-// Служебные слова (предлоги, «и», артикли) не считаются: они есть почти везде, и штрафовать за них нечего.
+// Служебные слова (предлоги, «и», артикли, вопросительные и связки вроде «потому что») не считаются: они есть почти везде,
+// и штрафовать за них нечего. Знаки препинания в конце слова («спит,», «кот?») слово не меняют.
 
 const SAMPLE = 28; // сколько случайных кандидатов сравниваем
 const SERIES_PENALTY = 4; // за слово, которое в этой серии уже было (за каждый раз)
@@ -20,6 +21,8 @@ export const FREE_FROM_LEVEL = 1; // с этого уровня иногда п�
 export const FREE_SHARE = 0.2; // какая доля заданий — предложения без картинки (если они есть)
 
 const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+// слово без знака препинания в конце: «спит,» и «спит» — одно и то же слово; регистр не важен
+const plain = (word) => word.toLowerCase().replace(/[,.!?;:]+$/, '');
 
 function sample(list, count) {
   const copy = [...list];
@@ -34,7 +37,7 @@ function sample(list, count) {
 // status(ключ) — ctx.words.status; mark(ключ) — ctx.words.mark
 export function createPicker({ sentences, ignore, ns, status, mark }) {
   const skip = new Set(ignore.map((w) => w.toLowerCase()));
-  const wordsOf = new Map(sentences.map((s) => [s.key, [...new Set(s.words.map((w) => w.toLowerCase()).filter((w) => !skip.has(w)))]]));
+  const wordsOf = new Map(sentences.map((s) => [s.key, [...new Set(s.words.map(plain).filter((w) => !skip.has(w)))]]));
   const share = new Map();
   for (const words of wordsOf.values()) for (const w of words) share.set(w, (share.get(w) || 0) + 1);
   for (const [w, n] of share) share.set(w, n / sentences.length);
@@ -54,12 +57,17 @@ export function createPicker({ sentences, ignore, ns, status, mark }) {
       return levelKinds;
     },
 
-    // Следующее предложение: из случайных кандидатов с самой низкой «затёртостью» слов; уже бывшие в серии не берём,
-    // пока есть другие.
+    // Следующее предложение. Сначала выбирается ВИД (поровну между видами уровня — иначе самые многочисленные виды
+    // забили бы редкие: вопросы и «потому что» стояли бы в одном задании из двадцати), потом из случайных кандидатов
+    // этого вида берётся тот, у которого меньше «затёртых» слов; уже бывшие в серии не берём, пока есть другие.
     pick(kinds, used) {
-      const pool = sentences.filter((s) => kinds.includes(s.kind));
-      const fresh = pool.filter((s) => !used.has(s.key));
-      const candidates = sample(fresh.length ? fresh : pool, SAMPLE);
+      const groups = kinds
+        .map((kind) => sentences.filter((s) => s.kind === kind))
+        .filter((pool) => pool.length)
+        .map((pool) => ({ pool, fresh: pool.filter((s) => !used.has(s.key)) }));
+      const withFresh = groups.filter((g) => g.fresh.length);
+      const group = (withFresh.length ? withFresh : groups)[rnd(0, (withFresh.length ? withFresh : groups).length - 1)];
+      const candidates = sample(withFresh.length ? group.fresh : group.pool, SAMPLE);
       let best = null;
       let bestScore = Infinity;
       for (const s of candidates) {

@@ -13,7 +13,7 @@ import { createPicker } from '../reading-sentences/picker.js';
 
 // Служебные слова не считаются при контроле повторов; ns — префикс учёта слов («dsw:слово»)
 const NS = 'dsw';
-const IGNORE = ['und', 'im', 'am', 'in', 'auf', 'an', 'unter', 'mit', 'der', 'die', 'das', 'dem', 'den', 'ein', 'eine', 'einen', 'zur', 'zum', 'für', 'durch', 'über', 'aus', 'nach', 'zu', 'bis', 'aufs'];
+const IGNORE = ['und', 'im', 'am', 'in', 'auf', 'an', 'unter', 'mit', 'der', 'die', 'das', 'dem', 'den', 'ein', 'eine', 'einen', 'zur', 'zum', 'für', 'durch', 'über', 'aus', 'nach', 'zu', 'bis', 'aufs', 'ist', 'sind', 'hat', 'aber', 'denn', 'weil', 'als', 'wo', 'wer', 'was', 'wie', 'wann', 'warum', 'wohin', 'dann', 'zuerst', 'vor'];
 const LEVEL_KINDS = [['short'], ['act'], ['pair'], ['short', 'act', 'pair', 'place']];
 const EXTRA_CHIP_LEVEL = 3; // с этого уровня добавляется лишнее слово
 const CLEAN_TO_LEVEL_UP = 3; // верных подряд до повышения уровня

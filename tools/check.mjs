@@ -257,11 +257,12 @@ for (const bank of BANKS) {
   for (const s of SENTENCES) {
     if (keys.has(s.key)) add('ПРЕДЛОЖЕНИЯ', id, `предложение «${s.key}» повторяется`);
     keys.add(s.key);
-    const lower = s.words.map((w) => w.toLowerCase());
+    const lower = s.words.map((w) => w.toLowerCase().replace(/[,.!?;:]+$/, '')); // «спит,» и «спит» — одно слово
     if (new Set(lower).size !== lower.length) add('ПРЕДЛОЖЕНИЯ', id, `в «${s.key}» слово повторяется — фишки перепутаются`);
+    if (id.startsWith('reading-long') && (s.words.length < 5 || s.words.length > 6)) add('ПРЕДЛОЖЕНИЯ', id, `«${s.key}»: в длинном предложении 5–6 слов, а не ${s.words.length}`);
     if (s.nopic) {
-      // предложение без картинки: только вида free, картинки нет, лишних фишек нет (по картинке их не отличить)
-      if (s.kind !== 'free' || s.scene.length || s.extras.length) add('ПРЕДЛОЖЕНИЯ', id, `«${s.key}»: без картинки (nopic) — только kind «free», без scene и extras`);
+      // предложение без картинки: картинки нет, лишних фишек нет (по картинке их не отличить)
+      if (s.scene.length || s.extras.length) add('ПРЕДЛОЖЕНИЯ', id, `«${s.key}»: без картинки (nopic) — без scene и extras`);
       if (s.words.length < 3 || s.words.length > 6) add('ПРЕДЛОЖЕНИЯ', id, `«${s.key}»: в предложении без картинки должно быть 3–6 слов, а не ${s.words.length}`);
     } else {
       if (!s.scene.length || s.scene.some((e) => !e)) add('ПРЕДЛОЖЕНИЯ', id, `у «${s.key}» нет картинки`);
@@ -276,7 +277,7 @@ for (const bank of BANKS) {
   for (const r of rows.filter((x) => x.share > MAX_SHARE)) {
     add('ПОВТОРЫ СЛОВ', id, `слово «${r.word}» стоит в ${(r.share * 100).toFixed(1)}% предложений (больше ${(MAX_SHARE * 100).toFixed(0)}%) — ребёнок узнаёт его по привычке; добавьте других героев, глаголы, предметы или предложения без картинки`);
   }
-  const free = SENTENCES.filter((s) => s.kind === 'free').length;
+  const free = SENTENCES.filter((s) => s.nopic).length;
   notes.push(`${id}: предложений ${SENTENCES.length}${free ? ` (без картинки ${free})` : ''}, разных слов ${rows.length + frequency(SENTENCES, bank.function).filter((r) => r.function).length}, самое частое «${rows[0].word}» ${(rows[0].share * 100).toFixed(1)}%`);
 }
 
