@@ -6,7 +6,14 @@
   "glyph": "Satz",
   "description": "Sätze aus sechs Wörtern",
   "version": "1.0.0",
-  "styles": ["style.css"],
-  "files": ["texts.js", "data.js", "../reading-sentences-de/data.js"],
+  "styles": [
+    "style.css"
+  ],
+  "files": [
+    "texts.js",
+    "data.js",
+    "../reading-sentences-de/data.js",
+    "../reading-sentences/picker.js"
+  ],
   "cycle": "german"
 }

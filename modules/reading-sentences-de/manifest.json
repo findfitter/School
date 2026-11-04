@@ -6,7 +6,13 @@
   "glyph": "1·2·3",
   "description": "Bring die Wörter in die richtige Reihenfolge",
   "version": "1.0.0",
-  "styles": ["style.css"],
-  "files": ["texts.js", "data.js"],
+  "styles": [
+    "style.css"
+  ],
+  "files": [
+    "texts.js",
+    "data.js",
+    "../reading-sentences/picker.js"
+  ],
   "cycle": "german"
 }

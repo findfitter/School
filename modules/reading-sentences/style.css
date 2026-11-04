@@ -196,3 +196,8 @@
 .sn-chip.placed {
   visibility: hidden;
 }
+
+/* Предложение без картинки: места под картинку нет */
+.sn-scene.empty {
+  display: none;
+}

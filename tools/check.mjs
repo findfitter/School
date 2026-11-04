@@ -4,7 +4,7 @@
 // Ничего не меняет в проекте. Нужен только Node.js.
 import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
 import { join, relative, dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync } from 'node:child_process';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..').split('\\').join('/');
@@ -244,19 +244,40 @@ if (existsSync(`${ROOT}/modules/german-articles/data.js`)) {
   const perArticle = ARTICLES.map((a) => `${a}: ${artNouns.filter((n) => n.art === a).length}`).join(', ');
   notes.push(`german-articles: существительных ${artNouns.length} (${perArticle}), лёгких ${artNouns.filter((n) => n.easy).length}`);
 }
-for (const id of ['reading-sentences', 'reading-sentences-de', 'reading-long', 'reading-long-de']) {
+// Банки предложений: ru/de, «Собери предложение» и «Длинные предложения». Проверяем повторы, картинки и перекос по словам:
+// частота слов — tools/word-freq.mjs (тот же расчёт: доля предложений банка, в которых слово встречается)
+const { BANKS, frequency, MAX_SHARE } = await import(pathToFileURL(`${ROOT}/tools/word-freq.mjs`).href);
+for (const bank of BANKS) {
+  const id = bank.id;
   const path = `${ROOT}/modules/${id}/data.js`;
   if (!existsSync(path)) continue;
   const { SENTENCES } = await import(bankUrl(`${id}/data.js`));
   const keys = new Set();
+  const sceneOf = new Map();
   for (const s of SENTENCES) {
     if (keys.has(s.key)) add('ПРЕДЛОЖЕНИЯ', id, `предложение «${s.key}» повторяется`);
     keys.add(s.key);
     const lower = s.words.map((w) => w.toLowerCase());
     if (new Set(lower).size !== lower.length) add('ПРЕДЛОЖЕНИЯ', id, `в «${s.key}» слово повторяется — фишки перепутаются`);
-    if (!s.scene.length || s.scene.some((e) => !e)) add('ПРЕДЛОЖЕНИЯ', id, `у «${s.key}» нет картинки`);
+    if (s.nopic) {
+      // предложение без картинки: только вида free, картинки нет, лишних фишек нет (по картинке их не отличить)
+      if (s.kind !== 'free' || s.scene.length || s.extras.length) add('ПРЕДЛОЖЕНИЯ', id, `«${s.key}»: без картинки (nopic) — только kind «free», без scene и extras`);
+      if (s.words.length < 3 || s.words.length > 6) add('ПРЕДЛОЖЕНИЯ', id, `«${s.key}»: в предложении без картинки должно быть 3–6 слов, а не ${s.words.length}`);
+    } else {
+      if (!s.scene.length || s.scene.some((e) => !e)) add('ПРЕДЛОЖЕНИЯ', id, `у «${s.key}» нет картинки`);
+      // одна картинка — одно предложение внутри вида: иначе по картинке не понять, какое собирать
+      const sceneKey = `${s.kind}|${s.scene.join('')}`;
+      if (sceneOf.has(sceneKey)) add('ПРЕДЛОЖЕНИЯ', id, `у «${s.key}» та же картинка ${s.scene.join('')}, что у «${sceneOf.get(sceneKey)}» (вид ${s.kind})`);
+      sceneOf.set(sceneKey, s.key);
+    }
   }
-  notes.push(`${id}: предложений ${SENTENCES.length}`);
+  // перекос: ни одно слово (кроме служебных) не должно стоять больше чем в MAX_SHARE предложений банка
+  const rows = frequency(SENTENCES, bank.function).filter((r) => !r.function);
+  for (const r of rows.filter((x) => x.share > MAX_SHARE)) {
+    add('ПОВТОРЫ СЛОВ', id, `слово «${r.word}» стоит в ${(r.share * 100).toFixed(1)}% предложений (больше ${(MAX_SHARE * 100).toFixed(0)}%) — ребёнок узнаёт его по привычке; добавьте других героев, глаголы, предметы или предложения без картинки`);
+  }
+  const free = SENTENCES.filter((s) => s.kind === 'free').length;
+  notes.push(`${id}: предложений ${SENTENCES.length}${free ? ` (без картинки ${free})` : ''}, разных слов ${rows.length + frequency(SENTENCES, bank.function).filter((r) => r.function).length}, самое частое «${rows[0].word}» ${(rows[0].share * 100).toFixed(1)}%`);
 }
 
 // 7г. Правило кругов: у каждого модуля любого раздела (английский тоже) должен быть cycle

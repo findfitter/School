@@ -4,10 +4,16 @@
 // прилагательными); 2 — «Кот и собака спят на траве» (6 слов); 3 — любые, плюс одно лишнее слово.
 // После ошибки уровень падает, после двух верных подряд растёт.
 // Предложения, в которых ошибались, повторяются в конце серии.
+// Предложения выбирает picker.js: слова не повторяются слишком часто (в серии и между сериями), иногда попадаются
+// предложения без картинки (kind «free»).
 
 import { TEXT } from './texts.js';
 import { SENTENCES } from './data.js';
+import { createPicker } from '../reading-sentences/picker.js';
 
+// Служебные слова не считаются при контроле повторов; ns — префикс учёта слов («rsw:слово»)
+const NS = 'rsw';
+const IGNORE = ['и', 'на', 'в', 'во', 'по', 'под', 'за', 'у', 'из', 'к', 'с', 'для', 'до', 'над'];
 const LEVEL_KINDS = [['two'], ['adj'], ['pair'], ['two', 'adj', 'pair']];
 const EXTRA_CHIP_LEVEL = 3; // с этого уровня добавляется лишнее слово
 const CLEAN_TO_LEVEL_UP = 3; // верных подряд до повышения уровня
@@ -25,13 +31,6 @@ function shuffle(list) {
     [out[i], out[j]] = [out[j], out[i]];
   }
   return out;
-}
-
-function makeTask(level, used) {
-  const kind = pick(LEVEL_KINDS[level]);
-  const pool = SENTENCES.filter((s) => s.kind === kind);
-  const fresh = pool.filter((s) => !used.has(s.key));
-  return pick(fresh.length ? fresh : pool);
 }
 
 // Слова-кнопки: нужные вперемешку (и на верхнем уровне одно лишнее, не подходящее к картинке).
@@ -66,6 +65,8 @@ function el(tag, className, text) {
 
 export function start(ctx) {
   const total = ctx.settings.seriesLength;
+  // Выбор предложений с контролем повторов слов (picker.js): частые и уже выученные слова реже, в серии слова не повторяются
+  const picker = createPicker({ sentences: SENTENCES, ignore: IGNORE, ns: NS, status: (key) => ctx.words.status(key), mark: (key) => ctx.words.mark(key) });
   let alive = true;
   const timers = new Set();
 
@@ -118,6 +119,7 @@ export function start(ctx) {
       let locked = false;
 
       scene.replaceChildren(...task.scene.map((emoji) => el('span', 'rl-pic', emoji)));
+      scene.classList.toggle('empty', task.scene.length === 0); // предложение без картинки: места под неё нет
       scene.classList.remove('hop');
       frame.className = 'rl-frame';
       frame.replaceChildren();
@@ -242,13 +244,15 @@ export function start(ctx) {
     const hardPlan = planHardTasks(ctx.hard, total);
 
     for (let i = 0; i < total; i++) {
-      const task = hardPlan.get(i) || makeTask(level, used);
+      const task = hardPlan.get(i) || picker.pick(picker.kindsFor(LEVEL_KINDS[level], level), used);
       used.add(task.key);
+      picker.shown(task);
       const firstTry = await playTask(task, level);
       ctx.task({ ok: firstTry, level });
       if (!alive) return;
       dots[i].classList.add('done');
       if (firstTry) {
+        picker.learned(task);
         correct += 1;
         clean += 1;
         if (clean >= CLEAN_TO_LEVEL_UP && level < LEVEL_KINDS.length - 1) {
@@ -275,7 +279,7 @@ export function start(ctx) {
       correct,
       level,
       total,
-      mistakes: again.map((t) => ({ key: t.key, label: `${t.scene.join('')} ${t.key}` })),
+      mistakes: again.map((t) => ({ key: t.key, label: `${t.scene.join('') || '📝'} ${t.key}` })),
     });
   }
 

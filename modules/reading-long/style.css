@@ -196,3 +196,8 @@
 .rl-chip.placed {
   visibility: hidden;
 }
+
+/* Предложение без картинки: места под картинку нет */
+.rl-scene.empty {
+  display: none;
+}

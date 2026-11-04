@@ -12,7 +12,8 @@
   "files": [
     "texts.js",
     "data.js",
-    "../reading-sentences/data.js"
+    "../reading-sentences/data.js",
+    "../reading-sentences/picker.js"
   ],
   "cycle": "russian"
 }
