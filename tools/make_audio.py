@@ -1,7 +1,7 @@
 """Создаёт озвучку английских слов, сочетаний и предложений голосом Sonia (британский английский).
 
 Что озвучивается:
-  * слова из modules/english-words/words.json (модули english-words и english-quiz);
+  * слова из modules/english-words/words.json (модули english-words, english-quiz и english-say);
   * сочетания «цвет + предмет» из modules/english-phrases/phrases.json (красный кот -> «red cat»);
   * предложения из modules/english-sentences/sentences.json;
   * рассказы для сложного задания из modules/challenge/pools/en.json (рассказ целиком и вопрос к нему,
@@ -81,6 +81,7 @@ def challenge() -> dict[str, str]:
 MANIFESTS = {
     MODULES / "english-words" / "manifest.json": (["texts.js", "words.json"], lambda: [slug(t) for t in words()]),
     MODULES / "english-quiz" / "manifest.json": (["texts.js", "../english-words/words.json"], lambda: [slug(t) for t in words()]),
+    MODULES / "english-say" / "manifest.json": (["texts.js", "../english-words/words.json"], lambda: [slug(t) for t in words()]),
     MODULES / "english-phrases" / "manifest.json": (["texts.js", "phrases.json", "../english-words/words.json"], lambda: [slug(t) for t in phrases()]),
     MODULES / "english-sentences" / "manifest.json": (["texts.js", "sentences.json"], lambda: [slug(t) for t in sentences()]),
     MODULES / "challenge" / "manifest.json": (

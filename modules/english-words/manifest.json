@@ -8,6 +8,8 @@
   "description": "Слушаем и запоминаем английские слова",
   "version": "1.0.0",
   "voice": true,
+  "cycle": "english",
+  "stars": false,
   "styles": [
     "style.css"
   ],

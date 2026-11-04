@@ -10,9 +10,5 @@ export const TEXT = {
   listenAgain: 'Ещё раз',
   next: 'Дальше',
   back: 'Назад',
-  done: 'Молодец!',
-  doneText: 'Ты познакомилась со словами. Теперь ты их знаешь!',
-  again: 'Ещё раз эту тему',
-  otherTopic: 'Другая тема',
   page: '{n} из {total}',
 };

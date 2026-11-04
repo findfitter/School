@@ -1,0 +1,209 @@
+/* Hello! Скажи слово, в стиле «сказочной книжки» (токены и общие классы — core/styles/base.css, book.css).
+   Размеры в vh/vw, чтобы всё помещалось на экране Хромбука без прокрутки. Прогресс серии рисует ядро (дорожка лапок). */
+
+.sy {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.6vh;
+  padding-top: 56px; /* под дорожку лапок */
+  touch-action: none;
+}
+
+.sy-heading {
+  flex: none;
+  font-size: clamp(34px, 7vh, 58px);
+  line-height: 1.05;
+  text-align: center;
+  color: var(--book-ink);
+}
+
+/* Выбор темы: плитки компактные — тем много, прокрутки в модуле нет, всё должно поместиться на 1024×600 */
+.sy-topics {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  gap: 1.4vh 1.1vw;
+}
+
+.sy-topic {
+  width: clamp(98px, 11.4vw, 140px);
+  min-height: clamp(70px, 11.6vh, 96px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3vh;
+  padding: 4px;
+  color: var(--book-ink);
+}
+
+.sy-topic:nth-child(odd) { --rot: -0.8deg; }
+.sy-topic:nth-child(even) { --rot: 0.9deg; }
+
+.sy-topic-icon {
+  font-size: clamp(26px, 4.6vh, 38px);
+  line-height: 1;
+}
+
+.sy-topic-title {
+  font-size: clamp(13px, 2.2vh, 18px);
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.sy-topic-ru {
+  color: var(--book-ink-soft);
+  font-size: clamp(10px, 1.7vh, 13px);
+  line-height: 1.1;
+  text-align: center;
+}
+
+/* Вопрос — рукописный */
+.sy-prompt {
+  flex: none;
+  text-align: center;
+  font-size: clamp(30px, 6vh, 50px);
+  line-height: 1.05;
+  color: var(--book-ink);
+}
+
+/* Картинка слова — бумажная карточка со скотчем */
+.sy-card {
+  --rot: -1deg;
+  flex: none;
+  width: clamp(170px, 34vh, 280px);
+  height: clamp(150px, 29vh, 240px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sy-pic {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Эмодзи — наклейка (белая кайма, тень), не крупнее 120 px: большие эмодзи на Хромбуке расплываются */
+.sy-emoji {
+  font-size: clamp(70px, 17vh, 120px);
+  line-height: 1;
+  filter: url(#stk);
+}
+
+.sy-swatch {
+  width: clamp(80px, 17vh, 120px);
+  height: clamp(80px, 17vh, 120px);
+  border-radius: 50%;
+  box-shadow: var(--book-shadow), inset 0 0 0 4px rgba(59, 47, 47, 0.12);
+}
+
+.sy-digit {
+  font-size: clamp(56px, 13vh, 100px);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--book-ink);
+}
+
+.sy-stars {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-size: clamp(12px, 2.2vh, 18px);
+  line-height: 1.1;
+  text-align: center;
+}
+
+/* Место под подсказку и под слово: высота зарезервирована, экран не прыгает */
+.sy-line {
+  flex: none;
+  min-height: clamp(76px, 15vh, 120px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4vh;
+}
+
+.sy-pattern {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(6px, 1vh, 10px);
+}
+
+.sy-letter {
+  width: clamp(30px, 6vh, 46px);
+  height: clamp(40px, 8vh, 60px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border-bottom: 4px solid var(--book-ink-soft);
+  font-size: clamp(32px, 6.4vh, 50px);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--book-ink);
+}
+
+.sy-letter.first {
+  border-bottom-color: var(--book-gold);
+}
+
+.sy-gap {
+  width: clamp(16px, 3vh, 26px);
+}
+
+.sy-word {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 18px;
+  min-height: 64px;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.sy-word.pressed {
+  transform: scale(0.96);
+}
+
+.sy-word-text {
+  font-size: clamp(40px, 9vh, 76px);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--book-ink);
+}
+
+.sy-word-speaker {
+  font-size: clamp(28px, 5vh, 42px);
+}
+
+.sy-translation {
+  color: var(--book-ink-soft);
+  font-size: clamp(16px, 3vh, 24px);
+}
+
+.sy-actions {
+  flex: none;
+  min-height: clamp(76px, 12vh, 96px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2vw;
+}
+
+.sy-actions .btn {
+  min-height: clamp(72px, 12vh, 96px);
+  min-width: clamp(220px, 24vw, 320px);
+}
+
+/* «Получилось!» — зелёная, «Не получилось» — тихая бумажная */
+.sy-yes {
+  background: var(--book-done);
+  color: #fff;
+}

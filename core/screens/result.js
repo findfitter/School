@@ -26,7 +26,8 @@ function spread({ heading, caption, right }) {
 export function renderResult(app, { manifest, result, stars, canBuy, locked, superSticker, newChallenges = [] }) {
   const lang = (STR.subjects[manifest.subject] || STR.subjects.other).lang;
   const t = STR.result[lang];
-  const praise = t.praise[stars];
+  const plain = manifest.stars === false; // модуль без звёзд (знакомство): без звёздочек и счёта
+  const praise = plain ? t.met : t.praise[stars];
 
   // Звёзды за серию: по одной, с отскоком; не заработанные — карандашным контуром.
   const starEls = [1, 2, 3].map((n) =>
@@ -50,10 +51,10 @@ export function renderResult(app, { manifest, result, stars, canBuy, locked, sup
 
   const book = spread({
     heading: praise,
-    caption: format(t.score, result),
+    caption: plain ? t.metCaption : format(t.score, result),
     right: [
-      h('div', { class: 'rs-stars' }, starEls),
-      stars > 0 ? h('span', { class: 'stamp rs-stamp', style: `animation-delay:${400 * stars + 300}ms`, text: t.stamp }) : null,
+      plain ? null : h('div', { class: 'rs-stars' }, starEls),
+      stars > 0 || plain ? h('span', { class: `stamp rs-stamp${plain ? ' plain' : ''}`, style: `animation-delay:${400 * stars + 300}ms`, text: t.stamp }) : null,
       h('div', { class: 'rs-notes' }, notes),
       h('div', { class: 'rs-actions' }, h('div', { class: 'row' }, buttons)),
     ],

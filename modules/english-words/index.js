@@ -179,7 +179,7 @@ export async function start(ctx) {
         ? button('ew-btn', `⬅ ${TEXT.back}`, () => showLesson(topic, pageIndex - 1))
         : button('ew-btn', `⬅ ${topic.title}`, showTopics),
       button('ew-btn listen', `🔊 ${TEXT.listenAgain}`, sayAll),
-      button('ew-btn go', `${TEXT.next} ➡`, () => (pageIndex + 1 < pages ? showLesson(topic, pageIndex + 1) : showDone(topic))));
+      button('ew-btn go', `${TEXT.next} ➡`, () => (pageIndex + 1 < pages ? showLesson(topic, pageIndex + 1) : finishTopic())));
 
     const row = el('div', 'ew-cards');
     row.append(...cards);
@@ -197,20 +197,11 @@ export async function start(ctx) {
   }
 
   // ---------- конец темы ----------
-  function showDone(topic) {
+  // Тема прослушана до конца — задание пройдено: ядро закрывает модуль в круге English и показывает «Готово!».
+  // Звёзд за знакомство нет (в манифесте "stars": false), поэтому счёт серии пустой.
+  function finishTopic() {
     run += 1;
-    ctx.sound('done');
-    root.replaceChildren(
-      el('div', 'ew-done-icon', '🎉'),
-      el('div', 'ew-heading', TEXT.done),
-      el('div', 'ew-done-text', TEXT.doneText),
-      (() => {
-        const nav = el('div', 'ew-nav center');
-        nav.append(
-          button('ew-btn', TEXT.again, () => showLesson(topic, 0)),
-          button('ew-btn go', TEXT.otherTopic, showTopics));
-        return nav;
-      })());
+    ctx.finish({ correct: 0, total: 0, mistakes: [] });
   }
 
   showTopics();

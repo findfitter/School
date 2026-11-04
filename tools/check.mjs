@@ -137,7 +137,7 @@ if (existsSync(wordsPath)) {
   const topics = JSON.parse(read(wordsPath)).topics;
   const seenWord = new Map();
   const seenPicture = new Map();
-  const englishModules = ['english-words', 'english-quiz'].filter((id) => existsSync(`${ROOT}/modules/${id}/manifest.json`));
+  const englishModules = ['english-words', 'english-quiz', 'english-say'].filter((id) => existsSync(`${ROOT}/modules/${id}/manifest.json`));
   const listedAudio = new Map(englishModules.map((id) => [id, new Set((JSON.parse(read(`${ROOT}/modules/${id}/manifest.json`)).files || []))]));
   let wordCount = 0;
   for (const topic of topics) {
@@ -259,13 +259,13 @@ for (const id of ['reading-sentences', 'reading-sentences-de', 'reading-long', '
   notes.push(`${id}: предложений ${SENTENCES.length}`);
 }
 
-// 7г. Правило кругов: у каждого модуля любого раздела, кроме английского, должен быть cycle
+// 7г. Правило кругов: у каждого модуля любого раздела (английский тоже) должен быть cycle
 // (пройденный модуль закрывается, пока не пройдены все; потом супер-наклейка и круг заново)
 for (const id of registry) {
   const manifestPath = `${ROOT}/modules/${id}/manifest.json`;
   if (!existsSync(manifestPath)) continue;
   const manifest = JSON.parse(read(manifestPath));
-  if (!manifest.challenge && manifest.subject !== 'english' && !manifest.cycle) add('КРУГ', id, 'у модуля нет cycle — он не закрывается после серии и не участвует в супер-наклейках');
+  if (!manifest.challenge && !manifest.cycle) add('КРУГ', id, 'у модуля нет cycle — он не закрывается после серии и не участвует в супер-наклейках');
 }
 
 // 7д. Сложные задания (modules/challenge): рассказы русского, немецкого и английского, задания математики и

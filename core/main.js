@@ -202,7 +202,7 @@ function finishChallenge(subject, result) {
 }
 
 function finishSeries(manifest, result) {
-  const stars = starsFor(result.correct, result.total);
+  const stars = manifest.stars === false ? 0 : starsFor(result.correct, result.total); // знакомство («stars»: false) звёзд не даёт
   storage.recordSeries(manifest.id, result);
   storage.addStars(stars);
   const cycle = completeSeries(app.manifests, manifest);

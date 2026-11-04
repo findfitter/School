@@ -58,6 +58,8 @@ export const STR = {
       praise: { 1: 'Молодец! Попробуем ещё?', 2: 'Здорово!', 3: 'Отлично!' },
       score: 'Верно: {correct} из {total}',
       stamp: 'Готово!',
+      met: 'Отлично!',
+      metCaption: 'Новые слова послушали!',
       shopHint: 'Можно купить наклейку в магазине!',
       superPopup: {
         title: 'Ура! Супер-наклейка!',
@@ -82,6 +84,8 @@ export const STR = {
       praise: { 1: 'Gut gemacht! Noch einmal?', 2: 'Toll gemacht!', 3: 'Super!' },
       score: '{correct} von {total} richtig',
       stamp: 'Fertig!',
+      met: 'Super!',
+      metCaption: 'Neue Wörter gehört!',
       shopHint: 'Im Laden gibt es neue Sticker!',
       superPopup: {
         title: 'Hurra! Super-Sticker!',
@@ -391,7 +395,7 @@ export const STR = {
     vocabHint: 'Слово считается выученным, когда прочитано верно с первой попытки два раза подряд. Выученные слова в заданиях не выпадают, пока не придёт пора повторить (через 2, 4, 8 недель и т. д.).',
     vocabLine: 'знает {known} · пора повторить {due} · учит {learning} · ещё не встречалось {fresh}',
     vocabNone: 'Пока нет данных: слова появятся после первых серий.',
-    vocabSets: { ru: 'Русские слова (чтение)', de: 'Немецкие слова (чтение)', 'de-art': 'Немецкие артикли (der, die, das)', en: 'Английские слова' },
+    vocabSets: { ru: 'Русские слова (чтение)', de: 'Немецкие слова (чтение)', 'de-art': 'Немецкие артикли (der, die, das)', en: 'Английские слова (узнаёт)', ens: 'Английские слова (называет вслух)' },
     reportButton: 'Отчёт для анализа',
     reportHint: 'Файл с результатами заданий за последние недели. Отдайте его Claude Code, чтобы он предложил, как усложнить задания.',
     reportSaved: 'Отчёт сохранён в «Загрузки».',

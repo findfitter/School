@@ -913,6 +913,14 @@
   --stamp-gap: var(--book-paper);
 }
 
+/* Без звёзд (знакомство): печать «Готово!» одна, крупно по центру страницы. Сдвиг не через transform: он занят анимацией печати */
+.rs-stamp.plain {
+  right: auto;
+  left: calc(50% - var(--u) * 80);
+  top: calc(var(--u) * 90);
+  --stamp-size: calc(var(--u) * 160);
+}
+
 .rs-bone {
   position: absolute;
   left: 0;

@@ -7,6 +7,7 @@
   "description": "Слушаем слово и выбираем картинку",
   "version": "1.0.0",
   "voice": true,
+  "cycle": "english",
   "styles": [
     "style.css"
   ],

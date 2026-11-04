@@ -265,10 +265,6 @@
   padding-bottom: 1vh;
 }
 
-.ew-nav.center {
-  justify-content: center;
-}
-
 .ew-btn {
   min-height: 72px;
   min-width: 72px;
@@ -294,18 +290,4 @@
 .ew-topic.pressed {
   transform: translateY(4px);
   box-shadow: none;
-}
-
-/* Конец темы */
-.ew-done-icon {
-  margin-top: 6vh;
-  font-size: clamp(80px, 20vh, 160px);
-  line-height: 1;
-}
-
-.ew-done-text {
-  max-width: 24em;
-  text-align: center;
-  font-size: clamp(20px, 3.6vh, 30px);
-  color: var(--ink-soft, #6b6f85);
 }
