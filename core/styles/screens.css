@@ -164,6 +164,42 @@
   gap: 20px;
 }
 
+/* Вкладки экрана родителя (core/screens/parent.js) */
+.parent-tabs {
+  flex: none;
+  display: flex;
+  gap: 8px;
+  padding: 4px 30px 8px;
+  overflow-x: auto;
+  touch-action: pan-x;
+}
+
+.parent-tab {
+  flex: none;
+  min-height: var(--tap);
+  padding: 0 20px;
+  border-radius: 999px;
+  background: #e9dfcb;
+  color: var(--book-ink-soft);
+  font-weight: 800;
+}
+
+.parent-tab.on {
+  background: var(--book-done);
+  color: #fff;
+}
+
+/* Вкладка тестировщика отличается пунктиром: это не для повседневной работы */
+.parent-tab.tester {
+  background: transparent;
+  border: 2px dashed #b9ac94;
+}
+
+.parent-tab.tester.on {
+  background: #6b5fa5;
+  border-color: #6b5fa5;
+}
+
 /* Экран родителя на бумаге книги: строже и мельче, поля — внутри страницы (service-sheet) */
 .parent-screen > .bar {
   padding: 18px 30px 6px;

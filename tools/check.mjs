@@ -348,6 +348,257 @@ if (existsSync(`${challengeDir}/manifest.json`)) {
   notes.push(`сложные задания: рассказов ${storyCount} (ru, de, en), математика и право-лево — генераторы`);
 }
 
+// 7б. Ежедневная миссия «Уборка комнаты»: файлы, данные, строки и переходы между фазами (хранилище на заглушке localStorage)
+{
+  const MISSION_FILES = ['core/mission-data.js', 'core/mission.js', 'core/screens/mission.js', 'core/screens/room-art.js', 'core/styles/mission.css'];
+  for (const f of MISSION_FILES) if (!swList.includes(f)) add('МИССИЯ', 'sw.js', `файла миссии нет в CORE_FILES: ${f}`);
+  if (!read(`${ROOT}/index.html`).includes('core/styles/mission.css')) add('МИССИЯ', 'index.html', 'не подключён core/styles/mission.css');
+
+  const coreUrl = (p) => 'file:///' + `${ROOT}/core/${p}`;
+  const data = await import(coreUrl('mission-data.js'));
+  const { STR } = await import(coreUrl('strings.js'));
+  const ids = data.ZONES.map((z) => z.id);
+  if (new Set(ids).size !== ids.length) add('МИССИЯ', 'mission-data.js', 'в ZONES повторяются id');
+  const icons = data.ZONES.map((z) => z.icon);
+  if (icons.some((i) => !i) || new Set(icons).size !== icons.length) add('МИССИЯ', 'mission-data.js', 'у каждой зоны свой значок, значки не повторяются');
+  for (const z of data.ZONES) {
+    if (!['A', 'B'].includes(z.view)) add('МИССИЯ', z.id, 'view зоны — A или B');
+    if (!STR.mission.zones?.[z.id]) add('МИССИЯ', z.id, 'нет названия зоны в STR.mission.zones');
+    if (!STR.mission.zonePick?.[z.id]) add('МИССИЯ', z.id, 'нет реплики собаки при выборе зоны в STR.mission.zonePick');
+  }
+  for (const id of Object.keys(STR.mission.zones || {})) if (!ids.includes(id)) add('МИССИЯ', 'strings.js', `название для несуществующей зоны ${id}`);
+  for (const z of data.ZONES) {
+    const inFrame = (p) => Array.isArray(p) && p[0] >= 0 && p[0] <= 380 && p[1] >= 0 && p[1] <= 250;
+    if (!data.VIEWS.includes(z.view) || !Array.isArray(z.views) || !z.views.includes(z.view)) add('МИССИЯ', z.id, 'view должен быть одним из views');
+    for (const v of z.views || []) if (!inFrame(z.stand?.[v]) || !inFrame(z.spot?.[v])) add('МИССИЯ', z.id, `stand и spot для вида ${v} — точки в кадре комнаты 380×250`);
+    if (!data.GESTURES.includes(z.gesture)) add('МИССИЯ', z.id, `жест «${z.gesture}» не из GESTURES`);
+  }
+  for (const g of data.GESTURES) if (!read(`${ROOT}/core/styles/mission.css`).includes(`.mz-actor.g-${g}`)) add('МИССИЯ', 'mission.css', `нет анимации жеста ${g}`);
+  if (ids.length !== 7) add('МИССИЯ', 'mission-data.js', `зон должно быть семь (раздел 8.4 ТЗ), а их ${ids.length}`);
+  if (!data.REWARD_TYPES.includes(data.REWARD.type)) add('МИССИЯ', 'mission-data.js', `REWARD.type «${data.REWARD.type}» не из REWARD_TYPES`);
+  // Все ключи STR.mission используются в коде ядра.
+  const coreCode = js.filter((p) => p.includes('/core/') && !p.endsWith('/strings.js')).map(read).join('\n');
+  for (const key of Object.keys(STR.mission)) {
+    if (!new RegExp(`\\b${key}\\b`).test(coreCode)) add('МИССИЯ', 'strings.js', `ключ STR.mission.${key} нигде не используется`);
+  }
+
+  // Рисунок комнаты (раздел 8 ТЗ): оба вида собираются, у каждой зоны есть группа data-zone хотя бы в одном виде,
+  // палитра --room-* определена в mission.css, id внутри рисунка не повторяются, внешних адресов нет.
+  const { roomMarkup } = await import(coreUrl('screens/room-art.js'));
+  const foundBy = {}; // какие зоны нарисованы в каком виде (ТЗ 8.11): сверяем с views в ZONES
+  const seen = new Set();
+  const cssVars = new Set([...css.map(read).join('\n').matchAll(/--([\w-]+)\s*:/g)].map((m) => m[1]));
+  for (const view of ['A', 'B']) {
+    const svg = roomMarkup(view);
+    if (!svg.startsWith('<svg') || !svg.trim().endsWith('</svg>')) add('КОМНАТА', `вид ${view}`, 'разметка не SVG');
+    if (/NaN|undefined|\[object/.test(svg)) add('КОМНАТА', `вид ${view}`, 'в разметке NaN/undefined');
+    const found = new Set([...svg.matchAll(/data-zone="(\w+)"/g)].map((m) => m[1]));
+    foundBy[view] = found;
+    for (const id of found) { seen.add(id); if (!ids.includes(id)) add('КОМНАТА', `вид ${view}`, `data-zone «${id}» нет в ZONES`); }
+    const idList = [...svg.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
+    if (new Set(idList).size !== idList.length) add('КОМНАТА', `вид ${view}`, 'повторяются id внутри рисунка');
+    if (/https?:\/\/(?!www\.w3\.org\/2000\/svg)/.test(svg)) add('КОМНАТА', `вид ${view}`, 'внешний адрес в рисунке');
+    for (const m of svg.matchAll(/var\((--room-[\w-]+)\)/g)) if (!cssVars.has(m[1].slice(2))) add('КОМНАТА', `вид ${view}`, `цвет ${m[1]} не определён в mission.css`);
+  }
+  for (const id of ids) if (!seen.has(id)) add('КОМНАТА', id, 'зоны нет ни в одном виде комнаты');
+  for (const z of data.ZONES) {
+    const drawn = data.VIEWS.filter((v) => foundBy[v]?.has(z.id));
+    if (drawn.join() !== [...z.views].sort().join()) add('КОМНАТА', z.id, `views в ZONES (${z.views}) не совпадают с видами, где зона нарисована (${drawn})`);
+  }
+  if (!read(`${ROOT}/core/styles/mission.css`).includes('.mz-turn')) add('КОМНАТА', 'mission.css', 'нет стиля кнопки «Повернуть комнату»');
+
+  // Карточка родителя: строки STR.parent.mission* / dayShort используются в parent.js, дней недели семь
+  const parentCode = read(`${ROOT}/core/screens/parent.js`);
+  for (const key of Object.keys(STR.parent).filter((k) => /^mission|^dayShort$/.test(k))) {
+    if (!new RegExp(`\\b${key}\\b`).test(parentCode)) add('МИССИЯ', 'strings.js', `ключ STR.parent.${key} нигде не используется`);
+  }
+  // вкладки экрана родителя: у каждой есть название, и каждое название относится к вкладке
+  const tabIds = [...parentCode.matchAll(/\{ id: '(\w+)', build:/g)].map((m) => m[1]);
+  for (const id of tabIds) if (!STR.parent.tabs?.[id]) add('МИССИЯ', 'strings.js', `нет названия вкладки родителя «${id}» в STR.parent.tabs`);
+  for (const id of Object.keys(STR.parent.tabs || {})) if (!tabIds.includes(id)) add('МИССИЯ', 'strings.js', `название вкладки «${id}» есть, а вкладки в parent.js нет`);
+  if (tabIds.length < 6 || !tabIds.includes('tester')) add('МИССИЯ', 'parent.js', 'на экране родителя должны быть вкладки и вкладка «tester»');
+  if (STR.parent.dayShort.length !== 7) add('МИССИЯ', 'strings.js', 'STR.parent.dayShort — семь дней недели');
+  for (const key of ['off', 'choose', 'timer', 'wait', 'done', 'doneNoZone', 'skipped']) if (!STR.parent.missionStatus?.[key]) add('МИССИЯ', 'strings.js', `нет STR.parent.missionStatus.${key}`);
+
+  // Хранилище и переходы. storage.js ждёт браузер, поэтому даём ему заглушки window и localStorage.
+  const mem = new Map();
+  globalThis.window = { addEventListener() {} };
+  globalThis.localStorage = { getItem: (k) => (mem.has(k) ? mem.get(k) : null), setItem: (k, v) => mem.set(k, String(v)), removeItem: (k) => mem.delete(k) };
+  const storage = await import(coreUrl('storage.js'));
+  const mission = await import(coreUrl('mission.js'));
+  const must = (cond, text) => { if (!cond) add('МИССИЯ', 'поведение', text); };
+  const today = storage.dayKey();
+  const yesterday = data.shiftDay(today, -1);
+  const importData = (d) => storage.importJson(JSON.stringify({ app: 'school-app', version: 1, data: d }));
+
+  // Расписание собаки в таймере: дорога, работа и отдых по кругу, финал; после продления времени — сразу работа
+  const mm = mission;
+  const plan = mm.dogPlan;
+  const okPlan = (r, mode) => r.mode === mode;
+  must(okPlan(plan(0, 300000), 'walk') && plan(0, 300000).t === 0, 'dogPlan: в начале собака идёт, доля пути 0');
+  must(okPlan(plan(mm.DOG_WALK_MS / 2, 290000), 'walk') && Math.abs(plan(mm.DOG_WALK_MS / 2, 290000).t - 0.5) < 1e-9, 'dogPlan: на середине дороги t = 0,5');
+  must(okPlan(plan(mm.DOG_WALK_MS + 1000, 280000), 'work'), 'dogPlan: после дороги работает');
+  must(okPlan(plan(mm.DOG_WALK_MS + mm.DOG_WORK_MS + 500, 270000), 'rest'), 'dogPlan: после рабочего отрезка отдыхает');
+  must(okPlan(plan(mm.DOG_WALK_MS + mm.DOG_WORK_MS + mm.DOG_REST_MS + 500, 260000), 'work'), 'dogPlan: цикл работа-отдых повторяется');
+  must(okPlan(plan(100000, mm.DOG_PROUD_MS), 'proud') && okPlan(plan(300000, 0), 'proud'), 'dogPlan: в последние секунды и после конца собака гордо сидит');
+  must(okPlan(plan(0, 300000, false), 'work'), 'dogPlan: после «Ещё нет» собака не идёт от двери заново');
+
+
+  // старое сохранение (без миссии) читается: миссия выключена, настройки по умолчанию
+  importData({ stars: 3 });
+  must(storage.stars() === 3, 'старое сохранение без миссии не прочиталось');
+  must(storage.settings().mission.enabled === false && storage.settings().mission.minutes === 5 && storage.settings().mission.days.length === 7, 'настройки миссии по умолчанию: выключена, 5 минут, все дни');
+  must(!mission.missionPending(), 'выключенная миссия не должна быть нужна');
+  storage.setSettings({ mission: { enabled: true } });
+  must(storage.settings().mission.minutes === 5, 'setSettings({ mission: { enabled } }) затёр остальные настройки миссии');
+  must(mission.missionPending(), 'включённая миссия сегодня должна быть нужна');
+  storage.setSettings({ mission: { days: [1, 2, 3, 4, 5, 6, 7].filter((d) => d !== data.isoWeekday(today)) } });
+  must(!mission.missionPending(), 'в «чужой» день недели миссии быть не должно');
+  storage.setSettings({ mission: { days: 'мусор', minutes: 999 } });
+  must(storage.settings().mission.days.length === 7 && storage.settings().mission.minutes === 15, 'плохие настройки миссии должны стать безопасными');
+
+  // полный день: зона → таймер → «убралась» → «ещё нет» → подтверждение один раз
+  must(!mission.startTimer(), 'таймер нельзя запустить без зоны');
+  must(!mission.chooseZone('нет-такой'), 'выбор несуществующей зоны принят');
+  must(mission.chooseZone('desk') && mission.chooseZone('bed'), 'ребёнок до «Начнём!» должна менять выбор');
+  const t0 = Date.now() - 600000; // начали 10 минут назад (хранилище не принимает моменты из будущего)
+  must(mission.startTimer(t0) && storage.mission().phase === 'timer' && storage.mission().endsAt === t0 + 15 * 60000, 'старт таймера');
+  must(!mission.chooseZone('desk') && storage.mission().zone === 'bed', 'после «Начнём!» зона меняться не должна');
+  must(mission.msLeft(t0 + 60000) === 14 * 60000, 'msLeft считается от endsAt');
+  must(mission.timerProgress(t0) === 0 && Math.abs(mission.timerProgress(t0 + 7.5 * 60000) - 0.5) < 1e-9 && mission.timerProgress(t0 + 20 * 60000) === 1, 'timerProgress: 0, 0,5 и 1 на начале, середине и конце отрезка');
+  must(mission.markCleaned(t0 + 90000) && storage.mission().phase === 'wait' && mission.missionPending(), '«Я убралась!» переводит в ожидание взрослого, миссия ещё не закрыта');
+  must(mission.addTime(t0 + 100000) && storage.mission().phase === 'timer' && storage.mission().extra === 1, '«Ещё нет» возвращает таймер');
+  must(mission.timerProgress(t0 + 100000) === 0, 'после «Ещё нет» отрезок таймера начинается заново (progress = 0)');
+  mission.markCleaned(t0 + 120000);
+  const gift = mission.confirmDone();
+  const m1 = storage.mission();
+  must(gift && m1.phase === 'done' && m1.streak === 1 && m1.lastDoneDay === today, 'подтверждение: фаза done, серия 1');
+  must(m1.history[today]?.result === 'done' && m1.history[today].zone === 'bed' && m1.history[today].sec === 120 && m1.history[today].extra === 1, 'запись в истории (зона, секунды, добавления)');
+  must(mission.confirmDone() === null && !mission.skipToday(), 'подарок или пропуск второй раз за день');
+  must(!mission.missionPending(), 'после подтверждения миссии быть не должно');
+
+  // перезагрузка: экспорт → импорт сохраняет миссию, настройки и время миссии
+  storage.addMissionUsage(7);
+  const before = JSON.stringify(storage.mission());
+  const dump = storage.exportJson();
+  storage.reset();
+  must(storage.mission().phase === 'choose' && Object.keys(storage.mission().history).length === 0 && storage.missionUsageOn() === 0, 'reset() стирает историю и время миссии');
+  must(storage.settings().mission.minutes === 15, 'reset() не должен стирать настройки миссии');
+  storage.importJson(dump);
+  must(JSON.stringify(storage.mission()) === before && storage.missionUsageOn() === 7, 'экспорт/импорт теряет данные миссии');
+  must(storage.usageOn() === 0, 'время миссии попало в дневной лимит');
+
+  // вчерашняя недоделанная миссия сгорает, серия и история остаются; серия продолжается через «не миссионные» дни
+  const base = { settings: { mission: { enabled: true, minutes: 5, days: [1, 2, 3, 4, 5, 6, 7] } } };
+  importData({ ...base, mission: { day: yesterday, phase: 'wait', zone: 'desk', startedAt: Date.now() - 5000, streak: 4, lastDoneDay: yesterday, history: { [yesterday]: { zone: 'desk', result: 'done', sec: 60, extra: 0 } } } });
+  const m2 = storage.mission();
+  must(m2.day === today && m2.phase === 'choose' && m2.zone === '' && m2.streak === 4 && m2.history[yesterday], 'новый день: миссия заново, серия и история на месте');
+  must(mission.currentStreak() === 4, 'серия за вчерашний день должна продолжаться');
+  mission.chooseZone('floor'); mission.startTimer(); mission.confirmDone();
+  must(storage.mission().streak === 5, 'серия растёт на следующий день');
+  importData({ ...base, mission: { day: today, phase: 'choose', streak: 4, lastDoneDay: data.shiftDay(today, -3) } });
+  must(mission.currentStreak() === 0, 'пропущенный день миссии обнуляет серию');
+  must(data.continuesStreak(data.shiftDay(today, -3), today, [data.isoWeekday(data.shiftDay(today, -1))]) === false, 'continuesStreak: пропущены «миссионные» дни');
+  must(data.continuesStreak(data.shiftDay(today, -3), today, []) === true, 'continuesStreak: между ними нет «миссионных» дней');
+
+  // пробный запуск из раздела для родителя: короткий таймер, настоящее состояние, история и время миссии не меняются
+  storage.reset();
+  storage.setSettings({ mission: { enabled: true } });
+  const realBefore = JSON.stringify(storage.mission());
+  const minutesBefore = mission.timerMs();
+  storage.startMissionTest();
+  must(storage.missionTestOn() && mission.timerMs() === data.MISSION_TEST_MS, 'пробный запуск: таймер короткий');
+  mission.chooseZone('sofa'); mission.startTimer(); mission.markCleaned();
+  must(mission.confirmDone() !== null && storage.mission().phase === 'done', 'пробный запуск доходит до конца');
+  storage.addMissionUsage(50);
+  storage.endMissionTest();
+  must(!storage.missionTestOn() && mission.timerMs() === minutesBefore, 'после пробного запуска таймер снова по настройкам');
+  must(JSON.stringify(storage.mission()) === realBefore && storage.missionUsageOn() === 0, 'пробный запуск изменил настоящую миссию, историю или время миссии');
+
+  // подарок за уборку — косточка, один раз; пропуск за звёзды списывает с баланса и подарка не даёт; пробный запуск ничего не меняет
+  must(data.REWARD.type === 'bones' && data.REWARD.amount === 1, 'REWARD: за уборку — одна косточка');
+  storage.reset();
+  storage.setSettings({ mission: { enabled: true } });
+  must(storage.bonesBalance() === 0, 'в начале косточек нет');
+  mission.chooseZone('desk'); mission.startTimer(); mission.markCleaned();
+  mission.confirmDone();
+  must(storage.bonesBalance() === 1 && storage.mission().reward?.type === 'bones', 'подтверждение уборки даёт одну косточку');
+  mission.confirmDone();
+  must(storage.bonesBalance() === 1, 'косточка за день выдаётся один раз');
+  storage.reset();
+  storage.addStars(150);
+  storage.setSettings({ mission: { enabled: true } });
+  const starsBefore = storage.stars();
+  must(mission.skipForStars() && storage.balance() === 50 && storage.stars() === starsBefore, 'пропуск за 100 звёзд списывает с баланса, заработанные звёзды не уменьшаются');
+  const paid = storage.mission();
+  must(paid.phase === 'skipped' && paid.history[today]?.result === 'skipped' && paid.history[today].paid === data.SKIP_COST && storage.bonesBalance() === 0 && !mission.missionPending(), 'пропуск за звёзды: фаза skipped, paid в истории, косточки нет');
+  must(!mission.skipForStars() && storage.balance() === 50, 'второй пропуск за день звёзды не тратит');
+  storage.reset();
+  storage.addStars(99);
+  storage.setSettings({ mission: { enabled: true } });
+  must(!mission.skipForStars() && storage.balance() === 99 && mission.missionPending(), 'не хватает звёзд: пропуска нет, звёзды на месте');
+  storage.startMissionTest();
+  must(mission.skipForStars() && storage.balance() === 99, 'пробный запуск: пропуск за звёзды ничего не тратит');
+  mission.chooseZone('desk');
+  storage.endMissionTest();
+  storage.reset();
+
+  // «Открыть сегодняшнюю миссию заново» (вкладка тестировщика): день стирается, серия пересчитывается по истории, выданное не возвращается
+  storage.reset();
+  storage.setSettings({ mission: { enabled: true } });
+  storage.setMission({ streak: 2, lastDoneDay: data.shiftDay(today, -1), history: { [data.shiftDay(today, -2)]: { zone: 'desk', result: 'done', sec: 90, extra: 0, paid: 0 }, [data.shiftDay(today, -1)]: { zone: 'bed', result: 'done', sec: 90, extra: 0, paid: 0 } } });
+  mission.chooseZone('floor'); mission.startTimer(); mission.markCleaned(); mission.confirmDone();
+  must(storage.mission().streak === 3 && storage.bonesBalance() === 1, 'перед повторным открытием: серия 3, косточка 1');
+  storage.reopenMission();
+  const reopened = storage.mission();
+  must(reopened.phase === 'choose' && reopened.zone === '' && !reopened.history[today] && reopened.streak === 2 && reopened.lastDoneDay === data.shiftDay(today, -1), 'reopenMission: день открыт заново, записи за сегодня нет, серия вернулась к 2');
+  must(storage.bonesBalance() === 1, 'reopenMission не отбирает уже выданную косточку');
+  storage.startMissionTest();
+  storage.reopenMission();
+  must(storage.mission().phase === 'choose' && storage.missionTestOn(), 'reopenMission в пробном запуске ничего не делает');
+  storage.endMissionTest();
+  storage.reset();
+
+  // повреждённые данные
+  const soon = Date.now() + 10 * 86400000;
+  importData({ mission: { day: today, phase: 'timer', zone: 'desk', startedAt: Date.now() - 1000, endsAt: soon } });
+  must(storage.mission().phase === 'timer' && storage.mission().endsAt <= Date.now() + 3600000 + 1000, 'endsAt слишком далеко в будущем');
+  importData({ mission: { day: today, phase: 'timer', zone: 'не-зона', startedAt: 1, endsAt: 2 } });
+  must(storage.mission().phase === 'choose', 'таймер без допустимой зоны должен вернуться к выбору');
+  importData({ mission: 'мусор', missionUsage: { 'не-день': 5, [today]: 'x' } });
+  must(storage.mission().phase === 'choose' && storage.missionUsageOn() === 0, 'мусор в миссии и времени миссии');
+  // раздел «Уборка комнаты» в отчёте для анализа: без данных — пометка, с данными — цифры и CSV по дням
+  const report = await import(coreUrl('report.js'));
+  const emptyApp = { manifests: [] };
+  storage.reset();
+  const textEmpty = report.buildReport(emptyApp);
+  must(textEmpty.includes(`## ${STR.report.mission.title}`) && textEmpty.includes(STR.report.mission.none) && !report.hasData(), 'отчёт без данных миссии: раздел с пометкой «данных нет»');
+  const dayAgo = (n) => data.shiftDay(today, -n);
+  importData({
+    settings: { mission: { enabled: true, minutes: 5, days: [1, 2, 3, 4, 5, 6, 7] } },
+    mission: {
+      day: today, phase: 'choose', streak: 2, lastDoneDay: dayAgo(1),
+      history: {
+        [dayAgo(1)]: { zone: 'desk', result: 'done', sec: 200, extra: 0 },
+        [dayAgo(2)]: { zone: 'desk', result: 'done', sec: 300, extra: 1 },
+        [dayAgo(3)]: { zone: 'bed', result: 'skipped', sec: 0, extra: 0 },
+        [dayAgo(20)]: { zone: 'sofa', result: 'done', sec: 100, extra: 0 },
+      },
+    },
+    missionUsage: { [dayAgo(1)]: 250, [dayAgo(2)]: 330 },
+  });
+  const text = report.buildReport(emptyApp);
+  must(report.hasData(), 'hasData() должна видеть историю миссии');
+  must(text.includes('выполнено 2, пропущено взрослым 1') && text.includes('выполнено 3, пропущено взрослым 1'), 'отчёт: счёт выполнено/пропущено за 14 и 30 дней');
+  must(text.includes('Стол 2') && text.includes('Диван 1') && text.includes('Ни разу не выбрано'), 'отчёт: зоны и невыбранные зоны');
+  must(text.includes('медиана 3:20') && text.includes('(дней с замером: 3)'), 'отчёт: медиана времени уборки (200, 300, 100 с → 3:20)');
+  must(text.includes('Взрослый добавлял время (30 дней): 1 раз в 1 дн.') && text.includes('сейчас 2, лучшая') && text.includes('14 дн. — 9:40'), 'отчёт: добавления времени, серия, время на экранах миссии');
+  must(text.includes(STR.report.mission.rawHead) && text.includes(`${dayAgo(2)},mission,desk,done,300,1,0,330`), 'отчёт: CSV миссии по дням с полем mission');
+  must(!/NaN|undefined|\[object/.test(text), 'в отчёте NaN или undefined');
+  storage.reset();
+  notes.push('миссия «Уборка комнаты»: зоны, строки, хранилище, переходы и раздел отчёта проверены');
+}
+
 // 8. Классы в CSS и JS: быстрый поиск мёртвых стилей и неопределённых переменных
 const vars = new Set([...css.map(read).join('\n').matchAll(/--([\w-]+)\s*:/g)].map((m) => m[1]));
 for (const f of css) {

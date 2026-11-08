@@ -1,0 +1,576 @@
+/* Ежедневная миссия «Уборка комнаты». Экраны — core/screens/mission.js (разворот книги: слева комната и собака, справа ответы ребёнка), рисунок комнаты — room-art.js. */
+
+/* Палитра комнаты (ТЗ, раздел 8.6): базовые цвета заливки, акварель ложится поверх них. Рисунок — core/screens/room-art.js */
+:root {
+  --room-ink: #5a4636;
+  --room-wall: #dce8ed;
+  --room-wall-far: #e9f1f4;
+  --room-ceiling: #f3f0e6;
+  --room-floor: #e8d2a8;
+  --room-seam: #d6b97f;
+  --room-rug: #f6d4de;
+  --room-heart: #ee9db9;
+  --room-sofa: #f2e06a;
+  --room-sofa-seat: #f8e99a;
+  --room-sofa-side: #e3cc5a;
+  --room-bed: #fbf8f1;
+  --room-blanket: #f6c9d6;
+  --room-curtain: #bfdcd0;
+  --room-wood: #e6cf9f;
+  --room-wood2: #ebd5ac;
+  --room-chair: #f4b8cc;
+  --room-lilac: #cdb8e6;
+  --room-lol: #5b78c8;
+}
+
+/* Рисунок комнаты: статичная картинка в своём слое, фильтр рисуется один раз */
+.room-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+}
+
+/* ===== Экраны миссии (размеры — в «пикселях эскиза» --u, как у остальных разворотов книги) ===== */
+.mission-holder {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* Левая страница: комната в рамке «фото» и собака с облачком под ней */
+.mz-room {
+  position: absolute;
+  left: calc(var(--u) * 40);
+  top: calc(var(--u) * 26);
+  width: calc(var(--u) * 516);
+  height: calc(var(--u) * 340);
+  background: var(--book-card);
+  box-shadow: var(--book-shadow), 0 0 0 calc(var(--u) * 6) var(--book-card);
+}
+
+/* Кнопка «Повернуть комнату»: показать комнату с другой стороны (вид A ↔ B) */
+.mz-turn {
+  position: absolute;
+  top: calc(var(--u) * 8);
+  right: calc(var(--u) * 8);
+  z-index: 3;
+  min-height: 64px;
+  padding: 0 calc(var(--u) * 14);
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 8);
+  --rot: 1deg;
+  font-family: var(--font);
+  font-size: max(16px, calc(var(--u) * 22));
+  font-weight: 700;
+  color: var(--book-ink);
+}
+
+.mz-turn-icon {
+  font-size: 1.5em;
+  line-height: 1;
+}
+
+/* Выбранная зона светится золотым (небольшие группы, не вся комната) */
+.mz-room .room-art .hi {
+  filter: drop-shadow(0 0 2px #fffbe0) drop-shadow(0 0 5px #ffd23f) drop-shadow(0 0 11px #ffb300) drop-shadow(0 0 18px rgba(255, 179, 0, 0.8)) brightness(1.08) saturate(1.2);
+}
+
+.mz-talk {
+  position: absolute;
+  left: calc(var(--u) * 24);
+  right: calc(var(--u) * 24);
+  bottom: calc(var(--u) * 20);
+  height: calc(var(--u) * 252);
+}
+
+.mz-dog {
+  position: absolute;
+  left: calc(var(--u) * 10);
+  bottom: 0;
+  width: calc(var(--u) * 168);
+  aspect-ratio: 240 / 270;
+  transform-origin: 50% 100%;
+}
+
+.mz-dog svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Радость собаки на экране подарка: несколько прыжков, не бесконечно */
+.mz-dog.joy {
+  animation: rs-joy 1.1s ease-in-out 4;
+}
+
+.mz-bubble {
+  position: absolute;
+  left: calc(var(--u) * 206);
+  right: calc(var(--u) * 6);
+  bottom: calc(var(--u) * 60);
+  padding: calc(var(--u) * 12) calc(var(--u) * 18) calc(var(--u) * 14);
+  background: var(--book-card);
+  border: 2.5px solid #5a4636;
+  border-radius: 30px 36px 28px 24px / 26px 22px 32px 28px;
+  font-size: max(20px, calc(var(--u) * 29));
+  line-height: 1.08;
+  text-align: center;
+}
+
+/* Хвостик облачка влево, к собаке */
+.mz-bubble::after {
+  content: "";
+  position: absolute;
+  left: calc(var(--u) * -11);
+  bottom: calc(var(--u) * 26);
+  width: calc(var(--u) * 18);
+  height: calc(var(--u) * 18);
+  background: var(--book-card);
+  border-left: 2.5px solid #5a4636;
+  border-bottom: 2.5px solid #5a4636;
+  transform: rotate(45deg);
+}
+
+/* Экран таймера: собаки под комнатой нет (она в комнате), облачко во всю ширину, хвостик вверх, к комнате */
+.mz-talk.alone .mz-bubble {
+  left: 0;
+  right: 0;
+  bottom: calc(var(--u) * 70);
+}
+
+.mz-talk.alone .mz-bubble::after {
+  left: calc(var(--u) * 60);
+  top: calc(var(--u) * -11);
+  bottom: auto;
+  border-left: 2.5px solid #5a4636;
+  border-top: 2.5px solid #5a4636;
+  border-bottom: 0;
+}
+
+/* Правая страница: ответы ребёнка */
+.mz-right {
+  position: absolute;
+  inset: 0;
+}
+
+.mz-cards {
+  position: absolute;
+  left: calc(var(--u) * 36);
+  right: calc(var(--u) * 36);
+  top: calc(var(--u) * 28);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: calc(var(--u) * 12);
+}
+
+.mz-card {
+  min-height: 64px;
+  height: calc(var(--u) * 94);
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 10);
+  padding: 0 calc(var(--u) * 14);
+  --rot: -0.6deg;
+  --s-tape: rgba(244, 195, 78, 0.55);
+  font-family: var(--font);
+  font-size: max(17px, calc(var(--u) * 25));
+  font-weight: 700;
+  line-height: 1.08;
+  text-align: left;
+  color: var(--book-ink);
+}
+
+.mz-card:nth-child(even) {
+  --rot: 0.7deg;
+}
+
+.mz-card:last-child {
+  grid-column: 1 / -1;
+  width: calc(50% - var(--u) * 6);
+  justify-self: center;
+}
+
+.mz-card.on {
+  background: #fff3cf;
+  box-shadow: var(--book-shadow), inset 0 0 0 4px var(--book-gold);
+}
+
+.mz-icon {
+  flex: none;
+  width: 1.3em;
+  text-align: center;
+  font-size: max(32px, calc(var(--u) * 48));
+  line-height: 1;
+}
+
+.mz-go {
+  position: absolute;
+  left: calc(var(--u) * 36);
+  right: calc(var(--u) * 36);
+  bottom: calc(var(--u) * 34);
+}
+
+.mz-go:disabled {
+  opacity: 0.45;
+  box-shadow: none;
+}
+
+/* Дуга-таймер: осталось — золотая дуга, она убывает против часовой по мере времени (core/screens/mission.js) */
+.mz-ring {
+  position: absolute;
+  left: calc(50% - var(--u) * 140);
+  top: calc(var(--u) * 30);
+  width: calc(var(--u) * 280);
+  height: calc(var(--u) * 280);
+}
+
+.mz-ring svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.mz-ring-track,
+.mz-ring-arc {
+  fill: none;
+  stroke-width: 16;
+}
+
+.mz-ring-track {
+  stroke: #eadfcb;
+}
+
+.mz-ring-arc {
+  stroke: var(--book-gold);
+  stroke-linecap: round;
+}
+
+.mz-ring-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--u) * 2);
+}
+
+.mz-ring-label {
+  font-size: max(16px, calc(var(--u) * 24));
+  color: var(--book-ink-soft);
+}
+
+.mz-clock {
+  font-size: calc(var(--u) * 84);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.mz-clock.over {
+  color: var(--book-done);
+}
+
+.mz-zone-chip {
+  position: absolute;
+  left: calc(var(--u) * 60);
+  right: calc(var(--u) * 60);
+  top: calc(var(--u) * 336);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--u) * 12);
+  font-size: max(18px, calc(var(--u) * 30));
+  color: var(--book-ink-soft);
+}
+
+/* После выбора: зона крупной карточкой */
+.mz-zone {
+  position: absolute;
+  left: calc(var(--u) * 100);
+  right: calc(var(--u) * 100);
+  top: calc(var(--u) * 100);
+  height: calc(var(--u) * 230);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--u) * 6);
+  --rot: -1deg;
+  --s-tape: rgba(244, 195, 78, 0.55);
+}
+
+.mz-zone .mz-icon {
+  font-size: max(54px, calc(var(--u) * 96));
+}
+
+.mz-zone .mz-name {
+  font-family: var(--font-hand);
+  font-size: calc(var(--u) * 46);
+  line-height: 1;
+}
+
+/* Вопрос взрослому */
+.mz-info {
+  position: absolute;
+  left: calc(var(--u) * 44);
+  right: calc(var(--u) * 44);
+  top: calc(var(--u) * 44);
+  margin: 0;
+  text-align: center;
+  font-size: max(18px, calc(var(--u) * 27));
+  line-height: 1.2;
+  color: var(--book-ink-soft);
+}
+
+.mz-adult {
+  position: absolute;
+  left: calc(var(--u) * 44);
+  right: calc(var(--u) * 44);
+  top: calc(var(--u) * 150);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 16);
+}
+
+.mz-right > .btn.quiet {
+  position: absolute;
+  left: calc(var(--u) * 44);
+  bottom: calc(var(--u) * 44);
+}
+/* ===== Собака в комнате (core/screens/mission-dog.js): ход, жесты зон, искорки «чисто» ===== */
+.mz-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Внешняя группа двигается (transform ставит JS, ход плавный); фильтр собаки внутри неподвижен */
+.mz-walker {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+}
+
+.mz-walker.moving {
+  transition: transform 0.55s linear;
+}
+
+.mz-actor {
+  transform-origin: 50% 100%;
+}
+
+.mz-actor svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Идёт: подпрыгивает на каждом шагу, хвост быстрее */
+.mz-actor.walk {
+  animation: mzd-hop 0.38s ease-in-out infinite;
+}
+
+.mz-actor.walk .dog-tail {
+  animation-duration: 0.35s;
+}
+
+/* Жесты зон: лёгкие повторяющиеся движения частей рисунка (лапа, голова) и корпуса */
+.mz-actor.g-wipe {
+  animation: mzd-lean 1.6s ease-in-out infinite;
+}
+
+.mz-actor.g-wipe .dog-paw-r {
+  animation: mzd-paw 0.8s ease-in-out infinite;
+}
+
+.mz-actor.g-sweep {
+  animation: mzd-sway 1.2s ease-in-out infinite;
+}
+
+.mz-actor.g-sweep .dog-head {
+  animation: mzd-sweep 1.2s ease-in-out infinite;
+}
+
+.mz-actor.g-sweep .dog-tail,
+.mz-actor.g-nudge .dog-tail {
+  animation-duration: 0.5s;
+}
+
+.mz-actor.g-tidy .dog-head {
+  animation: mzd-nod 0.9s ease-in-out infinite;
+}
+
+.mz-actor.g-nudge {
+  animation: mzd-push 1s ease-in-out infinite;
+}
+
+/* Гордо сидит: голова вверх, хвост машет */
+.mz-actor.proud .dog-head {
+  animation: none;
+  transform: translateY(-5px) rotate(-2deg);
+}
+
+.mz-actor.proud .dog-tail {
+  animation-duration: 0.45s;
+}
+
+.mz-spark {
+  position: absolute;
+  width: calc(var(--u) * 20);
+  height: calc(var(--u) * 20);
+  margin: calc(var(--u) * -10) 0 0 calc(var(--u) * -10);
+  animation: mzd-twinkle 2.4s ease-in-out infinite;
+}
+
+.mz-field.all .mz-spark {
+  animation-duration: 1.1s;
+}
+
+@keyframes mzd-hop {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7%); }
+}
+
+@keyframes mzd-lean {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-4deg); }
+}
+
+@keyframes mzd-paw {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-40deg); }
+}
+
+@keyframes mzd-sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+@keyframes mzd-sweep {
+  0%, 100% { transform: translateX(-5px) rotate(-5deg); }
+  50% { transform: translateX(5px) rotate(5deg); }
+}
+
+@keyframes mzd-nod {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(7px) rotate(4deg); }
+}
+
+@keyframes mzd-push {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(7%); }
+}
+
+@keyframes mzd-twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.6) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.15) rotate(25deg); }
+}
+
+/* Косточка за уборку и пропуск за звёзды */
+.mz-bone {
+  top: calc(var(--u) * 80);
+  height: calc(var(--u) * 190);
+}
+
+.mz-gift-caption {
+  position: absolute;
+  left: calc(var(--u) * 40);
+  right: calc(var(--u) * 40);
+  top: calc(var(--u) * 300);
+  margin: 0;
+  text-align: center;
+  font-size: calc(var(--u) * 40);
+  line-height: 1.1;
+  color: var(--book-ink);
+}
+
+.mz-spent {
+  position: absolute;
+  left: calc(var(--u) * 40);
+  right: calc(var(--u) * 40);
+  top: calc(var(--u) * 150);
+  text-align: center;
+  font-size: calc(var(--u) * 110);
+  line-height: 1;
+  color: #8a2a42;
+}
+
+.mz-skip {
+  color: #8a2a42;
+  transform: rotate(1.5deg);
+  --s-tape: rgba(217, 102, 127, 0.45);
+}
+
+.mz-dialog {
+  width: min(86%, calc(var(--u) * 520));
+}
+
+.mz-dialog p {
+  margin: 0;
+  font-size: calc(var(--u) * 38);
+  line-height: 1.15;
+}
+
+.mz-dialog .row {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 14);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mz-dog.joy,
+  .mz-actor,
+  .mz-actor *,
+  .mz-spark {
+    animation: none !important;
+  }
+
+  .mz-walker.moving {
+    transition: none;
+  }
+}
+
+/* ===== Карточка «Уборка комнаты» на экране родителя (core/screens/parent.js) ===== */
+.chips-days {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.chip-day {
+  min-width: var(--tap);
+  min-height: var(--tap);
+  border-radius: 999px;
+  background: #e9dfcb;
+  color: var(--book-ink-soft);
+  font-weight: 800;
+}
+
+.chip-day.on {
+  background: var(--book-done);
+  color: #fff;
+}
+
+.mission-days {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8em;
+}
+
+.mission-day {
+  display: grid;
+  grid-template-columns: minmax(150px, 220px) 1fr;
+  gap: 12px;
+  color: var(--book-ink-soft);
+}
+
+.mission-day.done {
+  color: var(--book-done);
+}

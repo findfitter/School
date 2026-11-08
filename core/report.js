@@ -6,6 +6,8 @@ import { STR } from './strings.js';
 import { format } from './dom.js';
 import * as storage from './storage.js';
 import * as journal from './journal.js';
+import { ZONES, currentStreak } from './mission.js';
+import { isoWeekday, continuesStreak } from './mission-data.js';
 
 const R = STR.report;
 const DAY_MS = 86400000;
@@ -108,7 +110,77 @@ function mistakesLine(done, labelOf) {
 }
 
 export function hasData() {
-  return journal.count() > 0;
+  return journal.count() > 0 || Object.keys(storage.mission().history).length > 0;
+}
+
+const RM = R.mission;
+const clock = (sec) => `${Math.floor(sec / 60)}:${pad(Math.round(sec % 60))}`;
+
+// Раздел «Уборка комнаты»: привычка (выполнено / пропущено), зоны, время уборки, добавления времени, серия, время на экранах миссии.
+// Возвращает строки markdown и строки CSV по дням (поле «вид» = mission).
+function missionSection(now) {
+  const m = storage.mission();
+  const cfg = storage.settings().mission;
+  const lines = [`## ${RM.title}`, '', RM.note, ''];
+  const zoneTitle = (id) => (id ? STR.mission.zones[id] || id : '—');
+  lines.push(format(RM.settings, {
+    state: cfg.enabled ? RM.on : RM.off,
+    min: cfg.minutes,
+    days: cfg.days.map((d) => STR.parent.dayShort[d - 1]).join(', ') || '—',
+  }), '');
+  const history = m.history;
+  const usage30 = storage.missionUsageDays(30);
+  if (!Object.keys(history).length && !usage30.some((d) => d.seconds > 0)) {
+    lines.push(RM.none, '');
+    return { lines, csv: [] };
+  }
+
+  const window = (count) => Array.from({ length: count }, (_, i) => {
+    const date = new Date(now);
+    date.setDate(date.getDate() - i);
+    return storage.dayKey(date);
+  });
+  for (const count of [14, 30]) {
+    const keys = window(count);
+    const done = keys.filter((k) => history[k]?.result === 'done').length;
+    const skipped = keys.filter((k) => history[k]?.result === 'skipped').length;
+    const empty = keys.filter((k) => !history[k]);
+    const off = empty.filter((k) => !cfg.days.includes(isoWeekday(k))).length;
+    lines.push(format(RM.period, { n: count, done, skipped, nothing: empty.length, off }), '');
+  }
+
+  const keys30 = window(30);
+  const entries30 = keys30.filter((k) => history[k]).map((k) => ({ day: k, ...history[k] }));
+  const paidSkips = entries30.filter((e) => e.paid > 0);
+  if (paidSkips.length) lines.push(format(RM.paid, { n: paidSkips.length, stars: paidSkips.reduce((n, e) => n + e.paid, 0) }), '');
+  const perZone = new Map(ZONES.map((z) => [z.id, 0]));
+  for (const e of entries30) if (perZone.has(e.zone)) perZone.set(e.zone, perZone.get(e.zone) + 1);
+  lines.push(format(RM.zones, { list: ZONES.map((z) => `${zoneTitle(z.id)} ${perZone.get(z.id)}`).join(' · ') }), '');
+  const never = ZONES.filter((z) => perZone.get(z.id) === 0).map((z) => zoneTitle(z.id));
+  if (entries30.length >= 3 && never.length) lines.push(format(RM.zonesNever, { list: never.join(', ') }), '');
+
+  const secs = entries30.filter((e) => e.result === 'done' && e.sec > 0).map((e) => e.sec);
+  lines.push(secs.length ? format(RM.time, { med: clock(quantile(secs, 0.5)), p90: clock(quantile(secs, 0.9)), n: secs.length }) : RM.timeNone, '');
+  const extras = entries30.filter((e) => e.extra > 0);
+  lines.push(format(RM.extra, { n: extras.reduce((n, e) => n + e.extra, 0), days: extras.length }), '');
+
+  // Лучшая серия по сохранённой истории: подтверждённые дни подряд (дни без миссии по расписанию серию не рвут).
+  const doneDays = Object.keys(history).filter((k) => history[k].result === 'done').sort();
+  let best = 0;
+  let run = 0;
+  doneDays.forEach((day, i) => {
+    run = i > 0 && continuesStreak(doneDays[i - 1], day, cfg.days) ? run + 1 : 1;
+    best = Math.max(best, run);
+  });
+  lines.push(format(RM.streak, { cur: currentStreak(), best }), '');
+
+  const sum = (count) => usage30.slice(0, count).reduce((n, d) => n + d.seconds, 0);
+  const active = usage30.filter((d) => d.seconds >= 30).length;
+  lines.push(format(RM.usage, { w14: clock(sum(14)), w30: clock(sum(30)), avg: active ? clock(sum(30) / active) : '—' }), '');
+
+  const usageOf = new Map(usage30.map((d) => [d.key, Math.round(d.seconds)]));
+  const csvRows = entries30.sort((a, b) => (a.day < b.day ? -1 : 1)).map((e) => [e.day, 'mission', e.zone || '', e.result, e.sec, e.extra, e.paid || 0, usageOf.get(e.day) || 0].map(csv).join(','));
+  return { lines, csv: csvRows };
 }
 
 export function buildReport(app, now = Date.now()) {
@@ -230,6 +302,10 @@ export function buildReport(app, now = Date.now()) {
     dwe: sums.dwe,
   }), '');
 
+  // ---------- Уборка комнаты ----------
+  const missionPart = missionSection(now);
+  out.push(...missionPart.lines);
+
   // ---------- Сырые данные ----------
   out.push(`## ${R.rawTitle}`, '', R.rawNote, '', '```csv', R.rawHead);
   const raw = entries.filter((e) => e.t >= now - RAW_DAYS * DAY_MS).slice(-RAW_MAX_ROWS);
@@ -244,6 +320,7 @@ export function buildReport(app, now = Date.now()) {
     ].map(csv).join(','));
   }
   out.push('```', '');
+  if (missionPart.csv.length) out.push(`## ${RM.rawTitle}`, '', RM.rawNote, '', '```csv', RM.rawHead, ...missionPart.csv, '```', '');
   return out.join('\n');
 }
 

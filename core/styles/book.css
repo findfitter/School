@@ -1028,6 +1028,8 @@
 .app-idle .sleep-star,
 .app-idle .sleep-zzz span,
 .app-idle .limit-star,
-.app-idle .limit-zzz span {
+.app-idle .limit-zzz span,
+.app-idle .mz-actor,
+.app-idle .mz-spark {
   animation-play-state: paused !important;
 }

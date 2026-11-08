@@ -1,4 +1,7 @@
-// Экран для родителя (вход через проверку для взрослых, см. gate.js): статистика, время, модули, настройки, данные.
+// Экран для родителя (вход через проверку для взрослых, см. gate.js). Разбит на вкладки, чтобы не показывать всё сразу:
+// «Сегодня» (время и уборка на сегодня), «Успехи» (статистика и слова), «Время» (время в приложении, лимит), «Уборка»
+// (настройки миссии и история), «Настройки», «Данные» (сохранение, отчёт, сброс) и «Тестировщик» (инструменты проверки).
+// Выбранная вкладка помнится на время работы приложения (storage.uiState), поэтому перерисовка экрана после кнопок её не сбрасывает.
 
 import { h, onTap, button, format } from '../dom.js';
 import { STR } from '../strings.js';
@@ -6,30 +9,57 @@ import * as storage from '../storage.js';
 import { moduleIcon } from '../registry.js';
 import { buildReport, reportFileName, hasData } from '../report.js';
 import { createSheet } from './book.js';
+import { missionPending, confirmDone, skipToday, currentStreak } from '../mission.js';
 
 const P = STR.parent;
+
+// Вкладки: id, что на ней лежит. Карточки собираются при открытии вкладки (тогда же читаются свежие данные).
+const TABS = [
+  { id: 'today', build: ({ app }) => [todayCard(app), missionTodayCard(app)] },
+  { id: 'progress', build: ({ app }) => [statsCard(app), wordsCard()] },
+  { id: 'time', build: () => [usageCard()] },
+  { id: 'mission', build: ({ app }) => [missionSettingsCard(app)] },
+  { id: 'settings', build: ({ app }) => [modulesCard(app), settingsCard(app)] },
+  { id: 'data', build: ({ app, screen, status }) => [dataCard(app, screen, status)] },
+  { id: 'tester', build: ({ app }) => testerCards(app) },
+];
 
 export function renderParent(app) {
   // Для родителя — та же бумага, но строже и мельче: одна страница с прокруткой внутри (createSheet).
   const screen = createSheet({ className: 'parent-screen service-sheet' }).el;
   const status = h('p', { class: 'status', 'aria-live': 'polite' });
+  const ctx = { app, screen, status };
 
-  const body = h('main', { class: 'scroll content parent-body' },
-    todayCard(app),
-    dogTestCard(app),
-    statsCard(app),
-    wordsCard(),
-    usageCard(),
-    modulesCard(app),
-    settingsCard(app),
-    dataCard(app, screen, status));
+  const saved = storage.uiState('parent-tab');
+  let current = TABS.some((t) => t.id === saved) ? saved : TABS[0].id;
+
+  const body = h('main', { class: 'scroll content parent-body', role: 'tabpanel' });
+  const buttons = TABS.map((t) => {
+    const b = h('button', { class: `parent-tab${t.id === 'tester' ? ' tester' : ''}`, type: 'button', role: 'tab' }, P.tabs[t.id]);
+    onTap(b, () => select(t.id));
+    return b;
+  });
+
+  function select(id) {
+    current = id;
+    storage.setUiState('parent-tab', id);
+    status.textContent = '';
+    TABS.forEach((t, i) => {
+      buttons[i].classList.toggle('on', t.id === id);
+      buttons[i].setAttribute('aria-selected', String(t.id === id));
+    });
+    body.replaceChildren(...TABS.find((t) => t.id === id).build(ctx).filter(Boolean));
+    body.scrollTop = 0;
+  }
 
   screen.append(
     h('header', { class: 'bar' },
       button('btn', `⬅ ${STR.common.back}`, () => app.go.menu()),
       h('h1', { text: P.title }),
       h('div', { class: 'chip' }, format(P.totalStars, { stars: storage.stars(), balance: storage.balance(), supers: storage.supers() }))),
+    h('nav', { class: 'parent-tabs', role: 'tablist' }, buttons),
     body);
+  select(current);
   return screen;
 }
 
@@ -50,11 +80,124 @@ function wordsCard() {
     rows.length ? rows : h('p', { class: 'status', text: P.vocabNone }));
 }
 
-// Тестовый экран собаки: свои собаки и косточки, рабочие данные ребёнка не затрагиваются.
-function dogTestCard(app) {
-  return card(P.dogTestTitle,
-    h('p', { class: 'hint-line', text: P.dogTestHint }),
-    button('btn primary', `🧪 ${P.dogTestOpen}`, () => app.go.dogTest()));
+// ---------- Уборка комнаты (ежедневная миссия, core/mission.js) ----------
+const MISSION_MIN = 3;
+const MISSION_MAX = 15;
+const zoneName = (id) => (STR.mission.zones[id] || '').toLowerCase();
+const clock = (sec) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+
+// Что с миссией сегодня: текст статуса и можно ли ещё её закрыть (пропустить / подтвердить).
+function missionStatus() {
+  const m = storage.mission();
+  const pending = missionPending();
+  const entry = m.history[storage.dayKey()];
+  const key = pending ? m.phase
+    : m.phase === 'done' ? (entry?.zone ? 'done' : 'doneNoZone')
+      : m.phase === 'skipped' ? (entry?.paid ? 'skippedPaid' : 'skipped') : 'off';
+  return { m, pending, text: format(P.missionStatus[key], { zone: zoneName(m.zone), time: clock(entry?.sec ?? 0), paid: entry?.paid ?? 0 }) };
+}
+
+// Вкладка «Сегодня»: статус уборки и кнопки, пока она не закрыта.
+function missionTodayCard(app) {
+  const { pending, text } = missionStatus();
+  const streak = currentStreak();
+  return card(P.missionTodayTitle,
+    h('p', { class: 'status' }, h('strong', { text: P.missionToday }), text),
+    pending ? h('div', { class: 'row-wrap' },
+      button('btn primary', `✓ ${P.missionConfirm}`, () => { confirmDone(); app.go.parent(); }),
+      button('btn', P.missionSkip, () => { skipToday(); app.go.parent(); })) : null,
+    streak ? h('p', { class: 'status', text: format(P.missionStreak, { n: streak }) }) : null);
+}
+
+// Вкладка «Уборка»: включение, длительность, дни недели, история.
+function missionSettingsCard() {
+  const cfg = () => storage.settings().mission;
+
+  const sw = h('button', { class: 'switch', type: 'button', role: 'switch' });
+  const paintSwitch = () => {
+    const on = cfg().enabled;
+    sw.classList.toggle('on', on);
+    sw.setAttribute('aria-checked', String(on));
+    sw.textContent = on ? P.on : P.off;
+  };
+  onTap(sw, () => {
+    storage.setSettings({ mission: { enabled: !cfg().enabled } });
+    paintSwitch();
+  });
+  paintSwitch();
+
+  const minutes = h('output', { class: 'value wide', text: `${cfg().minutes} ${P.missionMinutesUnit}` });
+  const stepMinutes = (delta) => () => {
+    const next = Math.min(MISSION_MAX, Math.max(MISSION_MIN, cfg().minutes + delta));
+    storage.setSettings({ mission: { minutes: next } });
+    minutes.textContent = `${next} ${P.missionMinutesUnit}`;
+  };
+
+  const chips = P.dayShort.map((name, i) => {
+    const day = i + 1;
+    const chip = h('button', { class: 'chip-day', type: 'button', role: 'switch' }, name);
+    const paint = () => {
+      const on = cfg().days.includes(day);
+      chip.classList.toggle('on', on);
+      chip.setAttribute('aria-checked', String(on));
+    };
+    onTap(chip, () => {
+      const days = new Set(cfg().days);
+      if (days.has(day)) days.delete(day);
+      else days.add(day);
+      storage.setSettings({ mission: { days: [...days] } });
+      paint();
+    });
+    paint();
+    return chip;
+  });
+
+  const m = storage.mission();
+  const history = Array.from({ length: 14 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    const e = m.history[storage.dayKey(date)];
+    const label = date.toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'short' });
+    const text = !e ? P.usageNone
+      : e.result === 'skipped' ? (e.paid ? format(P.missionHistoryPaid, { paid: e.paid }) : P.missionHistorySkipped)
+        : `${P.missionHistoryDone}${e.zone ? `, ${zoneName(e.zone)}` : ''}, ${clock(e.sec)}${e.extra ? format(P.missionHistoryExtra, { n: e.extra }) : ''}`;
+    return h('div', { class: `mission-day${e ? ` ${e.result}` : ''}` }, h('span', { class: 'usage-date', text: label }), h('span', { text }));
+  });
+
+  return card(P.missionTitle,
+    h('p', { class: 'hint-line', text: P.missionHint }),
+    h('div', { class: 'row-between' }, h('span', { text: P.missionOn }), sw),
+    h('div', { class: 'row-between' },
+      h('span', { text: P.missionMinutes }),
+      h('div', { class: 'stepper' }, button('btn round', '−', stepMinutes(-1)), minutes, button('btn round', '+', stepMinutes(1)))),
+    h('div', { class: 'row-between' }, h('span', { text: P.missionDays }), h('div', { class: 'chips-days' }, chips)),
+    h('h3', { class: 'usage-days-title', text: P.missionHistory }),
+    h('div', { class: 'mission-days' }, history));
+}
+
+// ---------- Вкладка «Тестировщик» ----------
+// Всё, что нужно для проверки новых возможностей, в одном месте. Блок «Рабочие данные» меняет данные ребёнка по-настоящему.
+function testerCards(app) {
+  const refresh = () => app.go.parent();
+  const { text } = missionStatus();
+  const bones = storage.bonesBalance();
+  return [
+    card(P.testerMissionTitle,
+      h('p', { class: 'status' }, h('strong', { text: P.missionToday }), text),
+      h('div', { class: 'row-wrap' }, button('btn primary', `🧪 ${P.missionTest}`, () => app.go.missionTest())),
+      h('p', { class: 'hint-line', text: P.missionTestHint }),
+      h('div', { class: 'row-wrap' }, button('btn', `↺ ${P.testerReopen}`, () => { storage.reopenMission(); refresh(); })),
+      h('p', { class: 'hint-line', text: P.testerReopenHint })),
+    card(P.testerWorkTitle,
+      h('p', { class: 'hint-line', text: P.testerWorkHint }),
+      h('p', { class: 'status', text: format(P.testerWorkNow, { stars: storage.balance(), bones }) }),
+      h('div', { class: 'row-wrap' },
+        button('btn', `+100 ⭐`, () => { storage.addStars(100); refresh(); }),
+        button('btn', `+1 🦴`, () => { storage.addBones(1); refresh(); }))),
+    card(P.dogTestTitle,
+      h('p', { class: 'hint-line', text: P.dogTestHint }),
+      button('btn primary', `🧪 ${P.dogTestOpen}`, () => app.go.dogTest())),
+  ];
 }
 
 function statsCard(app) {
@@ -85,7 +228,9 @@ function statsCard(app) {
 // Работает через дополнительные минуты на сегодня, поэтому статистика времени остаётся точной.
 function todayCard(app) {
   const limit = storage.settings().dailyLimit;
-  if (!limit) return null;
+  if (!limit) {
+    return card(P.todayTitle, h('p', { class: 'status', text: format(P.todayNoLimit, { used: formatTime(storage.usageOn()), mission: formatTime(storage.missionUsageOn()) }) }));
+  }
   const used = storage.usageOn();
   const bonus = storage.bonusOn();
   const total = (limit + bonus) * 60;
@@ -160,11 +305,16 @@ function usageCard() {
       h('span', { class: 'usage-time', text: formatTime(d.seconds) }));
   });
 
+  // Время на экранах миссии «Уборка комнаты» считается отдельно и в дневной лимит не входит.
+  const missionDays = storage.missionUsageDays(30);
+  const missionTotal = (count) => missionDays.slice(0, count).reduce((sum, d) => sum + d.seconds, 0);
+
   return card(P.usageTitle,
     h('div', { class: 'usage-stats' },
       stat(P.usageToday, total(1)),
       stat(P.usageWeek, total(7), average(total(7), 7)),
       stat(P.usageMonth, total(30), average(total(30), 30))),
+    h('p', { class: 'status', text: format(P.missionUsage, { today: formatTime(missionTotal(1)), week: formatTime(missionTotal(7)), month: formatTime(missionTotal(30)) }) }),
     h('div', { class: 'row-between' },
       h('span', { text: P.usageLimit }),
       h('div', { class: 'stepper' }, button('btn round', '−', stepLimit(-1)), limitValue, button('btn round', '+', stepLimit(1)))),

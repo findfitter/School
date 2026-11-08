@@ -6,6 +6,9 @@ import {
   cleanDog, dogPrice, applyDecay, clamp100, PACK_PRICE, FOOD_PACK, BAG_PACK, SHAMPOO_PACK, MAX_POOPS, FULL_AT, MAX_SKILL,
   ADULT_AGE, PUPPY_AFTER_MS, HAPPY_AT, SLEEP_FROM, SLEEP_MOOD, NAMES, PLAY_LIMIT_SEC,
 } from './dogs.js';
+import {
+  PHASES, OPEN_PHASES, ZONE_IDS, REWARD_TYPES, ALL_DAYS, DEFAULT_MINUTES, MIN_MINUTES, MAX_MINUTES, HISTORY_DAYS, continuesStreak,
+} from './mission-data.js';
 
 const KEY = 'school-app-v1';
 const APP_ID = 'school-app';
@@ -30,7 +33,15 @@ const DEFAULT_SETTINGS = {
   voices: { ru: '', de: '' }, // имя выбранного голоса; пусто — подбирать автоматически
   translation: false, // показывать русский перевод под английскими словами
   dailyLimit: 0, // ограничение времени в день, минуты (0 — без ограничения)
+  // Ежедневная миссия «Уборка комнаты» (core/mission.js): по умолчанию выключена; days — дни недели (1 — пн … 7 — вс).
+  mission: { enabled: false, minutes: DEFAULT_MINUTES, days: ALL_DAYS },
 };
+
+const DAY_RE = /^\d{4}-\d{2}-\d{2}$/; // объявлено до `let state = load()`: normalize() вызывается уже при загрузке модуля
+const MISSION_MAX_AHEAD_MS = 3600000; // таймер миссии не может кончаться позже, чем через час от «сейчас»
+const emptyMission = (day = '') => ({
+  day, phase: 'choose', zone: '', startedAt: 0, endsAt: 0, cleanedAt: 0, extra: 0, reward: null, streak: 0, lastDoneDay: '', history: {},
+});
 
 let state = load();
 
@@ -42,7 +53,9 @@ window.addEventListener('storage', (e) => {
 
 function fresh() {
   return {
-    settings: { ...DEFAULT_SETTINGS, disabledModules: [], voices: { ...DEFAULT_SETTINGS.voices } },
+    settings: { ...DEFAULT_SETTINGS, disabledModules: [], voices: { ...DEFAULT_SETTINGS.voices }, mission: { ...DEFAULT_SETTINGS.mission, days: [...ALL_DAYS] } },
+    mission: emptyMission(), // состояние миссии «Уборка комнаты» за день
+    missionUsage: {}, // время на экранах миссии по дням (отдельно от usage): { 'ГГГГ-ММ-ДД': секунды }
     stars: 0,
     owned: [], // id купленных наклеек (каталог в rewards.js)
     spent: 0, // сколько звёзд потрачено в магазине
@@ -128,6 +141,49 @@ function normalizeDogBag(c = {}) {
   };
 }
 
+function normalizeMissionSettings(m) {
+  const raw = m && typeof m === 'object' ? m : {};
+  const days = Array.isArray(raw.days)
+    ? [...new Set(raw.days.map(Number).filter((d) => Number.isInteger(d) && d >= 1 && d <= 7))].sort((a, b) => a - b)
+    : [...ALL_DAYS];
+  return { enabled: Boolean(raw.enabled), minutes: Math.round(num(raw.minutes, MIN_MINUTES, MAX_MINUTES, DEFAULT_MINUTES)), days };
+}
+
+// Состояние миссии за день. Плохие значения становятся безопасными: зона — только из ZONES, время — в разумных пределах
+// (таймер не кончается позже чем через час), фаза без нужных данных откатывается к выбору зоны.
+function normalizeMission(raw) {
+  const m = raw && typeof raw === 'object' ? raw : {};
+  const now = Date.now();
+  const out = emptyMission(DAY_RE.test(m.day) ? m.day : '');
+  out.phase = PHASES.includes(m.phase) ? m.phase : 'choose';
+  out.zone = ZONE_IDS.includes(m.zone) ? m.zone : '';
+  out.startedAt = Math.round(num(m.startedAt, 0, now, 0));
+  out.endsAt = Math.round(num(m.endsAt, 0, now + MISSION_MAX_AHEAD_MS, 0));
+  out.cleanedAt = Math.round(num(m.cleanedAt, 0, now, 0));
+  out.extra = Math.round(num(m.extra, 0, 99, 0));
+  if (m.reward && typeof m.reward === 'object' && REWARD_TYPES.includes(m.reward.type)) {
+    out.reward = { type: m.reward.type, amount: Math.round(num(m.reward.amount, 0, 9999, 0)) };
+  }
+  out.streak = Math.round(num(m.streak, 0, 9999, 0));
+  out.lastDoneDay = DAY_RE.test(m.lastDoneDay) ? m.lastDoneDay : '';
+  const days = Object.keys(m.history && typeof m.history === 'object' ? m.history : {}).filter((d) => DAY_RE.test(d)).sort().slice(-HISTORY_DAYS);
+  for (const day of days) {
+    const e = m.history[day];
+    if (!e || (e.result !== 'done' && e.result !== 'skipped')) continue;
+    out.history[day] = {
+      zone: ZONE_IDS.includes(e.zone) ? e.zone : '',
+      result: e.result,
+      sec: Math.round(num(e.sec, 0, 86400, 0)),
+      extra: Math.round(num(e.extra, 0, 99, 0)),
+      paid: Math.round(num(e.paid, 0, 9999, 0)), // сколько звёзд ребёнок заплатила, чтобы пропустить уборку
+    };
+  }
+  // Фаза без нужных данных (повреждённое сохранение) — снова выбор зоны.
+  const broken = (m.phase === 'timer' && !(out.zone && out.startedAt && out.endsAt)) || (m.phase === 'wait' && !(out.zone && out.startedAt));
+  if (broken) Object.assign(out, { phase: 'choose', zone: '', startedAt: 0, endsAt: 0, cleanedAt: 0 });
+  return out;
+}
+
 function normalize(data) {
   const s = fresh();
   if (!data || typeof data !== 'object') return s;
@@ -137,6 +193,8 @@ function normalize(data) {
   s.settings.speechRate = num(d.speechRate, 0.5, 1.5, DEFAULT_SETTINGS.speechRate);
   s.settings.translation = Boolean(d.translation);
   s.settings.dailyLimit = Math.round(num(d.dailyLimit, 0, 600, 0));
+  s.settings.mission = normalizeMissionSettings(d.mission);
+  s.mission = normalizeMission(data.mission);
   s.settings.disabledModules = Array.isArray(d.disabledModules)
     ? d.disabledModules.filter((id) => typeof id === 'string')
     : [];
@@ -156,6 +214,9 @@ function normalize(data) {
   }
   for (const [day, seconds] of Object.entries(data.usage || {})) {
     if (/^\d{4}-\d{2}-\d{2}$/.test(day) && day >= oldest) s.usage[day] = num(seconds, 0, 86400, 0);
+  }
+  for (const [day, seconds] of Object.entries(data.missionUsage || {})) {
+    if (DAY_RE.test(day) && day >= oldest) s.missionUsage[day] = num(seconds, 0, 86400, 0);
   }
   if (Array.isArray(data.owned)) {
     s.owned = [...new Set(data.owned.filter((id) => stickerById.has(id)))];
@@ -205,11 +266,15 @@ export function settings() {
     ...state.settings,
     disabledModules: [...state.settings.disabledModules],
     voices: { ...state.settings.voices },
+    mission: { ...state.settings.mission, days: [...state.settings.mission.days] },
   };
 }
 
+// patch.mission можно передавать частично ({ enabled: true }): его поля сливаются с текущими.
 export function setSettings(patch) {
-  state = normalize({ ...state, settings: { ...state.settings, ...patch } });
+  const next = { ...state.settings, ...patch };
+  if (patch.mission) next.mission = { ...state.settings.mission, ...patch.mission };
+  state = normalize({ ...state, settings: next });
   save();
 }
 
@@ -280,6 +345,156 @@ export function usageDays(count) {
     date.setDate(date.getDate() - i);
     const key = dayKey(date);
     return { key, date, seconds: state.usage[key] || 0 };
+  });
+}
+
+// ---------- Миссия «Уборка комнаты» (логика — core/mission.js) ----------
+
+// Новый день — новая миссия: вчерашняя, не доведённая до конца, тихо сгорает; серия и история остаются.
+function rollMission() {
+  const today = dayKey();
+  if (state.mission.day === today) return;
+  const { streak, lastDoneDay, history } = state.mission;
+  state.mission = { ...emptyMission(today), streak, lastDoneDay, history };
+  save();
+}
+
+// Пробный запуск миссии из раздела для родителя («Проверить миссию»): состояние живёт только в памяти, в сохранение,
+// историю, серию и время миссии ничего не попадает. Пока он идёт, mission()/setMission()/... работают с ним.
+let missionTest = null;
+export const missionTestOn = () => missionTest !== null;
+export function startMissionTest() {
+  missionTest = emptyMission(dayKey());
+}
+export function endMissionTest() {
+  missionTest = null;
+}
+
+const copyMission = (m) => ({ ...m, reward: m.reward ? { ...m.reward } : null, history: Object.fromEntries(Object.entries(m.history).map(([d, e]) => [d, { ...e }])) });
+
+export function mission() {
+  if (missionTest) return copyMission(missionTest);
+  rollMission();
+  return copyMission(state.mission);
+}
+
+// Поменять поля состояния миссии за сегодня (переходы между фазами — в core/mission.js).
+export function setMission(patch) {
+  if (missionTest) {
+    missionTest = normalizeMission({ ...missionTest, ...patch });
+    return;
+  }
+  rollMission();
+  state.mission = normalizeMission({ ...state.mission, ...patch });
+  save();
+}
+
+// Подтверждение уборки одним действием: фаза done, подарок (reward = { type, amount }), серия и история.
+// Возвращает false, если миссия сегодня уже закрыта (подарок второй раз не выдаётся).
+export function completeMission(reward) {
+  if (missionTest) {
+    if (!OPEN_PHASES.includes(missionTest.phase)) return false;
+    missionTest = normalizeMission({ ...missionTest, phase: 'done' });
+    return true;
+  }
+  rollMission();
+  const m = state.mission;
+  if (!OPEN_PHASES.includes(m.phase)) return false;
+  const today = dayKey();
+  const now = Date.now();
+  const end = m.cleanedAt || now;
+  const sec = m.startedAt ? Math.max(0, Math.round((end - m.startedAt) / 1000)) : 0;
+  const days = state.settings.mission.days;
+  const streak = continuesStreak(m.lastDoneDay, today, days) ? m.streak + 1 : 1;
+  const history = { ...m.history, [today]: { zone: m.zone, result: 'done', sec, extra: m.extra, paid: 0 } };
+  state.mission = normalizeMission({ ...m, phase: 'done', reward: reward || null, streak, lastDoneDay: today, history });
+  applyReward(state.mission.reward); // подарок выдаётся здесь же и один раз: повторно день уже не закрыть
+  save();
+  return true;
+}
+
+// Подарок за уборку (описан данными в core/mission-data.js): косточки, корм или звёзды рабочего набора ребёнка.
+function applyReward(reward) {
+  if (!reward || !(reward.amount > 0)) return;
+  if (reward.type === 'bones') state.bones = Math.min(1e6, state.bones + reward.amount);
+  else if (reward.type === 'food') state.food = Math.min(9999, state.food + reward.amount);
+  else if (reward.type === 'stars') state.stars += reward.amount;
+}
+
+// Взрослый пропускает миссию на сегодня: подарка нет, серия не растёт (в истории — «пропуск»).
+export function skipMission() {
+  if (missionTest) {
+    if (!OPEN_PHASES.includes(missionTest.phase)) return false;
+    missionTest = normalizeMission({ ...missionTest, phase: 'skipped' });
+    return true;
+  }
+  rollMission();
+  const m = state.mission;
+  if (!OPEN_PHASES.includes(m.phase)) return false;
+  const today = dayKey();
+  const history = { ...m.history, [today]: { zone: m.zone, result: 'skipped', sec: 0, extra: m.extra, paid: 0 } };
+  state.mission = normalizeMission({ ...m, phase: 'skipped', history });
+  save();
+  return true;
+}
+
+// Ребёнок сама пропускает уборку за звёзды: cost списывается с баланса (spent растёт, заработанные звёзды и счётчик сложных
+// заданий не уменьшаются). Подарка нет. false — миссия уже закрыта или звёзд не хватает. В пробном запуске ничего не тратится.
+export function skipMissionPaid(cost) {
+  if (missionTest) {
+    if (!OPEN_PHASES.includes(missionTest.phase)) return false;
+    missionTest = normalizeMission({ ...missionTest, phase: 'skipped' });
+    return true;
+  }
+  rollMission();
+  const m = state.mission;
+  if (!OPEN_PHASES.includes(m.phase) || balance() < cost) return false;
+  const today = dayKey();
+  state.spent += cost;
+  const history = { ...m.history, [today]: { zone: m.zone, result: 'skipped', sec: 0, extra: m.extra, paid: cost } };
+  state.mission = normalizeMission({ ...m, phase: 'skipped', history });
+  save();
+  return true;
+}
+
+// Для тестировщика: открыть сегодняшнюю миссию заново (выбор зоны, таймер и запись в истории за сегодня стираются, серия
+// пересчитывается по истории). Уже выданные косточка и потраченные звёзды не возвращаются.
+export function reopenMission() {
+  if (missionTest) return;
+  rollMission();
+  const m = state.mission;
+  const today = dayKey();
+  const history = { ...m.history };
+  delete history[today];
+  const done = Object.keys(history).filter((d) => history[d].result === 'done' && d < today).sort().reverse();
+  let streak = 0;
+  if (done.length) {
+    streak = 1;
+    const days = state.settings.mission.days;
+    for (let i = 0; i + 1 < done.length && continuesStreak(done[i + 1], done[i], days); i++) streak += 1;
+  }
+  state.mission = normalizeMission({ day: today, phase: 'choose', streak, lastDoneDay: done[0] || '', history });
+  save();
+}
+
+// Время на экранах миссии — отдельно от usage, чтобы миссия не съедала дневной лимит.
+export function addMissionUsage(seconds, key = dayKey()) {
+  if (missionTest) return;
+  state.missionUsage[key] = Math.min(86400, (state.missionUsage[key] || 0) + seconds);
+  save();
+}
+
+export function missionUsageOn(key = dayKey()) {
+  return state.missionUsage[key] || 0;
+}
+
+// Последние count дней, сегодняшний первым: [{ key, date, seconds }].
+export function missionUsageDays(count) {
+  return Array.from({ length: count }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    const key = dayKey(date);
+    return { key, date, seconds: state.missionUsage[key] || 0 };
   });
 }
 

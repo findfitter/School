@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Комната: сравнение с эталоном</title>
+<link rel="stylesheet" href="../core/styles/mission.css">
+<style>
+  body { margin: 0; padding: 16px; background: #e4ece6; font: 15px/1.4 system-ui, sans-serif; color: #3a3028; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p { margin: 0 0 14px; max-width: 70ch; }
+  section { margin-bottom: 28px; }
+  h2 { font-size: 16px; margin: 0 0 8px; }
+  .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  figure { margin: 0; }
+  figcaption { font-size: 13px; margin-top: 4px; }
+  .box { position: relative; aspect-ratio: 380 / 250; background: #fffdf6; box-shadow: 0 2px 8px rgba(90, 70, 54, 0.25); overflow: hidden; }
+  .box > svg, .box > .ref { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .overlay .room-art { opacity: var(--op, 0.5); }
+  label { display: block; margin-top: 6px; font-size: 13px; }
+  .zones { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .zones button { padding: 6px 10px; border: 1px solid #b9ac94; background: #fffdf6; border-radius: 6px; cursor: pointer; }
+  @media (max-width: 900px) { .row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<h1>Комната: рисунок и эталон</h1>
+<p>Слева эталон владельца (<code>design/room-ref</code>), в середине рисунок из <code>core/screens/room-art.js</code>, справа рисунок поверх эталона (ползунок — прозрачность). Кнопки зон подсвечивают группы <code>data-zone</code>.</p>
+<div id="views"></div>
+<script type="module">
+  import { drawRoom } from '../core/screens/room-art.js';
+
+  const REF = { A: 'room-ref/view-a-door-to-window.png', B: 'room-ref/view-b-window-to-door.png' };
+  const TITLE = { A: 'Вид A — от двери к окну', B: 'Вид B — от окна к двери' };
+  const ZONES = { A: ['desk', 'floor', 'bed', 'sofa', 'doll', 'shelf'], B: ['floor', 'bed', 'sofa', 'kallax'] };
+  const NS = 'http://www.w3.org/2000/svg';
+
+  const ref = (view) => {
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('class', 'ref');
+    svg.setAttribute('viewBox', '33 32 762 483'); // сама комната на картинке без чёрных полей
+    svg.setAttribute('preserveAspectRatio', 'none');
+    const img = document.createElementNS(NS, 'image');
+    img.setAttribute('href', REF[view]);
+    img.setAttribute('width', '828'); img.setAttribute('height', '548');
+    svg.append(img);
+    return svg;
+  };
+  const box = (...kids) => { const d = document.createElement('div'); d.className = 'box'; d.append(...kids); return d; };
+  const fig = (node, text) => { const f = document.createElement('figure'); const c = document.createElement('figcaption'); c.textContent = text; f.append(node, c); return f; };
+
+  for (const view of ['A', 'B']) {
+    const sec = document.createElement('section');
+    const h = document.createElement('h2'); h.textContent = TITLE[view];
+    const room = drawRoom(view, TITLE[view]);
+    const over = box(ref(view), drawRoom(view));
+    over.classList.add('overlay');
+    const slider = document.createElement('input');
+    slider.type = 'range'; slider.min = 0; slider.max = 1; slider.step = 0.05; slider.value = 0.5;
+    slider.addEventListener('input', () => over.style.setProperty('--op', slider.value));
+    const label = document.createElement('label'); label.append('Прозрачность рисунка: ', slider);
+    const zones = document.createElement('div'); zones.className = 'zones';
+    for (const id of ZONES[view]) {
+      const b = document.createElement('button'); b.textContent = id;
+      b.addEventListener('click', () => {
+        for (const g of room.querySelectorAll('[data-zone]')) g.style.opacity = g.dataset.zone === id ? '1' : '0.25';
+      });
+      zones.append(b);
+    }
+    const reset = document.createElement('button'); reset.textContent = 'все зоны';
+    reset.addEventListener('click', () => { for (const g of room.querySelectorAll('[data-zone]')) g.style.opacity = ''; });
+    zones.append(reset);
+    const row = document.createElement('div'); row.className = 'row';
+    row.append(fig(box(ref(view)), 'эталон'), fig(box(room), 'рисунок'), fig(over, 'поверх эталона'));
+    sec.append(h, row, label, zones);
+    document.getElementById('views').append(sec);
+  }
+</script>
+</body>
+</html>
