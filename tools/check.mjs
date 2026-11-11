@@ -429,7 +429,12 @@ if (existsSync(`${challengeDir}/manifest.json`)) {
   const must = (cond, text) => { if (!cond) add('МИССИЯ', 'поведение', text); };
   const today = storage.dayKey();
   const yesterday = data.shiftDay(today, -1);
-  const importData = (d) => storage.importJson(JSON.stringify({ app: 'school-app', version: 1, data: d }));
+  // Чтение сохранения возвращает настройки по умолчанию, где поздравление с днём рождения включено; если сегодня как раз
+  // день рождения из настроек (12-14 ноября), миссии не было бы, поэтому поздравление отключаем.
+  const importData = (d) => {
+    storage.importJson(JSON.stringify({ app: 'school-app', version: 1, data: d }));
+    storage.setSettings({ birthday: { enabled: false } });
+  };
 
   // Расписание собаки в таймере: дорога, работа и отдых по кругу, финал; после продления времени — сразу работа
   const mm = mission;
@@ -597,6 +602,92 @@ if (existsSync(`${challengeDir}/manifest.json`)) {
   must(!/NaN|undefined|\[object/.test(text), 'в отчёте NaN или undefined');
   storage.reset();
   notes.push('миссия «Уборка комнаты»: зоны, строки, хранилище, переходы и раздел отчёта проверены');
+}
+
+// 7б3. День рождения ребёнка: даты, настройки по умолчанию, подарки один раз в год, уборки в этот день нет
+{
+  const BD_FILES = ['core/birthday-data.js', 'core/birthday.js', 'core/screens/birthday.js', 'core/styles/birthday.css'];
+  for (const f of BD_FILES) if (!swList.includes(f)) add('ДЕНЬ РОЖДЕНИЯ', 'sw.js', `файла нет в CORE_FILES: ${f}`);
+  if (!read(`${ROOT}/index.html`).includes('core/styles/birthday.css')) add('ДЕНЬ РОЖДЕНИЯ', 'index.html', 'не подключён core/styles/birthday.css');
+
+  const coreUrl = (p) => 'file:///' + `${ROOT}/core/${p}`;
+  const data = await import(coreUrl('birthday-data.js'));
+  const { STR } = await import(coreUrl('strings.js'));
+  const { stickerById } = await import(coreUrl('rewards.js'));
+  const { itemById } = await import(coreUrl('dog-items.js'));
+  const storage = await import(coreUrl('storage.js'));
+  const bd = await import(coreUrl('birthday.js'));
+  const mission = await import(coreUrl('mission.js'));
+  const must = (cond, text) => { if (!cond) add('ДЕНЬ РОЖДЕНИЯ', 'поведение', text); };
+  const importData = (d) => storage.importJson(JSON.stringify({ app: 'school-app', version: 1, data: d }));
+  const now = new Date();
+  const todayCfg = { month: now.getMonth() + 1, day: now.getDate() };
+  const pad = (n) => String(n).padStart(2, '0');
+  const yesterday = (() => { const d = new Date(now); d.setDate(d.getDate() - 1); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; })();
+  const today = storage.dayKey();
+
+  // подарки существуют: колпак есть в каталоге вещей, наклейки — в каталоге наклеек
+  must(itemById.has(data.GIFT.hat), `колпак ${data.GIFT.hat} из GIFT нет в core/dog-items.js`);
+  for (const id of data.GIFT.stickers) must(stickerById.has(id), `наклейки ${id} из GIFT нет в каталоге core/rewards.js`);
+  must(data.GIFT.bones > 0, 'в GIFT нет косточек');
+  const coreCode = all.filter((p) => p.includes('/core/') && p.endsWith('.js') && !p.endsWith('/strings.js')).map(read).join('\n');
+  for (const key of Object.keys(STR.birthday)) {
+    if (!new RegExp(`\\b${key}\\b`).test(coreCode)) add('ДЕНЬ РОЖДЕНИЯ', 'strings.js', `ключ STR.birthday.${key} нигде не используется`);
+  }
+
+  // даты: сам день, «догоняющие» дни, до и после окна; 31 декабря → январь; 29 февраля
+  const cfg = { month: 11, day: 12, year: 2019 };
+  const at = (y, m, d) => data.birthdayAge(new Date(y, m - 1, d, 12), cfg);
+  must(at(2026, 11, 12)?.age === 7 && at(2026, 11, 12)?.daysAfter === 0, 'в день рождения 12.11.2026 ребёнку 7 лет, daysAfter 0');
+  must(at(2026, 11, 14)?.daysAfter === data.LATE_DAYS, 'через два дня поздравление ещё ждёт');
+  must(at(2026, 11, 15) === null && at(2026, 11, 11) === null && at(2026, 3, 1) === null, 'вне окна поздравления быть не должно');
+  must(data.birthdayAge(new Date(2027, 0, 1, 12), { month: 12, day: 31, year: 2019 })?.year === 2026, 'день рождения 31 декабря догоняет в январе (год — прошлый)');
+  must(data.birthdayAge(new Date(2027, 1, 28, 12), { month: 2, day: 29, year: 2020 })?.daysAfter === 0, '29 февраля в невисокосный год — 28-го');
+  must(data.yearsLabel(1) === '1 год' && data.yearsLabel(2) === '2 года' && data.yearsLabel(5) === '5 лет' && data.yearsLabel(7) === '7 лет' && data.yearsLabel(11) === '11 лет' && data.yearsLabel(21) === '21 год', 'склонение «год / года / лет»');
+
+  // настройки по умолчанию и плохие значения
+  importData({ stars: 1 });
+  const def = storage.settings().birthday;
+  must(def.enabled === true && def.name === 'Алиса' && def.month === 11 && def.day === 12 && def.year === 2019, 'настройки поздравления по умолчанию: Алиса, 12 ноября 2019');
+  storage.setSettings({ birthday: { month: 99, day: -4, year: 1800, name: '  ' + 'я'.repeat(40) } });
+  const bad = storage.settings().birthday;
+  must(bad.month === 12 && bad.day === 1 && bad.year === 1990 && bad.name.length === 20, 'плохие настройки поздравления должны стать безопасными');
+  storage.setSettings({ birthday: { enabled: false } });
+  must(storage.settings().birthday.month === 12 && storage.settings().birthday.enabled === false, 'setSettings({ birthday: { enabled } }) затёр остальные поля');
+
+  // поздравление нужно в день рождения, один раз за год; уборки в этот день нет
+  importData({ settings: { birthday: { enabled: true, ...todayCfg, year: now.getFullYear() - 7 }, mission: { enabled: true } }, mission: { day: today, phase: 'choose', streak: 3, lastDoneDay: yesterday, history: {} } });
+  const info = bd.birthdayInfo();
+  must(info && info.age === 7 && info.daysAfter === 0 && info.year === now.getFullYear(), 'сегодня день рождения: поздравление ждёт, ребёнку 7');
+  must(bd.birthdayToday() && !mission.missionPending(), 'в день рождения уборки комнаты нет');
+  const before = { bones: storage.bones(), owned: storage.owned().length };
+  const got = bd.claimBirthday(info);
+  must(got && got.bones === data.GIFT.bones && got.hat === data.GIFT.hat && got.sticker === data.GIFT.stickers[0], 'подарок: косточки, колпак, первая наклейка');
+  must(storage.bones() === before.bones + data.GIFT.bones && storage.owned().length === before.owned + 1 && storage.owned().includes(got.sticker), 'подарок выдан в хранилище: косточки и наклейка');
+  must(storage.dogApi('real').items().includes(data.GIFT.hat), 'колпак добавлен в вещи');
+  must(bd.claimBirthday(info) === null && bd.birthdayInfo() === null && !bd.birthdayPending(), 'второй раз за год подарок не выдаётся, поздравление больше не нужно');
+  must(storage.mission().phase === 'skipped' && storage.mission().history[today]?.result === 'skipped' && storage.mission().lastDoneDay === today && storage.mission().streak === 3, 'уборка в день рождения закрыта без подарка, серия дней не прервалась');
+  storage.reset();
+  must(storage.birthdayDoneYear() === now.getFullYear(), 'сброс прогресса не должен возвращать поздравление этого года');
+
+  // колпак надевается на собаку без шапки; следующий год — следующая наклейка; поздравление «задним числом» уборку не отменяет
+  importData({ bones: 10, settings: { birthday: { enabled: true, ...todayCfg, year: now.getFullYear() - 7 }, mission: { enabled: true } }, mission: { day: today, phase: 'choose' }, dogsVersion: 2 });
+  storage.dogApi('real').buyDog({ name: 'Рекс', breed: 'labrador', color: 'gold', age: 3 });
+  must(storage.dogApi('real').dogs()[0]?.outfit.hat === '', 'у новой собаки нет шапки');
+  const late = storage.claimBirthday(now.getFullYear(), data.GIFT, 1);
+  must(late && storage.dogApi('real').dogs()[0]?.outfit.hat === data.GIFT.hat, 'колпак надет на собаку без шапки');
+  must(storage.mission().phase === 'choose', 'поздравление «задним числом» (daysAfter > 0) уборку не отменяет');
+  const next = storage.claimBirthday(now.getFullYear() + 1, data.GIFT, 1);
+  must(next && next.sticker === data.GIFT.stickers[1], 'в следующий год — следующая ещё не собранная наклейка');
+  must(storage.claimBirthday(now.getFullYear() + 1, data.GIFT, 1) === null, 'повторный подарок за тот же год');
+  storage.reopenBirthday();
+  must(storage.birthdayDoneYear() === 0, 'reopenBirthday сбрасывает отметку');
+
+  // выключенное поздравление не показывается
+  storage.setSettings({ birthday: { enabled: false } });
+  must(bd.birthdayInfo() === null && !bd.birthdayToday(), 'выключенное поздравление не должно появляться');
+  storage.reset();
+  notes.push('день рождения: даты, настройки, подарки раз в год, колпак на собаку, нет уборки в этот день проверены');
 }
 
 // 8. Классы в CSS и JS: быстрый поиск мёртвых стилей и неопределённых переменных

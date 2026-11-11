@@ -1,0 +1,354 @@
+/* День рождения ребёнка: экраны — core/screens/birthday.js. Разворот книги по образцу миссии «Уборка комнаты»
+   (стили .mission-holder, .mz-room, .mz-talk, .mz-dog, .mz-bubble берём оттуда). Размеры — в «пикселях эскиза» --u. */
+
+.bd-scene {
+  overflow: hidden;
+}
+
+.bd-scene-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Конфетти: один раз сыплется сверху вниз и исчезает (бесконечных анимаций нет) */
+.bd-confetti {
+  position: absolute;
+  top: calc(var(--u) * -20);
+  width: calc(var(--u) * 12);
+  height: calc(var(--u) * 20);
+  border-radius: 2px;
+  opacity: 0;
+  --tilt: 0deg;
+  animation: bd-fall 3s ease-in 1 both;
+  pointer-events: none;
+}
+
+@keyframes bd-fall {
+  0% { opacity: 1; transform: translateY(0) rotate(var(--tilt, 0deg)); }
+  100% { opacity: 0; transform: translateY(calc(var(--u) * 380)) rotate(calc(var(--tilt, 0deg) + 360deg)); }
+}
+
+/* Правая страница */
+.bd-right {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: calc(var(--u) * 28) calc(var(--u) * 36) calc(var(--u) * 150);
+  gap: calc(var(--u) * 10);
+}
+
+.bd-go {
+  position: absolute;
+  left: calc(var(--u) * 36);
+  right: calc(var(--u) * 36);
+  bottom: calc(var(--u) * 34);
+}
+
+.bd-go:disabled {
+  opacity: 0.45;
+  box-shadow: none;
+}
+
+/* 1. Карточка с поздравлением по-немецки и возрастом */
+.bd-card {
+  position: relative;
+  width: 100%;
+  margin-top: calc(var(--u) * 36);
+  padding: calc(var(--u) * 34) calc(var(--u) * 24) calc(var(--u) * 30);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--u) * 8);
+  text-align: center;
+  --rot: -0.8deg;
+  --s-tape: rgba(244, 195, 78, 0.55);
+}
+
+.bd-card-emoji {
+  font-size: calc(var(--u) * 110);
+  line-height: 1;
+}
+
+.bd-card-text {
+  margin: 0;
+  font-size: calc(var(--u) * 56);
+  line-height: 1.05;
+  color: var(--book-ink);
+}
+
+.bd-card-age {
+  margin: 0;
+  font-size: calc(var(--u) * 64);
+  line-height: 1;
+  color: #c9623a;
+}
+
+/* 2. Торт и свечки */
+.bd-counter {
+  margin: 0;
+  min-height: calc(var(--u) * 40);
+  font-size: calc(var(--u) * 34);
+  line-height: 1.1;
+  color: var(--book-ink-soft);
+  text-align: center;
+}
+
+.bd-cake {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bd-candles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+  margin-bottom: calc(var(--u) * -70); /* свечки стоят на верхней поверхности торта */
+  position: relative;
+  z-index: 1;
+}
+
+.bd-candle {
+  position: relative;
+  width: max(64px, calc(var(--u) * 64));
+  height: calc(var(--u) * 124);
+  min-height: 64px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+/* Свечек больше шести: две строки; задняя строка стоит выше, передняя ниже и закрывает её (свечки на круглой верхушке торта) */
+.bd-candles.two-rows {
+  --per: 4; /* свечек в строке; точное число ставит экран */
+  width: calc(var(--per) * max(64px, calc(var(--u) * 64)));
+  padding-top: calc(var(--u) * 89);
+}
+
+.bd-candles.two-rows .bd-candle {
+  margin-top: calc(var(--u) * -89);
+}
+
+.bd-candle svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.bd-flame {
+  transform-origin: 20px 30px;
+  animation: bd-flicker 1.2s ease-in-out 6;
+}
+
+.bd-smoke {
+  opacity: 0;
+}
+
+.bd-candle.out .bd-flame {
+  animation: none;
+  opacity: 0;
+}
+
+.bd-candle.out .bd-smoke {
+  animation: bd-smoke 1.6s ease-out 1 both;
+}
+
+@keyframes bd-flicker {
+  0%, 100% { transform: scale(1, 1); }
+  50% { transform: scale(0.92, 1.08) rotate(3deg); }
+}
+
+@keyframes bd-smoke {
+  0% { opacity: 0.8; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(calc(var(--u) * -50)); }
+}
+
+.bd-cake-art {
+  display: block;
+  width: 100%;
+  max-width: calc(var(--u) * 500);
+  height: auto;
+}
+
+/* 3. Подарки: три коробки в ряд */
+.bd-boxes {
+  width: 100%;
+  margin-top: calc(var(--u) * 36);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: calc(var(--u) * 14);
+}
+
+.bd-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--u) * 8);
+}
+
+.bd-box {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  min-height: 64px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  --box: #f6a5bd;
+  --box-dark: #e5809e;
+  --rib: #fff6e6;
+  --bow: #c9506e;
+}
+
+.bd-box.c2 { --box: #9fd0f0; --box-dark: #74b4e0; --rib: #fff0c9; --bow: #e0b53a; }
+.bd-box.c3 { --box: #f8d56e; --box-dark: #e8b83e; --rib: #f26d85; --bow: #f26d85; }
+
+.bd-lid,
+.bd-body,
+.bd-rib-v,
+.bd-rib-h {
+  position: absolute;
+  display: block;
+}
+
+.bd-body {
+  left: 8%;
+  right: 8%;
+  top: 38%;
+  bottom: 6%;
+  border-radius: 8px;
+  background: var(--box);
+  box-shadow: inset 0 -8px 0 var(--box-dark), var(--book-shadow);
+}
+
+.bd-lid {
+  left: 3%;
+  right: 3%;
+  top: 22%;
+  height: 20%;
+  border-radius: 8px;
+  background: var(--box-dark);
+}
+
+.bd-rib-v {
+  left: 45%;
+  width: 10%;
+  top: 22%;
+  bottom: 6%;
+  background: var(--rib);
+}
+
+.bd-rib-h {
+  left: 3%;
+  right: 3%;
+  top: 28%;
+  height: 8%;
+  display: none;
+}
+
+/* Бантик над крышкой */
+.bd-lid::before,
+.bd-lid::after {
+  content: "";
+  position: absolute;
+  top: -90%;
+  width: 26%;
+  height: 90%;
+  border: 6px solid var(--bow);
+  border-radius: 60% 60% 0 60%;
+  box-sizing: border-box;
+}
+
+.bd-lid::before { left: 24%; }
+.bd-lid::after { right: 24%; transform: scaleX(-1); }
+
+.bd-box.open {
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: bd-pop 0.6s ease-out 1;
+}
+
+.bd-box.open .bd-lid,
+.bd-box.open .bd-body,
+.bd-box.open .bd-rib-v { display: none; }
+
+.bd-gift-art {
+  display: block;
+  font-size: calc(var(--u) * 92);
+  line-height: 1;
+  text-align: center;
+}
+
+.bd-gift-art.bone {
+  width: 78%;
+  color: #c98a2b;
+}
+
+.bd-gift-art.bone svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.bd-gift-art.sticker {
+  filter: url(#stk);
+}
+
+.bd-gift-caption {
+  margin: 0;
+  min-height: calc(var(--u) * 80);
+  font-size: calc(var(--u) * 28);
+  line-height: 1.05;
+  text-align: center;
+  color: var(--book-ink);
+}
+
+.bd-test-note {
+  margin: 0;
+  font-size: calc(var(--u) * 22);
+  color: var(--book-ink-soft);
+  text-align: center;
+}
+
+@keyframes bd-pop {
+  0% { transform: scale(0.4) rotate(-12deg); }
+  60% { transform: scale(1.18) rotate(4deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bd-confetti,
+  .bd-flame,
+  .bd-candle.out .bd-smoke,
+  .bd-box.open {
+    animation: none !important;
+  }
+
+  .bd-confetti {
+    display: none;
+  }
+}
+
+/* Поле имени в карточке родителя (core/screens/parent.js) */
+.text-input {
+  min-width: 0;
+  width: min(14em, 50%);
+  min-height: 44px;
+  padding: 0 12px;
+  font: inherit;
+  color: var(--ink);
+  background: #fff;
+  border: 2px solid #d8d0c4;
+  border-radius: 10px;
+}

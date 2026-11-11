@@ -5,6 +5,7 @@
 // Экраны (core/screens/mission.js) только показывают то, что здесь решено.
 
 import * as storage from './storage.js';
+import { birthdayToday } from './birthday.js';
 import { OPEN_PHASES, ZONES, ZONE_IDS, REWARD, SKIP_COST, DOG_START, MISSION_TEST_MS, isoWeekday, continuesStreak } from './mission-data.js';
 
 export { ZONES, REWARD, SKIP_COST, OPEN_PHASES, DOG_START };
@@ -14,6 +15,7 @@ export const zoneById = new Map(ZONES.map((z) => [z.id, z]));
 // и она ещё не выполнена и не пропущена (новый день всегда начинает миссию заново).
 export function missionPending() {
   const cfg = storage.settings().mission;
+  if (!storage.missionTestOn() && birthdayToday()) return false; // в день рождения ребёнка уборки нет
   if (!cfg.enabled || !cfg.days.includes(isoWeekday(storage.dayKey()))) return false;
   return OPEN_PHASES.includes(storage.mission().phase);
 }

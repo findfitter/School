@@ -9,6 +9,7 @@ import {
 import {
   PHASES, OPEN_PHASES, ZONE_IDS, REWARD_TYPES, ALL_DAYS, DEFAULT_MINUTES, MIN_MINUTES, MAX_MINUTES, HISTORY_DAYS, continuesStreak,
 } from './mission-data.js';
+import { DEFAULT_BIRTHDAY } from './birthday-data.js';
 
 const KEY = 'school-app-v1';
 const APP_ID = 'school-app';
@@ -35,6 +36,8 @@ const DEFAULT_SETTINGS = {
   dailyLimit: 0, // ограничение времени в день, минуты (0 — без ограничения)
   // Ежедневная миссия «Уборка комнаты» (core/mission.js): по умолчанию выключена; days — дни недели (1 — пн … 7 — вс).
   mission: { enabled: false, minutes: DEFAULT_MINUTES, days: ALL_DAYS },
+  // День рождения ребёнка (core/birthday.js): собака поздравляет в этот день; в этот день уборки комнаты нет.
+  birthday: { ...DEFAULT_BIRTHDAY },
 };
 
 const DAY_RE = /^\d{4}-\d{2}-\d{2}$/; // объявлено до `let state = load()`: normalize() вызывается уже при загрузке модуля
@@ -53,7 +56,8 @@ window.addEventListener('storage', (e) => {
 
 function fresh() {
   return {
-    settings: { ...DEFAULT_SETTINGS, disabledModules: [], voices: { ...DEFAULT_SETTINGS.voices }, mission: { ...DEFAULT_SETTINGS.mission, days: [...ALL_DAYS] } },
+    settings: { ...DEFAULT_SETTINGS, disabledModules: [], voices: { ...DEFAULT_SETTINGS.voices }, mission: { ...DEFAULT_SETTINGS.mission, days: [...ALL_DAYS] }, birthday: { ...DEFAULT_BIRTHDAY } },
+    birthdayDone: 0, // за какой год день рождения ребёнка уже отпразднован (подарки получены)
     mission: emptyMission(), // состояние миссии «Уборка комнаты» за день
     missionUsage: {}, // время на экранах миссии по дням (отдельно от usage): { 'ГГГГ-ММ-ДД': секунды }
     stars: 0,
@@ -149,6 +153,19 @@ function normalizeMissionSettings(m) {
   return { enabled: Boolean(raw.enabled), minutes: Math.round(num(raw.minutes, MIN_MINUTES, MAX_MINUTES, DEFAULT_MINUTES)), days };
 }
 
+// Настройки дня рождения: плохие значения заменяются безопасными (старое сохранение без поля — значения по умолчанию).
+function normalizeBirthdaySettings(b) {
+  const raw = b && typeof b === 'object' ? b : {};
+  const def = DEFAULT_BIRTHDAY;
+  return {
+    enabled: raw.enabled === undefined ? def.enabled : Boolean(raw.enabled),
+    name: typeof raw.name === 'string' ? raw.name.trim().slice(0, 20) : def.name,
+    month: Math.round(num(raw.month, 1, 12, def.month)),
+    day: Math.round(num(raw.day, 1, 31, def.day)),
+    year: Math.round(num(raw.year, 1990, new Date().getFullYear(), def.year)),
+  };
+}
+
 // Состояние миссии за день. Плохие значения становятся безопасными: зона — только из ZONES, время — в разумных пределах
 // (таймер не кончается позже чем через час), фаза без нужных данных откатывается к выбору зоны.
 function normalizeMission(raw) {
@@ -194,6 +211,8 @@ function normalize(data) {
   s.settings.translation = Boolean(d.translation);
   s.settings.dailyLimit = Math.round(num(d.dailyLimit, 0, 600, 0));
   s.settings.mission = normalizeMissionSettings(d.mission);
+  s.settings.birthday = normalizeBirthdaySettings(d.birthday);
+  s.birthdayDone = Math.round(num(data.birthdayDone, 0, 3000, 0));
   s.mission = normalizeMission(data.mission);
   s.settings.disabledModules = Array.isArray(d.disabledModules)
     ? d.disabledModules.filter((id) => typeof id === 'string')
@@ -267,13 +286,15 @@ export function settings() {
     disabledModules: [...state.settings.disabledModules],
     voices: { ...state.settings.voices },
     mission: { ...state.settings.mission, days: [...state.settings.mission.days] },
+    birthday: { ...state.settings.birthday },
   };
 }
 
-// patch.mission можно передавать частично ({ enabled: true }): его поля сливаются с текущими.
+// patch.mission и patch.birthday можно передавать частично ({ enabled: true }): их поля сливаются с текущими.
 export function setSettings(patch) {
   const next = { ...state.settings, ...patch };
   if (patch.mission) next.mission = { ...state.settings.mission, ...patch.mission };
+  if (patch.birthday) next.birthday = { ...state.settings.birthday, ...patch.birthday };
   state = normalize({ ...state, settings: next });
   save();
 }
@@ -515,6 +536,48 @@ export function buySticker(id) {
   state.spent += sticker.price;
   save();
   return true;
+}
+
+// ---------- День рождения ребёнка (логика — core/birthday.js) ----------
+
+export const birthdayDoneYear = () => state.birthdayDone;
+
+// Для проверки: снова «не отпраздновано» (выданные подарки не возвращаются).
+export function reopenBirthday() {
+  state.birthdayDone = 0;
+  save();
+}
+
+// Подарки собаки на день рождения, один раз за год (второй вызов за тот же год ничего не делает и возвращает null):
+// косточки, праздничный колпак (в вещах и на собаках без шапки), наклейка (первая ещё не собранная из gift.stickers,
+// иначе звёзды). Если поздравление пришло в сам день рождения (daysAfter = 0), сегодняшняя уборка комнаты закрывается
+// без подарка, а серия подряд идущих дней не прерывается. Возвращает то, что выдано: { bones, hat, sticker, stars }.
+export function claimBirthday(year, gift, daysAfter = 0) {
+  if (!Number.isInteger(year) || state.birthdayDone >= year) return null;
+  state.birthdayDone = year;
+  state.bones = Math.min(1e6, state.bones + gift.bones);
+  let hat = '';
+  if (gift.hat && itemById.has(gift.hat)) {
+    hat = gift.hat;
+    if (!state.items.includes(hat)) state.items.push(hat);
+    for (const dog of state.dogs) if (!dog.outfit.hat) dog.outfit.hat = hat;
+  }
+  const sticker = gift.stickers.find((id) => stickerById.has(id) && !state.owned.includes(id)) || '';
+  let stars = 0;
+  if (sticker) state.owned.push(sticker);
+  else { stars = gift.fallbackStars; state.stars += stars; }
+  if (daysAfter === 0) {
+    rollMission();
+    const m = state.mission;
+    if (OPEN_PHASES.includes(m.phase)) {
+      const today = dayKey();
+      const keep = continuesStreak(m.lastDoneDay, today, state.settings.mission.days);
+      const history = { ...m.history, [today]: { zone: '', result: 'skipped', sec: 0, extra: 0, paid: 0 } };
+      state.mission = normalizeMission({ ...m, phase: 'skipped', streak: keep ? m.streak : 0, lastDoneDay: keep ? today : '', history });
+    }
+  }
+  save();
+  return { bones: gift.bones, hat, sticker, stars };
 }
 
 // ---------- Косточки и собаки ----------
@@ -891,8 +954,10 @@ export function recordSeries(id, { correct, total, mistakes, offered, level }) {
 export function reset() {
   const keep = state.settings;
   const keepTest = state.test;
+  const keepBirthday = state.birthdayDone; // подарки уже получены: после сброса прогресса не выдаём второй раз
   state = fresh();
   state.settings = keep;
+  state.birthdayDone = keepBirthday;
   state.test = keepTest; // тестовые собаки родителя не сбрасываются вместе с прогрессом ребёнка
   save();
 }

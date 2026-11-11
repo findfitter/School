@@ -10,6 +10,7 @@ import { moduleIcon } from '../registry.js';
 import { buildReport, reportFileName, hasData } from '../report.js';
 import { createSheet } from './book.js';
 import { missionPending, confirmDone, skipToday, currentStreak } from '../mission.js';
+import { birthdayDate } from '../birthday-data.js';
 
 const P = STR.parent;
 
@@ -19,7 +20,7 @@ const TABS = [
   { id: 'progress', build: ({ app }) => [statsCard(app), wordsCard()] },
   { id: 'time', build: () => [usageCard()] },
   { id: 'mission', build: ({ app }) => [missionSettingsCard(app)] },
-  { id: 'settings', build: ({ app }) => [modulesCard(app), settingsCard(app)] },
+  { id: 'settings', build: ({ app }) => [modulesCard(app), settingsCard(app), birthdayCard()] },
   { id: 'data', build: ({ app, screen, status }) => [dataCard(app, screen, status)] },
   { id: 'tester', build: ({ app }) => testerCards(app) },
 ];
@@ -175,6 +176,54 @@ function missionSettingsCard() {
     h('div', { class: 'mission-days' }, history));
 }
 
+// ---------- День рождения ребёнка (core/birthday.js) ----------
+// Включение, имя, день, месяц и год рождения (по году считается возраст на торте); ближайшее поздравление.
+function birthdayCard() {
+  const cfg = () => storage.settings().birthday;
+  const set = (patch) => { storage.setSettings({ birthday: patch }); paint(); };
+
+  const sw = h('button', { class: 'switch', type: 'button', role: 'switch' });
+  const name = h('input', {
+    type: 'text', maxLength: 20, value: cfg().name, class: 'text-input', 'aria-label': P.birthdayName,
+    onInput: (e) => { storage.setSettings({ birthday: { name: e.target.value } }); }, // имя пишем сразу, без перерисовки (курсор не прыгает)
+  });
+  const dayOut = h('output', { class: 'value' });
+  const monthOut = h('output', { class: 'value wide' });
+  const yearOut = h('output', { class: 'value wide' });
+  const next = h('p', { class: 'status' });
+
+  const stepper = (out, onStep) => h('div', { class: 'stepper' }, button('btn round', '−', () => onStep(-1)), out, button('btn round', '+', () => onStep(1)));
+  const wrap = (value, min, max) => (value < min ? max : value > max ? min : value);
+
+  function paint() {
+    const c = cfg();
+    sw.classList.toggle('on', c.enabled);
+    sw.setAttribute('aria-checked', String(c.enabled));
+    sw.textContent = c.enabled ? P.on : P.off;
+    dayOut.textContent = c.day;
+    monthOut.textContent = P.months[c.month - 1];
+    yearOut.textContent = c.year;
+    const now = new Date();
+    let date = birthdayDate(now.getFullYear(), c);
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (date < today) date = birthdayDate(now.getFullYear() + 1, c);
+    const done = storage.birthdayDoneYear() === date.getFullYear();
+    next.textContent = !c.enabled ? P.birthdayOff
+      : `${format(P.birthdayNext, { date: `${date.getDate()} ${P.months[date.getMonth()]} ${date.getFullYear()}`, age: Math.max(1, date.getFullYear() - c.year) })}${done ? ` ${P.birthdayDone}` : ''}`;
+  }
+  onTap(sw, () => set({ enabled: !cfg().enabled }));
+  paint();
+
+  return card(P.birthdayTitle,
+    h('p', { class: 'hint-line', text: P.birthdayHint }),
+    h('div', { class: 'row-between' }, h('span', { text: P.birthdayOn }), sw),
+    h('div', { class: 'row-between' }, h('span', { text: P.birthdayName }), name),
+    h('div', { class: 'row-between' }, h('span', { text: P.birthdayDay }), stepper(dayOut, (d) => set({ day: wrap(cfg().day + d, 1, 31) }))),
+    h('div', { class: 'row-between' }, h('span', { text: P.birthdayMonth }), stepper(monthOut, (d) => set({ month: wrap(cfg().month + d, 1, 12) }))),
+    h('div', { class: 'row-between' }, h('span', { text: P.birthdayYear }), stepper(yearOut, (d) => set({ year: Math.min(new Date().getFullYear(), Math.max(1990, cfg().year + d)) }))),
+    next);
+}
+
 // ---------- Вкладка «Тестировщик» ----------
 // Всё, что нужно для проверки новых возможностей, в одном месте. Блок «Рабочие данные» меняет данные ребёнка по-настоящему.
 function testerCards(app) {
@@ -188,6 +237,11 @@ function testerCards(app) {
       h('p', { class: 'hint-line', text: P.missionTestHint }),
       h('div', { class: 'row-wrap' }, button('btn', `↺ ${P.testerReopen}`, () => { storage.reopenMission(); refresh(); })),
       h('p', { class: 'hint-line', text: P.testerReopenHint })),
+    card(P.testerBirthdayTitle,
+      h('div', { class: 'row-wrap' }, button('btn primary', `🎂 ${P.birthdayTest}`, () => app.go.birthdayTest())),
+      h('p', { class: 'hint-line', text: P.birthdayTestHint }),
+      h('div', { class: 'row-wrap' }, button('btn', `↺ ${P.birthdayReopen}`, () => { storage.reopenBirthday(); refresh(); })),
+      h('p', { class: 'hint-line', text: P.birthdayReopenHint })),
     card(P.testerWorkTitle,
       h('p', { class: 'hint-line', text: P.testerWorkHint }),
       h('p', { class: 'status', text: format(P.testerWorkNow, { stars: storage.balance(), bones }) }),

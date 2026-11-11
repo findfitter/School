@@ -23,6 +23,8 @@ import { renderLimit } from './screens/limit.js';
 import { renderGate } from './screens/gate.js';
 import { renderMission } from './screens/mission.js';
 import { missionPending } from './mission.js';
+import { birthdayInfo, previewInfo } from './birthday.js';
+import { renderBirthday } from './screens/birthday.js';
 import { createSheet, homeTag } from './screens/book.js';
 import { createTrack } from './screens/series-track.js';
 
@@ -47,7 +49,7 @@ const IDLE_MS = 90000; // без касаний дольше этого врем
 const CALM_MS = 60000; // без касаний дольше этого бесконечные декоративные анимации замирают (класс app-idle)
 const GRACE_MIN = 5; // сколько минут сверх лимита дают закончить начатое задание
 
-let screenKind = 'menu'; // menu | stickers | dog | game | result | parent | limit | gate | mission
+let screenKind = 'menu'; // menu | stickers | dog | game | result | parent | limit | gate | mission | birthday
 let lastActivity = Date.now();
 let lastTick = Date.now();
 
@@ -77,8 +79,8 @@ function tick() {
     // Миссия «Уборка комнаты» дневной лимит не расходует: её время пишется отдельно (storage.missionUsage).
     // Пока идёт таймер, ребёнок убирает и экрана не касается, поэтому простоем это не считается.
     if (now - lastActivity < IDLE_MS || storage.mission().phase === 'timer') storage.addMissionUsage(seconds); // в пробном запуске — игнорируется
-  } else if (screenKind !== 'parent' && screenKind !== 'limit' && screenKind !== 'gate' && now - lastActivity < IDLE_MS) {
-    // Экран для родителей, проверка для взрослых и экран отдыха время не считают.
+  } else if (screenKind !== 'parent' && screenKind !== 'limit' && screenKind !== 'gate' && screenKind !== 'birthday' && now - lastActivity < IDLE_MS) {
+    // Экран для родителей, проверка для взрослых, экран отдыха и поздравление с днём рождения время не считают.
     storage.addUsage(seconds);
   }
   if (screenKind === 'menu' || screenKind === 'stickers' || screenKind === 'dog') {
@@ -95,7 +97,7 @@ const app = {
   services,
   manifests: [], // обычные модули
   challenge: null, // модуль сложных заданий (modules/challenge), в обычные списки не входит
-  go: { menu: showMenu, stickers: showStickers, dog: () => showDog('real'), dogTest: () => showDog('test'), missionTest: showMissionTest, parent: showParent, play },
+  go: { menu: showMenu, stickers: showStickers, dog: () => showDog('real'), dogTest: () => showDog('test'), missionTest: showMissionTest, birthdayTest: showBirthdayTest, parent: showParent, play },
 };
 
 function show(screen, onLeave = null, kind = 'menu') {
@@ -107,14 +109,28 @@ function show(screen, onLeave = null, kind = 'menu') {
   root.replaceChildren(screen);
 }
 
-// Порядок проверок при входе на экраны ребёнка: вышел дневной лимит → экран отдыха; не выполнена ежедневная
-// миссия «Уборка комнаты» → миссия; иначе нужный экран.
+// Порядок проверок при входе на экраны ребёнка: вышел дневной лимит → экран отдыха; день рождения, поздравление
+// ещё не получено → поздравление собаки; не выполнена ежедневная миссия «Уборка комнаты» → миссия; иначе нужный экран.
 function showMenu() {
   if (limitReached()) return showLimit();
+  if (birthdayInfo()) return showBirthday();
   if (missionPending()) return showMission();
   healCycles(app.manifests);
   syncChallenges(app);
   show(renderMenu(app), null, 'menu');
+}
+
+function showBirthday() {
+  const info = birthdayInfo();
+  if (!info) return showMenu(); // поздравление уже получено (например, в другом окне)
+  const screen = renderBirthday(app, info);
+  show(screen.el, screen.onLeave, 'birthday');
+}
+
+// «Показать поздравление» из раздела для родителя: пробный показ, подарки не выдаются; выход — на экран родителя.
+function showBirthdayTest() {
+  const screen = renderBirthday(app, previewInfo(), { test: true, onExit: () => show(renderParent(app), null, 'parent') });
+  show(screen.el, screen.onLeave, 'birthday');
 }
 
 function showMission() {
@@ -131,6 +147,7 @@ function showMissionTest() {
 
 function showStickers() {
   if (limitReached()) return showLimit();
+  if (birthdayInfo()) return showBirthday();
   if (missionPending()) return showMission();
   show(renderStickers(app), null, 'stickers');
 }
@@ -139,6 +156,7 @@ function showStickers() {
 // экран родителя без повторной проверки для взрослых.
 function showDog(scope = 'real') {
   if (limitReached()) return showLimit();
+  if (scope === 'real' && birthdayInfo()) return showBirthday();
   if (scope === 'real' && missionPending()) return showMission(); // тестовую собаку родителя миссия не закрывает
   const onBack = scope === 'test' ? () => show(renderParent(app), null, 'parent') : showMenu;
   show(renderDog(app, { scope, onBack }), null, 'dog');
@@ -163,6 +181,7 @@ function showLimit() {
 async function play(manifest, opts = {}) {
   if (isLocked(manifest)) return showMenu();
   if (limitReached()) return showLimit();
+  if (birthdayInfo()) return showBirthday();
   if (missionPending()) return showMission();
   const challenge = manifest.challenge ? challengeInfo(app, opts.subject) : null;
   if (manifest.challenge && !challenge) return showMenu(); // задания уже нет (например, пройдено в другом окне)
