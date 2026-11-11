@@ -15,6 +15,7 @@ const add = (kind, where, text) => problems.push(`[${kind}] ${where}: ${text}`);
 function walk(dir, out = []) {
   for (const name of readdirSync(dir)) {
     if (name === '.git' || name === 'node_modules') continue;
+    if (name.startsWith('.') && statSync(join(dir, name)).isDirectory()) continue; // служебные папки (.claude, .art — worktree ветки art, .art-raw)
     if (dir === ROOT && name === 'design') continue; // эскизы дизайна — справочник, не часть приложения
     const p = join(dir, name);
     statSync(p).isDirectory() ? walk(p, out) : out.push(p);
