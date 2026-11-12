@@ -13,17 +13,9 @@ import numpy as np
 from PIL import Image
 
 
-def main():
-    p = argparse.ArgumentParser()
-    p.add_argument("src")
-    p.add_argument("dst")
-    p.add_argument("width", type=int)
-    p.add_argument("--tol", type=float, default=26, help="до этого расстояния цвета — точно фон")
-    p.add_argument("--soft", type=float, default=22, help="ширина плавного края по цвету")
-    p.add_argument("--quality", type=int, default=86)
-    a = p.parse_args()
-
-    im = np.asarray(Image.open(a.src).convert("RGB")).astype(np.float32)
+def cut(image, tol=26, soft=22):
+    """Убрать однотонный фон, связанный с краем картинки. Возвращает RGBA того же размера."""
+    im = np.asarray(image.convert("RGB")).astype(np.float32)
     h, w, _ = im.shape
     k = max(4, min(h, w) // 40)
     corners = np.concatenate([im[:k, :k].reshape(-1, 3), im[:k, -k:].reshape(-1, 3),
@@ -32,7 +24,7 @@ def main():
     dist = np.sqrt(((im - bg) ** 2).sum(axis=2))
 
     # заливка от краёв по «почти фону» (с запасом soft): связанная с краем область — кандидат в фон
-    near = dist < a.tol + a.soft
+    near = dist < tol + soft
     seen = np.zeros((h, w), bool)
     q = deque()
     for x in range(w):
@@ -54,14 +46,27 @@ def main():
                 q.append((ny, nx))
 
     alpha = np.ones((h, w), np.float32)
-    ramp = np.clip((dist - a.tol) / a.soft, 0, 1)
+    ramp = np.clip((dist - tol) / soft, 0, 1)
     alpha[seen] = ramp[seen]
     # убрать серый фон из полупрозрачных краёв: c = (c - (1 - a) * bg) / a
     safe = np.maximum(alpha, 1e-3)[..., None]
     rgb = np.where(alpha[..., None] < 1, (im - (1 - alpha[..., None]) * bg) / safe, im)
     rgb = np.clip(rgb, 0, 255)
 
-    out = Image.fromarray(np.dstack([rgb, alpha * 255]).astype(np.uint8), "RGBA")
+    return Image.fromarray(np.dstack([rgb, alpha * 255]).astype(np.uint8), "RGBA"), bg
+
+
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("src")
+    p.add_argument("dst")
+    p.add_argument("width", type=int)
+    p.add_argument("--tol", type=float, default=26, help="до этого расстояния цвета — точно фон")
+    p.add_argument("--soft", type=float, default=22, help="ширина плавного края по цвету")
+    p.add_argument("--quality", type=int, default=86)
+    a = p.parse_args()
+
+    out, bg = cut(Image.open(a.src), a.tol, a.soft)
     box = out.getchannel("A").point(lambda v: 255 if v > 8 else 0).getbbox()
     out = out.crop(box)
     hh = round(out.height * a.width / out.width)
