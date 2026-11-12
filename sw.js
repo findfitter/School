@@ -64,6 +64,13 @@ const CORE_FILES = [
   'core/styles/screens.css',
   'core/styles/dog.css',
   'core/styles/book.css',
+  'core/styles/menu-scene.css',
+  // слои главного экрана (макет C-1)
+  'images/screens/menu/bg.webp',
+  'images/screens/menu/sign.webp',
+  'images/screens/menu/plank.webp',
+  'images/screens/menu/stump.webp',
+  'images/screens/menu/bone.webp',
   'core/styles/dog-book.css',
   'core/styles/stickers-book.css',
   'core/styles/birthday.css',

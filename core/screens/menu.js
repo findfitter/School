@@ -1,6 +1,7 @@
-// Главный экран — «сказочная книжка» (общий компонент core/screens/book.js): слева страница с собакой ребёнка
-// и дорожкой к косточке, справа закладки-главы (разделы) и карточки заданий выбранной главы.
-// Рисунки — core/screens/book-art.js, стили — core/styles/book.css.
+// Главный экран — сказочный луг по макету C-1 (design/ai-ref/main-menu-C1.webp): фон и предметы — картинки
+// (images/screens/menu/), слева табличка «Моя школа», собака ребёнка, косточка на пеньке и доска «Дорожка к косточке»,
+// справа бумажная панель с закладками-главами (разделы) и карточками заданий выбранной главы.
+// Стили — core/styles/menu-scene.css (поверх общих классов book.css), мелкие рисунки — core/screens/book-art.js.
 import { h, button, format } from '../dom.js';
 import { STR } from '../strings.js';
 import * as storage from '../storage.js';
@@ -8,12 +9,14 @@ import { moduleIcon } from '../registry.js';
 import { isLocked } from '../cycles.js';
 import { challengeProgress } from '../challenges.js';
 import { starsFor } from '../rewards.js';
-import { createBook, createIllustration, counters, noteButton, lockButton, guideDog } from './book.js';
-import { svgEl, SPEECH_TAIL, starIcon, boneIcon, pawIcon, blob, trackBar } from './book-art.js';
+import { drawDog } from '../dogs.js';
+import { counters, noteButton, lockButton, guideDog } from './book.js';
+import { svgEl, starIcon, boneIcon, pawIcon, blob } from './book-art.js';
+
+const ART = 'images/screens/menu/'; // слои сцены (WebP), см. design/gemini/main-menu-layers.md
 
 const TILT = [-1.4, 1.1, 0.8, -1, 1.3, -0.7, 1, -1.2]; // наклон карточек, градусы
 const TAPE_TILT = [3, -4, 5, -3, 2, -5, 4, -2]; // наклон полосок скотча
-const PATH_STARS = 5; // звёзд на дорожке; закрашиваются по мере набора 25 звёзд
 const CHAPTER_KEY = 'chapter'; // выбранная глава помнится (storage.uiState), пока открыта вкладка
 const LEAVE_MS = 350; // через сколько убрать старую страницу: новая к этому времени непрозрачна (page-turn, 0.5 с, 60%)
 
@@ -26,13 +29,10 @@ function plural(n, forms) {
   return forms[2];
 }
 
-function today() {
-  try {
-    return new Date().toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' });
-  } catch {
-    return '';
-  }
-}
+// Короткие предлоги и союзы не остаются в конце строки: «Сложение / до 10», а не «Сложение до / 10».
+const glue = (text) => String(text).replace(/(^|\s)(до|в|во|и|а|с|со|на|из|по|о|об|у|к|от|за)\s+/giu, '$1$2 ');
+
+const img = (name, cls) => h('img', { class: cls, src: `${ART}${name}.webp`, alt: '', decoding: 'async' });
 
 // Звёзды карточки задания: 0 — серий ещё не было, иначе по доле верных с первой попытки за всё время (starsFor).
 // Формат сохранения не меняется: отдельных «звёзд модуля» в нём нет.
@@ -80,59 +80,62 @@ export function renderMenu(app) {
       return el;
     }));
 
-  const book = createBook({
-    className: 'menu-screen',
-    top: [
-      counters(storage.balance(), storage.bonesBalance()),
-      noteButton({
-        label: STR.menu.dog,
-        icon: pawIcon(),
-        className: 'bk-note-dog',
-        onTap: () => {
-          app.services.sounds('tap');
-          app.go.dog();
-        },
-      }),
-      noteButton({ label: STR.menu.stickers, icon: starIcon('#D9667F'), className: 'bk-note-stickers', onTap: () => app.go.stickers() }),
-      lockButton(STR.menu.parent, () => app.go.parent()),
-    ],
-    left: leftPage(app),
-    right: [nav, body],
-  });
+  const el = h('div', { class: 'screen menu-scene' },
+    h('div', { class: 'ms-bg', 'aria-hidden': 'true' }, img('bg', 'ms-bg-img')),
+    h('div', { class: 'ms-stage' },
+      leftSide(app),
+      h('header', { class: 'book-top ms-top' },
+        counters(storage.balance(), storage.bonesBalance()),
+        noteButton({
+          label: STR.menu.dog,
+          icon: pawIcon(),
+          className: 'bk-note-dog',
+          onTap: () => {
+            app.services.sounds('tap');
+            app.go.dog();
+          },
+        }),
+        noteButton({ label: STR.menu.stickers, icon: starIcon('#D9667F'), className: 'bk-note-stickers', onTap: () => app.go.stickers() }),
+        lockButton(STR.menu.parent, () => app.go.parent())),
+      h('section', { class: 'ms-panel' }, nav, body)));
 
   if (subjects.length) pick(current, true);
   else body.append(h('p', { class: 'bk-empty', text: STR.menu.empty }));
-  return book.el;
+  return el;
 }
 
-// ---------- Левая страница ----------
+// ---------- Левая часть: луг ----------
 
-// Собака ребёнка (первая из купленных) на тропинке; пока своей нет — собака-проводник Бобик (guideDog).
-function leftPage(app) {
+// Собака ребёнка (первая из купленных; пока своей нет — собака-проводник Бобик, guideDog), рядом косточка на пеньке:
+// она светится ярче, когда в каком-нибудь разделе ждёт сложное задание. Внизу — доска «Дорожка к косточке».
+function leftSide(app) {
   const { have, need, left } = challengeProgress();
-  const pathDone = Math.floor((have * PATH_STARS) / need);
   const pending = Boolean(app.challenge) && Object.keys(storage.challenges().pending).length > 0;
   const dog = guideDog();
   const progress = format(STR.book.pathProgress, { n: have, total: need });
-
-  const art = createIllustration({ dog, pathDone, label: dog ? `${STR.book.artLabel}: ${dog.name}` : STR.book.artLabel });
+  const share = Math.max(0, Math.min(1, have / need));
 
   return [
-    h('div', { class: 'bk-left-head' },
-      h('h1', { class: 'bk-title hand', text: STR.appTitle }),
-      h('span', { class: 'bk-date hand', text: today() })),
-    art,
-    dog ? h('div', { class: 'bk-bubble hand' }, pending ? STR.book.helloChallenge : STR.book.hello, svgEl(SPEECH_TAIL, 'bk-bubble-tail')) : null,
-    h('div', { class: 'bk-path' },
-      h('div', { class: 'bk-path-head' },
-        h('span', { class: 'bk-path-title hand', text: STR.book.pathTitle }),
-        h('span', { class: 'bk-path-count', text: progress })),
-      h('div', { class: 'bk-track', role: 'img', 'aria-label': progress }, svgEl(trackBar(have / need))),
-      h('p', { class: 'bk-path-hint', text: format(STR.book.pathLeft, { n: left, stars: plural(left, STR.book.starForms) }) })),
+    h('div', { class: 'ms-sign' }, img('sign', 'ms-sign-img'), h('h1', { class: 'ms-title', text: STR.appTitle })),
+    h('div', { class: 'ms-dog', role: 'img', 'aria-label': dog ? `${STR.book.artLabel}: ${dog.name}` : STR.book.artLabel },
+      drawDog({ ...dog, mood: 'happy' })),
+    h('div', { class: 'ms-bubble' }, pending ? STR.book.helloChallenge : STR.book.hello),
+    h('div', { class: `ms-reward${pending ? ' ready' : ''}`, 'aria-hidden': 'true' },
+      h('div', { class: 'ms-glow' }),
+      img('stump', 'ms-stump'),
+      img('bone', 'ms-bone')),
+    h('div', { class: 'ms-plank' },
+      h('div', { class: 'ms-plank-head' },
+        h('span', { class: 'ms-plank-title', text: STR.book.pathTitle }),
+        h('span', { class: 'ms-plank-count', text: progress })),
+      h('div', { class: 'ms-track', role: 'img', 'aria-label': progress, style: `--share: ${share}` },
+        h('div', { class: 'ms-fill' }),
+        svgEl(starIcon('#FFD84A', '#D9A21E'), 'ms-track-star')),
+      h('p', { class: 'ms-hint', text: format(STR.book.pathLeft, { n: left, stars: plural(left, STR.book.starForms) }) })),
   ];
 }
 
-// ---------- Правая страница: глава ----------
+// ---------- Правая панель: глава ----------
 
 // Новая страница «переворачивается» (page-turn) поверх старой, старая убирается, когда новая проявилась, — без мигания. Цвета предмета лежат
 // на самой странице главы (s-<предмет>), а не на общем контейнере, поэтому тающая страница не перекрашивается.
@@ -186,7 +189,7 @@ function challengeCard(app, subject) {
     h('i', { class: 'tape', 'aria-hidden': 'true' }),
     h('span', { class: 'bk-icon' }, svgEl(blob(), 'bk-blob'), svgEl(boneIcon('#FFFDF6'), 'bk-bone-big')),
     h('span', { class: 'bk-card-text' },
-      h('span', { class: 'bk-card-title', text: info.title }),
+      h('span', { class: 'bk-card-title', text: glue(info.title) }),
       h('span', { class: 'bk-card-sub hand', text: STR.book.challengeBonus })),
   ], () => {
     app.services.sounds('tap');
@@ -202,7 +205,7 @@ function taskCard(app, manifest) {
     h('i', { class: 'tape', 'aria-hidden': 'true' }),
     h('span', { class: 'bk-icon' }, svgEl(blob(), 'bk-blob'), h('span', { class: 'bk-glyph' }, glyphOrIcon(manifest))),
     h('span', { class: 'bk-card-text' },
-      h('span', { class: 'bk-card-title', text: manifest.title }),
+      h('span', { class: 'bk-card-title', text: glue(manifest.title) }),
       stars(moduleStars(manifest.id))),
     locked ? h('span', { class: 'stamp', title: STR.menu.done, text: STR.book.stamp }) : null,
   ], locked ? null : () => {
