@@ -1,4 +1,7 @@
 {
+ "scene": {
+  "fairy": "scenes/fairy.webp"
+ },
  "sticker": {
   "☁️": "stickers/2601.webp",
   "☄️": "stickers/2604.webp",

@@ -10,7 +10,7 @@ import { ALBUMS, WORLDS, WORLD_SIZE, TOTAL_SUPERS, stickerById, worldProgress } 
 import { superSticker } from '../cycles.js';
 import { createBook, counters, noteButton } from './book.js';
 import { svgEl, starIcon } from './book-art.js';
-import { picOrEmoji } from '../pic.js';
+import { picOrEmoji, picUrl } from '../pic.js';
 
 const S = STR.stickers;
 const SHOP_PER_PAGE = 12; // карточек на странице лавки (3 в ряд, 4 ряда)
@@ -248,9 +248,19 @@ function worldScene(world, count) {
     el.style.fontSize = `${s.size * 1.15}cqw`;
     return el;
   });
-  const sky = h('div', { class: 'scene-sky' });
-  sky.style.background = world.sky;
-  const hill = h('div', { class: 'scene-hill' });
-  hill.style.background = world.ground;
-  return h('div', { class: 'st-scene', role: 'img', 'aria-label': world.title.ru }, h('div', { class: 'scene-paint' }, sky, hill), items);
+  // Нарисованный фон мира (images/index.json, раздел «scene»: id мира → картинка) — картинкой без фильтров;
+  // нет картинки — небо и холм из WORLDS акварельными пятнами, как раньше.
+  const bg = picUrl(world.id, 'scene');
+  let paint;
+  if (bg) {
+    paint = h('div', { class: 'scene-paint scene-art' });
+    paint.style.backgroundImage = `url("${bg}")`;
+  } else {
+    const sky = h('div', { class: 'scene-sky' });
+    sky.style.background = world.sky;
+    const hill = h('div', { class: 'scene-hill' });
+    hill.style.background = world.ground;
+    paint = h('div', { class: 'scene-paint' }, sky, hill);
+  }
+  return h('div', { class: 'st-scene', role: 'img', 'aria-label': world.title.ru }, paint, items);
 }

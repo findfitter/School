@@ -93,6 +93,14 @@
   filter: url(#wc2);
 }
 
+/* Нарисованный фон мира (картинка): большой слой — без SVG-фильтра (скорость на Хромбуке), края — мягкая тень */
+.scene-paint.scene-art {
+  filter: none;
+  background-size: cover;
+  background-position: center;
+  box-shadow: inset 0 0 0 1px rgba(120, 90, 60, 0.12), 0 2px 6px rgba(80, 55, 30, 0.12);
+}
+
 .scene-sky {
   position: absolute;
   inset: 0;
