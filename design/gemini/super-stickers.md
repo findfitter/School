@@ -23,7 +23,7 @@ Layout: a neat grid of exactly 12 stickers — 4 columns and 3 rows, evenly spac
 
 Background: one plain flat solid light grey colour (#C8C8C8) everywhere. Do NOT draw a white sticker border or outline around the stickers, no shadows on the background, no frames, no text, no numbers, no letters anywhere (also not on objects), no decorations between the stickers.
 
-Each sticker is one single subject, complete and not cut off, in its own natural colours (do not make everything golden). Landscape 4:3 image, high resolution.
+Each sticker is one single subject, complete and not cut off, in its own natural colours (do not make everything golden). All characters are original designs for this sticker set and must not resemble any existing film, cartoon, toy or book character. Landscape 4:3 image, high resolution.
 ```
 
 ## fairy — «Моя сказка»
@@ -31,12 +31,12 @@ Each sticker is one single subject, complete and not cut off, in its own natural
 ```text
 Row 1, left to right:
 1. a white unicorn with a pastel rainbow mane and tail and a golden spiral horn
-2. a little princess with long brown hair, a small golden tiara and a pink ball gown
+2. a little girl princess with long wavy chestnut hair, a small flower crown and a lilac dress with stars
 3. a pink fairy-tale castle with round towers, pointed purple roofs and little flags
 4. a pretty soft pink sofa with curved golden legs and two heart-shaped cushions
 Row 2, left to right:
 5. a bright rainbow arch with two small fluffy white clouds at its ends
-6. a kind little fairy with blonde hair, a light green dress and shimmering transparent wings, holding a star wand
+6. a kind little fairy girl with short orange curly hair, a leaf green dress and shimmering transparent wings, holding a star wand
 7. a golden royal crown with red, blue and green gems
 8. a cluster of magic sparkles: three golden four-pointed stars of different sizes
 Row 3, left to right:
@@ -50,7 +50,7 @@ Row 3, left to right:
 
 ```text
 Row 1, left to right:
-1. a little mermaid with long red hair and a green fish tail, sitting
+1. a little mermaid girl with long dark blue hair with pearls and a purple-pink fish tail, sitting on a rock
 2. a magic pink spiral seashell with a small white pearl
 3. a smiling blue-grey dolphin jumping
 4. a bright yellow and blue tropical fish
@@ -61,7 +61,7 @@ Row 2, left to right:
 8. a big friendly blue whale with a small water spout
 Row 3, left to right:
 9. an orange starfish with a smiling face
-10. a second mermaid friend with long blonde hair and a purple fish tail
+10. a second mermaid girl friend with short black curly hair, a starfish hair clip and a golden-yellow fish tail
 11. a little wooden sailing ship with white sails
 12. a round spiky yellow pufferfish
 ```
@@ -75,7 +75,7 @@ Row 1, left to right:
 3. a gentle young deer with antlers and white spots
 4. a wise brown owl with big round eyes, sitting on a branch
 Row 2, left to right:
-5. a forest fairy with green hair, a leaf dress and shimmering wings
+5. a forest fairy girl with green hair in two buns, a leaf dress and shimmering wings
 6. a magic red toadstool mushroom with white spots and a tiny glow
 7. a little orange fox with a white chest and tail tip, sitting
 8. a red squirrel with a fluffy tail holding an acorn
@@ -131,7 +131,7 @@ Row 3, left to right:
 ```text
 Row 1, left to right:
 1. a decorated Christmas tree with coloured balls, garland and a star on top
-2. Father Frost (Ded Moroz): a kind old man with a long white beard, long red coat with white fur trim, red hat and a staff
+2. Father Frost (Ded Moroz, the Russian winter grandfather): a kind old man with a long white beard, a long ankle-length blue coat with white fur trim and snowflake pattern, a round fur hat and a tall staff
 3. a happy snowman with a carrot nose, red scarf and a little hat
 4. a reindeer with big antlers and a red scarf
 Row 2, left to right:
@@ -151,7 +151,7 @@ Row 3, left to right:
 ```text
 Row 1, left to right:
 1. a red and white striped circus tent with little flags on top
-2. a funny friendly clown with a red nose, colourful curly hair and a polka-dot costume
+2. a funny friendly clown with a red nose, curly green hair and a yellow polka-dot costume
 3. a juggler child in a colourful costume juggling three balls
 4. a bunch of five colourful balloons on strings
 Row 2, left to right:

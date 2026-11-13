@@ -69,22 +69,27 @@ Row 3, left to right:
 
 ## princess — «Принцессы и феи»
 
+Если Gemini отвечает «I can't generate … third-party content providers» — значит, герой показался ему похожим на
+персонажа из мультфильма. Тогда в том же чате: «Make all characters clearly original, different hair colours and
+outfits, not like any cartoon character» — или поменять цвета волос и одежды в списке ниже.
+
 ```text
+All characters are original designs for this sticker set and must not resemble any existing film, cartoon, toy or book character.
 Row 1, left to right:
-1. a little princess with long blonde hair, a golden tiara and a pink ball gown
-2. a little fairy with light purple hair, a lilac dress and shimmering transparent wings
-3. a little mermaid with long red hair and a teal fish tail, sitting
-4. a superhero girl with a red cape and a blue costume, flying pose
+1. a little girl princess with short dark curly hair, a small silver flower crown and a mint green and yellow dress with daisies
+2. a little fairy girl with light purple pigtails, a lilac petal dress and shimmering transparent wings
+3. a little mermaid girl with a short lavender bob haircut, a seashell hair clip and a coral pink fish tail with scales, sitting on a rock
+4. a little girl playing superhero in a homemade costume: a green cape with a yellow star, a purple eye mask and a rainbow t-shirt
 Row 2, left to right:
 5. a golden royal crown with red and blue gems
-6. a pretty pink princess dress on a little hanger
-7. a sparkly pink high-heel princess shoe
+6. a pretty pink party dress on a little hanger
+7. a sparkly pink party shoe with a bow
 8. a golden ring with a big shiny diamond
 Row 3, left to right:
 9. a pink lipstick tube
 10. a big pink satin ribbon bow
 11. a purple crystal ball with a swirl of light inside, on a golden stand
-12. a friendly girl genie with a ponytail, coming out of a golden magic lamp
+12. a cute magic spirit girl with a lilac ponytail floating out of a small round silver lamp in a puff of pink smoke
 ```
 
 ## unicorn — «Единороги и радуга»
