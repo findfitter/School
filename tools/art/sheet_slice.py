@@ -5,7 +5,8 @@ python sheet_slice.py <лист> <id альбома или мира> [--cols 4] 
 Порядок наклеек на листе — порядок в core/rewards.js (альбом ALBUM_DEFS или мир WORLDS), список берётся оттуда
 через node, поэтому файл данных не правится. Наклейки ищутся как отдельные пятна на вырезанном фоне (кайма Gemini
 делает каждую одним куском), потом сортируются по рядам и столбцам. Готовые файлы — images/stickers/<коды эмодзи>.webp
-(у супер-наклеек с --gold — images/stickers/gold/…), таблица — images/index.json: {"sticker": {эмодзи: путь}, "super": …}.
+(у супер-наклеек с --gold — images/stickers/gold/<мир>-<коды>.webp), таблица — images/index.json:
+{"sticker": {эмодзи: путь}, "super": {"мир:эмодзи": путь}}.
 Лист сравнения «эмодзи ↔ наклейка» — рядом с листом, <лист>-check.jpg.
 Запускать встроенным Python ComfyUI (Pillow + numpy) из корня ветки art или откуда угодно — пути от корня репозитория.
 """
@@ -26,12 +27,12 @@ from sticker_finish import finish  # noqa: E402
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 
-def group_items(group):
-    """Эмодзи альбома или мира по порядку — из core/rewards.js."""
+def group_items(group, world=False):
+    """Эмодзи альбома или мира по порядку — из core/rewards.js (id space есть и у альбома, и у мира: world=True — мир)."""
     js = (
         "import('./core/rewards.js').then(r => {"
         f"  const id = {json.dumps(group)};"
-        "  const a = r.ALBUMS.find(x => x.id === id);"
+        f"  const a = {'null' if world else 'r.ALBUMS.find(x => x.id === id)'};"
         "  const w = r.WORLDS.find(x => x.id === id);"
         "  const items = a ? a.items.map(i => i.emoji) : w ? w.items.map(i => i.emoji) : null;"
         "  console.log(JSON.stringify(items));"
@@ -72,6 +73,55 @@ def components(mask):
     return found
 
 
+def kmeans1d(vals, weights, k, iters=30):
+    """Взвешенный k-means по одной координате: номер кластера для каждого значения (кластеры по возрастанию)."""
+    lo, hi = vals.min(), vals.max()
+    centers = np.array([lo + (hi - lo) * (i + 0.5) / k for i in range(k)])
+    for _ in range(iters):
+        lab = np.abs(vals[:, None] - centers[None, :]).argmin(1)
+        for i in range(k):
+            if (lab == i).any():
+                centers[i] = np.average(vals[lab == i], weights=weights[lab == i])
+    order = np.argsort(centers)
+    return np.argsort(order)[np.abs(vals[:, None] - centers[None, :]).argmin(1)]
+
+
+def grid_cells(blobs, rows, cols):
+    """Пятна → клетки сетки по рядам и столбцам. В клетке может быть несколько пятен (три светлячка, россыпь
+    искорок без каймы): главное — самое большое, рядом лежащие и крупные мелкие пятна присоединяются к нему,
+    далёкие крошки отбрасываются. Возвращает список (py, px) по порядку клеток."""
+    biggest = max(b[0] for b in blobs)
+    blobs = [b for b in blobs if b[0] >= biggest * 0.004]  # шум и пылинки
+    cy = np.array([b[1].mean() for b in blobs])
+    cx = np.array([b[2].mean() for b in blobs])
+    wt = np.array([b[0] for b in blobs], float)
+    row = kmeans1d(cy, wt, rows)
+    cells = []
+    for r in range(rows):
+        idx = np.nonzero(row == r)[0]
+        if len(idx) < cols:
+            sys.exit(f"в ряду {r + 1} нашлось {len(idx)} пятен, нужно {cols} — наклейки слиплись или вылезли из ряда?")
+        col = kmeans1d(cx[idx], wt[idx], cols)
+        for c in range(cols):
+            members = [blobs[i] for i in idx[col == c]]
+            if not members:
+                sys.exit(f"пустая клетка: ряд {r + 1}, столбец {c + 1}")
+            members.sort(key=lambda b: -b[0])
+            main = members[0]
+            y0, y1, x0, x1 = main[1].min(), main[1].max(), main[2].min(), main[2].max()
+            pad = 0.2 * max(y1 - y0, x1 - x0)
+            keep = [main]
+            for b in members[1:]:
+                near = (b[1].min() <= y1 + pad and b[1].max() >= y0 - pad and
+                        b[2].min() <= x1 + pad and b[2].max() >= x0 - pad)
+                if near or b[0] >= main[0] * 0.1:
+                    keep.append(b)
+            if main[0] < biggest * 0.08 and len(keep) == 1:
+                sys.exit(f"в клетке ряд {r + 1}, столбец {c + 1} слишком маленькое пятно — наклейка не найдена?")
+            cells.append((np.concatenate([b[1] for b in keep]), np.concatenate([b[2] for b in keep])))
+    return cells
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     p = argparse.ArgumentParser()
@@ -85,7 +135,7 @@ def main():
     p.add_argument("--part", type=int, default=0, help="альбом больше листа (base, 24): 1 — первые 12, 2 — следующие")
     a = p.parse_args()
 
-    emojis = group_items(a.group)
+    emojis = group_items(a.group, world=a.gold)
     n = a.cols * a.rows
     if a.part:
         emojis = emojis[(a.part - 1) * n:a.part * n]
@@ -99,14 +149,7 @@ def main():
     # маленькая картинка для поиска пятен (быстрее), потом пятна переносятся на полный размер
     k = max(1, round(max(sheet.size) / 600))
     small = (alpha[::k, ::k] > 0.5)
-    blobs = sorted(components(small), key=lambda c: -c[0])
-    if len(blobs) < n or blobs[n - 1][0] < blobs[0][0] * 0.15:
-        sys.exit(f"нашлось меньше {n} отдельных наклеек — слиплись? размеры: {[b[0] for b in blobs[:n + 2]]}")
-    blobs = blobs[:n]
-    # по рядам: сортировка по y центра, по n/rows в ряд, внутри ряда — по x
-    blobs.sort(key=lambda c: c[1].mean())
-    rows = [sorted(blobs[r * a.cols:(r + 1) * a.cols], key=lambda c: c[2].mean()) for r in range(a.rows)]
-    ordered = [c for row in rows for c in row]
+    ordered = grid_cells(components(small), a.rows, a.cols)
 
     sub = "stickers/gold" if a.gold else "stickers"
     out_dir = os.path.join(ROOT, "images", sub)
@@ -117,7 +160,7 @@ def main():
 
     full = np.asarray(cutout)
     made = []
-    for emoji, (_, py, px) in zip(emojis, ordered):
+    for emoji, (py, px) in zip(emojis, ordered):
         m = np.zeros(small.shape, np.uint8)
         m[py, px] = 255
         big = Image.fromarray(m).resize(sheet.size, Image.NEAREST).filter(ImageFilter.MaxFilter(2 * k + 3))
@@ -125,9 +168,10 @@ def main():
         rgba = full.copy()
         rgba[..., 3] = np.where(mask, rgba[..., 3], 0)
         sticker = finish(Image.fromarray(rgba, "RGBA"), a.size, a.border, a.gold)
-        name = file_key(emoji) + ".webp"
+        # супер-наклейки — по миру: одно эмодзи в разных мирах нарисовано по-разному (✨, 🏡, 🦌)
+        name = (f"{a.group}-" if a.gold else "") + file_key(emoji) + ".webp"
         sticker.save(os.path.join(out_dir, name), quality=88, method=6)
-        section[emoji] = f"{sub}/{name}"
+        section[f"{a.group}:{emoji}" if a.gold else emoji] = f"{sub}/{name}"
         made.append((emoji, sticker))
 
     with open(index_path, "w", encoding="utf-8") as f:

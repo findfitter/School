@@ -123,7 +123,7 @@ function superPopup(app, text, sticker, lang) {
   const popup = h('div', { class: 'overlay super-popup' },
     sparkles,
     h('div', { class: 'super-card' },
-      picOrEmoji(sticker.emoji, ['super', 'sticker'], 'super-flyer'),
+      picOrEmoji(sticker.emoji, [`super:${sticker.world.id}`, 'sticker'], 'super-flyer'),
       h('h2', { text: text.title }),
       h('p', { text: message }),
       button('btn primary big', text.ok, () => popup.remove())));

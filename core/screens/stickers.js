@@ -79,7 +79,7 @@ export function renderStickers(app) {
     const caption = n === 0 ? S.worldHint : left0 > 0 ? format(S.worldLeft, { n: left0 }) : S.worldDone;
 
     const extras = [];
-    for (let k = TOTAL_SUPERS + 1; k <= n; k++) extras.push(picOrEmoji(superSticker(k).emoji, ['super', 'sticker'], 'st-emoji owned'));
+    for (let k = TOTAL_SUPERS + 1; k <= n; k++) extras.push(picOrEmoji(superSticker(k).emoji, [`super:${superSticker(k).world.id}`, 'sticker'], 'st-emoji owned'));
 
     left.replaceChildren(...[
       h('div', { class: 'dog-head-row' },
@@ -236,7 +236,7 @@ function worldScene(world, count) {
   const items = world.items.map((s, i) => {
     const have = i < count;
     // супер-наклейка с золотым ободком, если есть, иначе обычная наклейка, иначе эмодзи
-    const el = picOrEmoji(s.emoji, ['super', 'sticker'], `scene-item ${have ? 'owned' : 'sketch'}`, { title: have ? s.ru : '' });
+    const el = picOrEmoji(s.emoji, [`super:${world.id}`, 'sticker'], `scene-item ${have ? 'owned' : 'sketch'}`, { title: have ? s.ru : '' });
     el.style.left = `${s.x}%`;
     el.style.top = `${s.y}%`;
     el.style.fontSize = `${s.size * 1.15}cqw`;
