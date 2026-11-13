@@ -1,12 +1,15 @@
 """Лист наклеек из Gemini (сетка 4×3 на ровном сером фоне) → 12 наклеек WebP + запись в images/index.json.
 
 python sheet_slice.py <лист> <id альбома или мира> [--cols 4] [--rows 3] [--border 0.03] [--gold]
+python sheet_slice.py <лист> - --items "🦔 🦥 … candy:🥞 winter:⛸️ -"   (свой список: лист замен)
 
 Порядок наклеек на листе — порядок в core/rewards.js (альбом ALBUM_DEFS или мир WORLDS), список берётся оттуда
 через node, поэтому файл данных не правится. Наклейки ищутся как отдельные пятна на вырезанном фоне (кайма Gemini
 делает каждую одним куском), потом сортируются по рядам и столбцам. Готовые файлы — images/stickers/<коды эмодзи>.webp
 (у супер-наклеек с --gold — images/stickers/gold/<мир>-<коды>.webp), таблица — images/index.json:
 {"sticker": {эмодзи: путь}, "super": {"мир:эмодзи": путь}}.
+--items — свой порядок клеток (лист замен, когда в rewards.js нового эмодзи ещё нет): «эмодзи» — обычная наклейка,
+«мир:эмодзи» — супер-наклейка этого мира (золотой ободок), «-» — клетка-запас, не сохраняется.
 Лист сравнения «эмодзи ↔ наклейка» — рядом с листом, <лист>-check.jpg.
 Запускать встроенным Python ComfyUI (Pillow + numpy) из корня ветки art или откуда угодно — пути от корня репозитория.
 """
@@ -133,14 +136,23 @@ def main():
     p.add_argument("--gold", action="store_true", help="супер-наклейки: золотой ободок")
     p.add_argument("--size", type=int, default=256)
     p.add_argument("--part", type=int, default=0, help="альбом больше листа (base, 24): 1 — первые 12, 2 — следующие")
+    p.add_argument("--items", help="свой список клеток через пробел: эмодзи, мир:эмодзи (супер), - (пропустить)")
     a = p.parse_args()
 
-    emojis = group_items(a.group, world=a.gold)
     n = a.cols * a.rows
-    if a.part:
-        emojis = emojis[(a.part - 1) * n:a.part * n]
-    if len(emojis) != n:
-        sys.exit(f"в «{a.group}» {len(emojis)} наклеек, а на листе {n} мест")
+    if a.items:
+        # (эмодзи, мир или None); мир — супер-наклейка с золотым ободком
+        cells = [None if t == "-" else (t.split(":", 1)[1], t.split(":", 1)[0]) if ":" in t else (t, None)
+                 for t in a.items.split()]
+        name = "--items"
+    else:
+        emojis = group_items(a.group, world=a.gold)
+        if a.part:
+            emojis = emojis[(a.part - 1) * n:a.part * n]
+        cells = [(e, a.group if a.gold else None) for e in emojis]
+        name = f"«{a.group}»"
+    if len(cells) != n:
+        sys.exit(f"в {name} {len(cells)} клеток, а на листе {n} мест")
 
     sheet = Image.open(a.sheet).convert("RGB")
     cutout, _ = cut(sheet)
@@ -151,27 +163,30 @@ def main():
     small = (alpha[::k, ::k] > 0.5)
     ordered = grid_cells(components(small), a.rows, a.cols)
 
-    sub = "stickers/gold" if a.gold else "stickers"
-    out_dir = os.path.join(ROOT, "images", sub)
-    os.makedirs(out_dir, exist_ok=True)
     index_path = os.path.join(ROOT, "images", "index.json")
     index = json.load(open(index_path, encoding="utf-8")) if os.path.exists(index_path) else {}
-    section = index.setdefault("super" if a.gold else "sticker", {})
 
     full = np.asarray(cutout)
     made = []
-    for emoji, (py, px) in zip(emojis, ordered):
+    for cell, (py, px) in zip(cells, ordered):
+        if cell is None:
+            continue
+        emoji, world = cell
+        sub = "stickers/gold" if world else "stickers"
+        out_dir = os.path.join(ROOT, "images", sub)
+        os.makedirs(out_dir, exist_ok=True)
+        section = index.setdefault("super" if world else "sticker", {})
         m = np.zeros(small.shape, np.uint8)
         m[py, px] = 255
         big = Image.fromarray(m).resize(sheet.size, Image.NEAREST).filter(ImageFilter.MaxFilter(2 * k + 3))
         mask = np.asarray(big) > 0
         rgba = full.copy()
         rgba[..., 3] = np.where(mask, rgba[..., 3], 0)
-        sticker = finish(Image.fromarray(rgba, "RGBA"), a.size, a.border, a.gold)
+        sticker = finish(Image.fromarray(rgba, "RGBA"), a.size, a.border, bool(world))
         # супер-наклейки — по миру: одно эмодзи в разных мирах нарисовано по-разному (✨, 🏡, 🦌)
-        name = (f"{a.group}-" if a.gold else "") + file_key(emoji) + ".webp"
-        sticker.save(os.path.join(out_dir, name), quality=88, method=6)
-        section[f"{a.group}:{emoji}" if a.gold else emoji] = f"{sub}/{name}"
+        fname = (f"{world}-" if world else "") + file_key(emoji) + ".webp"
+        sticker.save(os.path.join(out_dir, fname), quality=88, method=6)
+        section[f"{world}:{emoji}" if world else emoji] = f"{sub}/{fname}"
         made.append((emoji, sticker))
 
     with open(index_path, "w", encoding="utf-8") as f:
@@ -190,7 +205,7 @@ def main():
         check.alpha_composite(st.resize((cell - 20, cell - 20), Image.LANCZOS), (x + 10, y + 100))
     check_path = os.path.splitext(a.sheet)[0] + "-check.jpg"
     check.convert("RGB").save(check_path, quality=90)
-    print(f"{len(made)} наклеек → images/{sub}/, index.json обновлён, сравнение: {check_path}")
+    print(f"{len(made)} наклеек → images/stickers/, index.json обновлён, сравнение: {check_path}")
 
 
 if __name__ == "__main__":
