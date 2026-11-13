@@ -1,6 +1,13 @@
 {
  "scene": {
-  "fairy": "scenes/fairy.webp"
+  "candy": "scenes/candy.webp",
+  "circus": "scenes/circus.webp",
+  "fairy": "scenes/fairy.webp",
+  "forest": "scenes/forest.webp",
+  "sea": "scenes/sea.webp",
+  "space": "scenes/space.webp",
+  "winter": "scenes/winter.webp",
+  "zoo": "scenes/zoo.webp"
  },
  "sticker": {
   "☁️": "stickers/2601.webp",

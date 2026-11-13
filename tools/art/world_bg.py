@@ -26,18 +26,73 @@ STYLE = (
     "kawaii storybook cartoon illustration for a children's game, clean soft outlines, smooth soft gradients, "
     "gentle cel shading, pastel colors, dreamy, cheerful, high quality"
 )
+# мир → (что нарисовать, чего не рисовать: предметы этого мира, они лягут сверху наклейками)
 WORLDS = {
     "fairy": (
         "wide calm background landscape for a children's sticker book page: dreamy pastel pink and lilac sky "
         "with big soft fluffy white clouds, tiny twinkling stars and soft magical glow, faint lilac hills far away, "
         "a gentle rolling green meadow with tiny pink and white flowers along the bottom third, "
-        "lots of calm empty space in the middle, no buildings, no characters"
+        "lots of calm empty space in the middle, no buildings, no characters",
+        "castle, house, building, tower, princess, unicorn, horse, rainbow, crown, bow, butterfly, sofa",
+    ),
+    "sea": (
+        "(underwater scene:1.4), view inside the sea below the water surface, the whole picture is under water, "
+        "soft clear turquoise and blue water everywhere, gentle sunbeams shining down through the water from above, "
+        "a few rising bubbles, soft sandy ocean floor with small pebbles along the bottom, a little soft green seaweed "
+        "and pink coral only at the far left and right edges, lots of calm empty water in the middle",
+        "(sky, clouds, sun, land, beach, shore, island, lake, mountains, trees, horizon:1.3), "
+        "fish, mermaid, whale, dolphin, turtle, crab, octopus, starfish, seashell, ship, boat, pufferfish, shark",
+    ),
+    "forest": (
+        "wide calm background for a children's sticker book page: a sunny magical forest clearing, soft green and "
+        "golden light, tall tree trunks only at the far left and right edges, soft leafy canopy at the very top, "
+        "a gentle mossy green meadow with tiny flowers along the bottom third, soft misty glow, "
+        "lots of calm empty space in the middle",
+        "deer, fox, owl, squirrel, hare, rabbit, fairy, house, cabin, mushroom, moon, tulip, fireflies, big oak tree",
+    ),
+    "candy": (
+        "wide calm background landscape of a sweet candy land for a children's sticker book page: pastel pink sky "
+        "with soft cotton candy clouds, gentle rolling hills of pink and mint frosting with tiny colourful sprinkles "
+        "along the bottom third, soft glossy light, lots of calm empty space in the middle",
+        "cake, lollipop, ice cream, cupcake, donut, cookie, chocolate, candy, strawberry, gingerbread house, house, "
+        "food items",
+    ),
+    "zoo": (
+        "wide calm background landscape for a children's sticker book page: sunny warm savanna, soft pale blue sky "
+        "turning warm golden yellow near the horizon, small soft clouds, far away gentle hills and a few tiny "
+        "acacia trees on the horizon, soft green and golden grass along the bottom third, "
+        "lots of calm empty space in the middle",
+        "giraffe, elephant, lion, zebra, penguin, parrot, monkey, panda, tiger, flamingo, palm tree, bananas, "
+        "animals, fence, cage",
+    ),
+    "winter": (
+        "wide calm winter background landscape for a children's sticker book page: soft pale blue sky with gentle "
+        "falling snowflakes, soft snowy hills, a few small snowy fir trees only at the far left and right edges, "
+        "smooth white snow along the bottom third, cosy soft light, lots of calm empty space in the middle",
+        "snowman, house, cabin, decorated christmas tree, reindeer, deer, santa, old man, presents, gift, sledge, "
+        "bell, stocking, mittens, star",
+    ),
+    "circus": (
+        "wide calm festive background for a children's sticker book page: soft lilac and pink evening sky, "
+        "strings of small colourful triangle bunting flags across the very top, soft warm spotlight glow, "
+        "a smooth light sandy circus ring floor with a little confetti along the bottom third, "
+        "lots of calm empty space in the middle",
+        "circus tent, tent, clown, juggler, carousel, ferris wheel, balloons, fireworks, masks, top hat, rabbit, "
+        "pony, horse, popcorn, bear, ball, animals",
+    ),
+    "space": (
+        "(outer space:1.4), deep space seen from a spaceship, cosmos, soft deep blue and purple starry space "
+        "with gentle pink and violet nebula clouds, a soft milky way, many tiny twinkling stars of different sizes, "
+        "no ground, lots of calm empty space in the middle",
+        "(landscape, ground, land, mountains, hills, trees, water, lake, horizon, moon:1.3), "
+        "rocket, planet, saturn, moon face, astronaut, alien, ufo, flying saucer, comet, shooting star, satellite, "
+        "sun, earth, telescope, spaceship",
     ),
 }
 NEGATIVE = (
-    "photo, realistic, photorealistic, 3d render, dark, night, scary, ugly, deformed, blurry, lowres, "
+    "photo, realistic, photorealistic, 3d render, scary, ugly, deformed, blurry, lowres, "
     "watermark, signature, logo, text, letters, jpeg artifacts, cropped, messy, cluttered, busy, horror, "
-    "castle, house, building, tower, people, girl, princess, animal, unicorn, horse, rainbow, user interface, frame, border"
+    "people, characters, user interface, frame, border"
 )
 
 
@@ -49,8 +104,8 @@ def build(a):
     g = {
         "1": node("CheckpointLoaderSimple", ckpt_name="sd_xl_base_1.0.safetensors"),
         "2": node("VAELoader", vae_name="sdxl_vae.safetensors"),
-        "3": node("CLIPTextEncode", text=f"{WORLDS[a.world]}, {STYLE}", clip=["1", 1]),
-        "4": node("CLIPTextEncode", text=NEGATIVE, clip=["1", 1]),
+        "3": node("CLIPTextEncode", text=f"{WORLDS[a.world][0]}, {STYLE}", clip=["1", 1]),
+        "4": node("CLIPTextEncode", text=f"{NEGATIVE}, {WORLDS[a.world][1]}", clip=["1", 1]),
         "5": node("EmptyLatentImage", width=W, height=H, batch_size=1),
     }
     model = ["1", 0]
