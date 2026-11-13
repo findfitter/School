@@ -51,19 +51,21 @@ WORLDS = {
         "deer, fox, owl, squirrel, hare, rabbit, fairy, house, cabin, mushroom, moon, tulip, fireflies, big oak tree",
     ),
     "candy": (
-        "wide calm background landscape of a sweet candy land for a children's sticker book page: pastel pink sky "
-        "with soft cotton candy clouds, gentle rolling hills of pink and mint frosting with tiny colourful sprinkles "
-        "along the bottom third, soft glossy light, lots of calm empty space in the middle",
-        "cake, lollipop, ice cream, cupcake, donut, cookie, chocolate, candy, strawberry, gingerbread house, house, "
-        "food items",
+        "(candy land:1.4), a sweet fairy-tale landscape made of sweets for a children's sticker book page: "
+        "soft rolling hills of pink and white whipped cream frosting with colourful sprinkles, a little winding "
+        "chocolate river, red and white striped candy canes and round gumdrop bushes only at the far left and right "
+        "edges, cotton candy clouds in a pastel pink and mint sky, lots of calm empty space in the middle",
+        "(ordinary grass, green meadow, ordinary trees, forest, mountains, volcano:1.3), "
+        "cake, birthday cake, ice cream cone, cupcake, donut, cookie, chocolate bar, wrapped candy, strawberry, "
+        "gingerbread house, house, characters",
     ),
     "zoo": (
-        "wide calm background landscape for a children's sticker book page: sunny warm savanna, soft pale blue sky "
-        "turning warm golden yellow near the horizon, small soft clouds, far away gentle hills and a few tiny "
-        "acacia trees on the horizon, soft green and golden grass along the bottom third, "
-        "lots of calm empty space in the middle",
-        "giraffe, elephant, lion, zebra, penguin, parrot, monkey, panda, tiger, flamingo, palm tree, bananas, "
-        "animals, fence, cage",
+        "(children's zoo park:1.4), a sunny cartoon zoo for a children's sticker book page: low wooden fences "
+        "and light sandy paths dividing grassy animal enclosures, big grey rocks, a small blue pond, green bushes "
+        "and bamboo, a few palm trees only at the far left and right edges, soft blue sky with small clouds, "
+        "empty enclosures, lots of calm empty space in the middle",
+        "(wild nature, empty meadow, mountains:1.2), giraffe, elephant, lion, zebra, penguin, parrot, monkey, "
+        "panda, tiger, flamingo, bananas, animals, birds, people, signs, text",
     ),
     "winter": (
         "wide calm winter background landscape for a children's sticker book page: soft pale blue sky with gentle "
@@ -73,12 +75,12 @@ WORLDS = {
         "bell, stocking, mittens, star",
     ),
     "circus": (
-        "wide calm festive background for a children's sticker book page: soft lilac and pink evening sky, "
-        "strings of small colourful triangle bunting flags across the very top, soft warm spotlight glow, "
-        "a smooth light sandy circus ring floor with a little confetti along the bottom third, "
-        "lots of calm empty space in the middle",
-        "circus tent, tent, clown, juggler, carousel, ferris wheel, balloons, fireworks, masks, top hat, rabbit, "
-        "pony, horse, popcorn, bear, ball, animals",
+        "(inside a big circus tent:1.4), cartoon circus arena for a children's sticker book page: red and white "
+        "striped tent walls rising to the top, a round circus ring with a red and gold edge and a soft sandy floor "
+        "at the bottom, warm golden spotlight beams, strings of small colourful triangle flags across the top, "
+        "a few tiny confetti, empty stage, lots of calm empty space in the middle",
+        "(outdoor landscape, hills, mountains, lake, sky, sunset:1.3), clown, juggler, carousel, ferris wheel, "
+        "balloons, fireworks, masks, top hat, rabbit, pony, horse, popcorn, bear, ball, animals, people, audience",
     ),
     "space": (
         "(outer space:1.4), deep space seen from a spaceship, cosmos, soft deep blue and purple starry space "
