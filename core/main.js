@@ -27,6 +27,7 @@ import { birthdayInfo, previewInfo } from './birthday.js';
 import { renderBirthday } from './screens/birthday.js';
 import { createSheet, homeTag } from './screens/book.js';
 import { createTrack } from './screens/series-track.js';
+import { loadPics, allPicUrls } from './pic.js';
 
 installFilters(); // акварельные SVG-фильтры для всех экранов
 installTextures(); // фактура бумаги: картинка, нарисованная один раз
@@ -281,6 +282,7 @@ async function init() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch((err) => console.warn('Service worker не запущен', err));
   }
+  const pics = loadPics(); // таблица картинок вместо эмодзи (ветка art), читается вместе с реестром
   try {
     const all = await loadRegistry();
     app.challenge = all.find((m) => m.challenge) || null;
@@ -289,8 +291,9 @@ async function init() {
   } catch (err) {
     console.error('Не удалось прочитать реестр модулей', err);
   }
+  await pics;
   showMenu();
-  warmCache(allManifests);
+  warmCache(allManifests, allPicUrls());
   setInterval(tick, TICK_MS);
 }
 

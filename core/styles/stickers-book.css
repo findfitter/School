@@ -21,6 +21,29 @@
   filter: url(#pencil);
 }
 
+/* Картинка вместо эмодзи (core/pic.js): размер — как у эмодзи того же font-size (с запасом на кайму);
+   кайма и тень уже нарисованы в картинке, поэтому фильтр stk не нужен; не купленная — бледный серый набросок */
+.st-emoji.pic,
+.scene-item.pic {
+  width: 1.55em; /* в картинке есть поле под тень — чуть больше эмодзи */
+  height: 1.55em;
+  object-fit: contain;
+  vertical-align: middle;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.st-emoji.pic.owned,
+.scene-item.pic.owned {
+  filter: none;
+}
+
+.st-emoji.pic.sketch,
+.scene-item.pic.sketch {
+  filter: grayscale(1) sepia(0.35) contrast(0.75) brightness(1.18);
+  opacity: 0.5;
+}
+
 .st-emoji.pop {
   animation: st-bounce 0.8s cubic-bezier(0.2, 1.6, 0.4, 1) both;
 }

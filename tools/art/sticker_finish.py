@@ -50,26 +50,12 @@ def keep_main(alpha):
     return np.where(grow, alpha, 0)
 
 
-def main():
-    p = argparse.ArgumentParser()
-    p.add_argument("src")
-    p.add_argument("dst")
-    p.add_argument("--size", type=int, default=256)
-    p.add_argument("--border", type=float, default=0.045, help="ширина каймы, доля стороны")
-    p.add_argument("--tol", type=float, default=26)
-    p.add_argument("--soft", type=float, default=22)
-    p.add_argument("--rim", choices=["none", "gold"], default="none",
-                   help="gold — золотой ободок снаружи белой каймы (супер-наклейки)")
-    a = p.parse_args()
-
-    item, _ = cut(Image.open(a.src), a.tol, a.soft)
-    arr = np.asarray(item).astype(np.float32)
-    arr[..., 3] = keep_main(arr[..., 3] / 255) * 255
-    item = Image.fromarray(arr.astype(np.uint8), "RGBA")
+def finish(item, size=256, border=0.045, rim_gold=False):
+    """Вырезанный предмет (RGBA, лишнее уже прозрачное) → квадратная наклейка size×size: кайма, ободок, тень."""
     item = item.crop(item.getchannel("A").point(lambda v: 255 if v > 8 else 0).getbbox())
 
-    b = round(WORK * a.border)
-    rim = round(WORK * 0.014) if a.rim == "gold" else 0
+    b = round(WORK * border)
+    rim = round(WORK * 0.014) if rim_gold else 0
     pad = b + rim + round(WORK * 0.03)  # место под кайму, ободок и тень
     room = WORK - 2 * pad
     k = room / max(item.width, item.height)
@@ -107,7 +93,25 @@ def main():
     out.alpha_composite(white)
     out.alpha_composite(canvas)
 
-    out = out.resize((a.size, a.size), Image.LANCZOS)
+    return out.resize((size, size), Image.LANCZOS)
+
+
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("src")
+    p.add_argument("dst")
+    p.add_argument("--size", type=int, default=256)
+    p.add_argument("--border", type=float, default=0.045, help="ширина каймы, доля стороны")
+    p.add_argument("--tol", type=float, default=26)
+    p.add_argument("--soft", type=float, default=22)
+    p.add_argument("--rim", choices=["none", "gold"], default="none",
+                   help="gold — золотой ободок снаружи белой каймы (супер-наклейки)")
+    a = p.parse_args()
+
+    item, _ = cut(Image.open(a.src), a.tol, a.soft)
+    arr = np.asarray(item).astype(np.float32)
+    arr[..., 3] = keep_main(arr[..., 3] / 255) * 255
+    out = finish(Image.fromarray(arr.astype(np.uint8), "RGBA"), a.size, a.border, a.rim == "gold")
     os.makedirs(os.path.dirname(os.path.abspath(a.dst)), exist_ok=True)
     out.save(a.dst, quality=88, method=6)
     print(a.dst, out.size)

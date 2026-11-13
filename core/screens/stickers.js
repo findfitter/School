@@ -10,6 +10,7 @@ import { ALBUMS, WORLDS, WORLD_SIZE, TOTAL_SUPERS, stickerById, worldProgress } 
 import { superSticker } from '../cycles.js';
 import { createBook, counters, noteButton } from './book.js';
 import { svgEl, starIcon } from './book-art.js';
+import { picOrEmoji, picUrl } from '../pic.js';
 
 const S = STR.stickers;
 const SHOP_PER_PAGE = 12; // карточек на странице лавки (3 в ряд, 4 ряда)
@@ -23,8 +24,8 @@ const SHOP_PAGES = ALBUMS.flatMap((album) => {
 const SPARK = 'M0 -12 l4 8 8 4 -8 4 -4 8 -4 -8 -8 -4 8 -4 z';
 const sparkles = () => svgEl(`<svg xmlns="http://www.w3.org/2000/svg" class="st-sparks" aria-hidden="true" viewBox="-50 -50 100 100" overflow="visible"><g transform="translate(34 -30)"><path class="bk-sparkle" d="${SPARK}" fill="#F7D774"/></g><g transform="translate(-36 -8)"><path class="bk-sparkle bk-sparkle-2" d="${SPARK}" transform="scale(0.75)" fill="#F7D774"/></g><g transform="translate(26 34)"><path class="bk-sparkle" d="${SPARK}" transform="scale(0.6)" fill="#F7D774"/></g></svg>`);
 
-// Эмодзи как наклейка (купленная) или как карандашный набросок (ещё нет).
-const stickerFace = (emoji, have, extra = '') => h('span', { class: `st-emoji ${have ? 'owned' : 'sketch'} ${extra}`.trim(), text: emoji });
+// Наклейка (купленная) или карандашный набросок (ещё нет). Есть картинка (images/index.json, core/pic.js) — она, иначе эмодзи.
+const stickerFace = (emoji, have, extra = '') => picOrEmoji(emoji, 'sticker', `st-emoji ${have ? 'owned' : 'sketch'} ${extra}`.trim());
 
 export function renderStickers(app) {
   const supers = () => storage.supers();
@@ -234,7 +235,8 @@ export function renderStickers(app) {
 function worldScene(world, count) {
   const items = world.items.map((s, i) => {
     const have = i < count;
-    const el = h('span', { class: `scene-item ${have ? 'owned' : 'sketch'}`, title: have ? s.ru : '', text: s.emoji });
+    const kind = picUrl(s.emoji, 'super') ? 'super' : 'sticker'; // супер-наклейка с ободком, если есть, иначе обычная
+    const el = picOrEmoji(s.emoji, kind, `scene-item ${have ? 'owned' : 'sketch'}`, { title: have ? s.ru : '' });
     el.style.left = `${s.x}%`;
     el.style.top = `${s.y}%`;
     el.style.fontSize = `${s.size * 1.15}cqw`;

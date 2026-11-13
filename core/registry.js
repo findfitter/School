@@ -49,9 +49,11 @@ export function moduleIcon(manifest) {
 }
 
 // Просит service worker закэшировать файлы модулей, чтобы они работали офлайн.
-export async function warmCache(manifests) {
+// extra — пути от корня приложения (картинки из images/index.json, core/pic.js).
+export async function warmCache(manifests, extra = []) {
   if (!('serviceWorker' in navigator)) return;
   const urls = ['registry.json'].map((f) => new URL(f, MODULES_URL).href);
+  for (const f of extra) urls.push(new URL(f, document.baseURI).href);
   for (const m of manifests) {
     const files = ['manifest.json', 'index.js', ...(m.styles || []), ...(m.files || [])];
     for (const f of files) urls.push(new URL(f, m.base).href);

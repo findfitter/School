@@ -14,6 +14,8 @@ const CORE_FILES = [
   'icons/icon-512.png',
   'icons/icon-maskable-512.png',
   'core/main.js',
+  'core/pic.js',
+  'images/index.json',
   'core/config.js',
   'core/cycles.js',
   'core/dom.js',
