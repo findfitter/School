@@ -4,6 +4,7 @@ import * as storage from '../storage.js';
 import { challengeProgress } from '../challenges.js';
 import { createBook, createIllustration, counters, guideDog } from './book.js';
 import { svgEl, starIcon, boneMark } from './book-art.js';
+import { picOrEmoji } from '../pic.js';
 
 const PATH_STARS = 5; // звёзд на тропинке иллюстрации (как на главном экране)
 
@@ -122,7 +123,7 @@ function superPopup(app, text, sticker, lang) {
   const popup = h('div', { class: 'overlay super-popup' },
     sparkles,
     h('div', { class: 'super-card' },
-      h('div', { class: 'super-flyer', text: sticker.emoji }),
+      picOrEmoji(sticker.emoji, ['super', 'sticker'], 'super-flyer'),
       h('h2', { text: text.title }),
       h('p', { text: message }),
       button('btn primary big', text.ok, () => popup.remove())));

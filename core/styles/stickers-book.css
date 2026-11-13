@@ -365,3 +365,14 @@
     animation: none;
   }
 }
+
+/* Картинка супер-наклейки в окне поздравления (result.js): размер как у эмодзи, ободок и тень уже в картинке */
+.super-flyer.pic {
+  width: 1.3em;
+  height: 1.3em;
+  object-fit: contain;
+}
+
+.super-card .super-flyer.pic {
+  filter: none;
+}

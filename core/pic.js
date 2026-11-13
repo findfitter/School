@@ -4,6 +4,7 @@
 //
 //   await loadPics();                       // один раз при старте (core/main.js)
 //   picUrl('🐹', 'sticker')                 // 'images/stickers/1f439.webp' или null
+//   picUrl('🦄', ['super', 'sticker'])      // первый раздел, где картинка есть
 //   picOrEmoji('🐹', 'sticker', 'класс')    // <img class="pic класс"> или <span class="класс">🐹</span>
 
 import { h } from './dom.js';
@@ -11,7 +12,7 @@ import { h } from './dom.js';
 const INDEX = 'images/index.json';
 let table = {};
 
-const bare = (emoji) => String(emoji).replace(/️/g, '');
+const bare = (emoji) => String(emoji).replace(/\uFE0F/g, '');
 
 export async function loadPics() {
   try {
@@ -23,10 +24,13 @@ export async function loadPics() {
 }
 
 export function picUrl(emoji, kind = 'sticker') {
-  const section = table[kind];
-  if (!section || !emoji) return null;
-  const path = section[emoji] ?? section[bare(emoji)];
-  return path ? `images/${path}` : null;
+  if (!emoji) return null;
+  for (const k of [kind].flat()) {
+    const section = table[k];
+    const path = section && (section[emoji] ?? section[bare(emoji)]);
+    if (path) return `images/${path}`;
+  }
+  return null;
 }
 
 // Все пути картинок — чтобы service worker положил их в офлайн-кэш (core/main.js → warmCache).

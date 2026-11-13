@@ -13,6 +13,7 @@ import { GIFT, claimBirthday } from '../birthday.js';
 import { yearsLabel, MAX_CANDLES } from '../birthday-data.js';
 import { createBook, guideDog, lockButton } from './book.js';
 import { svgEl, boneMark } from './book-art.js';
+import { picOrEmoji } from '../pic.js';
 
 const B = STR.birthday;
 const CANDLE_COLORS = ['#f7a8c4', '#a8d8f0', '#fbe08a', '#b9e5b8', '#d9b8f0'];
@@ -184,7 +185,7 @@ export function renderBirthday(app, info, { test = false, onExit = null } = {}) 
       if (i === 0) return { art: h('span', { class: 'bd-gift-art bone' }, svgEl(boneMark())), caption: format(B.giftBones, { n: gift.bones }) };
       if (i === 1) return { art: h('span', { class: 'bd-gift-art', text: '🥳' }), caption: test ? B.giftHatTest : B.giftHat };
       return gift.sticker
-        ? { art: h('span', { class: 'bd-gift-art sticker', text: stickerById.get(gift.sticker).emoji }), caption: B.giftSticker }
+        ? { art: picOrEmoji(stickerById.get(gift.sticker).emoji, 'sticker', 'bd-gift-art sticker'), caption: B.giftSticker }
         : { art: h('span', { class: 'bd-gift-art', text: '⭐' }), caption: format(B.giftStars, { n: gift.stars }) };
     };
 

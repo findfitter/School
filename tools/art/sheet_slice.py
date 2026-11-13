@@ -82,10 +82,13 @@ def main():
     p.add_argument("--border", type=float, default=0.03, help="доп. белая кайма (у Gemini своя тонкая уже есть)")
     p.add_argument("--gold", action="store_true", help="супер-наклейки: золотой ободок")
     p.add_argument("--size", type=int, default=256)
+    p.add_argument("--part", type=int, default=0, help="альбом больше листа (base, 24): 1 — первые 12, 2 — следующие")
     a = p.parse_args()
 
     emojis = group_items(a.group)
     n = a.cols * a.rows
+    if a.part:
+        emojis = emojis[(a.part - 1) * n:a.part * n]
     if len(emojis) != n:
         sys.exit(f"в «{a.group}» {len(emojis)} наклеек, а на листе {n} мест")
 

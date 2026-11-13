@@ -352,3 +352,12 @@
   border: 2px solid #d8d0c4;
   border-radius: 10px;
 }
+
+/* Наклейка-подарок картинкой (core/pic.js): кайма и тень уже в картинке */
+.bd-gift-art.sticker.pic {
+  width: 1.45em;
+  height: 1.45em;
+  margin: 0 auto;
+  object-fit: contain;
+  filter: none;
+}

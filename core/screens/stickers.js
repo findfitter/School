@@ -10,7 +10,7 @@ import { ALBUMS, WORLDS, WORLD_SIZE, TOTAL_SUPERS, stickerById, worldProgress } 
 import { superSticker } from '../cycles.js';
 import { createBook, counters, noteButton } from './book.js';
 import { svgEl, starIcon } from './book-art.js';
-import { picOrEmoji, picUrl } from '../pic.js';
+import { picOrEmoji } from '../pic.js';
 
 const S = STR.stickers;
 const SHOP_PER_PAGE = 12; // карточек на странице лавки (3 в ряд, 4 ряда)
@@ -79,7 +79,7 @@ export function renderStickers(app) {
     const caption = n === 0 ? S.worldHint : left0 > 0 ? format(S.worldLeft, { n: left0 }) : S.worldDone;
 
     const extras = [];
-    for (let k = TOTAL_SUPERS + 1; k <= n; k++) extras.push(stickerFace(superSticker(k).emoji, true));
+    for (let k = TOTAL_SUPERS + 1; k <= n; k++) extras.push(picOrEmoji(superSticker(k).emoji, ['super', 'sticker'], 'st-emoji owned'));
 
     left.replaceChildren(...[
       h('div', { class: 'dog-head-row' },
@@ -235,8 +235,8 @@ export function renderStickers(app) {
 function worldScene(world, count) {
   const items = world.items.map((s, i) => {
     const have = i < count;
-    const kind = picUrl(s.emoji, 'super') ? 'super' : 'sticker'; // супер-наклейка с ободком, если есть, иначе обычная
-    const el = picOrEmoji(s.emoji, kind, `scene-item ${have ? 'owned' : 'sketch'}`, { title: have ? s.ru : '' });
+    // супер-наклейка с золотым ободком, если есть, иначе обычная наклейка, иначе эмодзи
+    const el = picOrEmoji(s.emoji, ['super', 'sticker'], `scene-item ${have ? 'owned' : 'sketch'}`, { title: have ? s.ru : '' });
     el.style.left = `${s.x}%`;
     el.style.top = `${s.y}%`;
     el.style.fontSize = `${s.size * 1.15}cqw`;
