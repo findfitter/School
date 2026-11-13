@@ -262,5 +262,5 @@ function worldScene(world, count) {
     hill.style.background = world.ground;
     paint = h('div', { class: 'scene-paint' }, sky, hill);
   }
-  return h('div', { class: 'st-scene', role: 'img', 'aria-label': world.title.ru }, paint, items);
+  return h('div', { class: `st-scene${bg ? ' has-art' : ''}`, role: 'img', 'aria-label': world.title.ru }, paint, items);
 }
