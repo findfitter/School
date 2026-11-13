@@ -27,8 +27,14 @@ const sparkles = () => svgEl(`<svg xmlns="http://www.w3.org/2000/svg" class="st-
 // Наклейка (купленная) или карандашный набросок (ещё нет). Есть картинка (images/index.json, core/pic.js) — она, иначе эмодзи.
 const stickerFace = (emoji, have, extra = '') => picOrEmoji(emoji, 'sticker', `st-emoji ${have ? 'owned' : 'sketch'} ${extra}`.trim());
 
+// Просмотр «всё собрано» (вкладка «Тестировщик» у родителя): все наклейки и все миры показаны полученными.
+// Только показ — данные ребёнка не меняются, режим живёт, пока открыта вкладка браузера (sessionStorage).
+export const PREVIEW_ALL = 'stickers-all';
+const previewAll = () => storage.uiState(PREVIEW_ALL) === '1';
+const ownedIds = () => (previewAll() ? ALBUMS.flatMap((a) => a.items.map((s) => s.id)) : storage.owned());
+
 export function renderStickers(app) {
-  const supers = () => storage.supers();
+  const supers = () => (previewAll() ? WORLDS.length * WORLD_SIZE : storage.supers());
   const topWorld = () => Math.min(WORLDS.length - 1, Math.floor(supers() / WORLD_SIZE));
   let tab = 'mine';
   let worldIdx = topWorld(); // какой мир показан слева
@@ -143,7 +149,7 @@ export function renderStickers(app) {
   // «Коллекция»: страница альбома — все наклейки альбома, купленные в цвете, остальные карандашом.
   function minePage() {
     const album = ALBUMS[albumIdx];
-    const owned = new Set(storage.owned());
+    const owned = new Set(ownedIds());
     const have = album.items.filter((s) => owned.has(s.id)).length;
     const cols = album.items.length > 12 ? 6 : 4;
     return [
@@ -160,7 +166,7 @@ export function renderStickers(app) {
   // «Лавка наклеек»: бумажные карточки с ценой на жёлтой плашке; на купленных печать «Есть!».
   function shopPage() {
     const page = SHOP_PAGES[shopIdx];
-    const owned = new Set(storage.owned());
+    const owned = new Set(ownedIds());
     const sub = say || S.shopSub;
     return [
       pageHead(S.shopTitle, sub, shopIdx, SHOP_PAGES.length, (d) => {

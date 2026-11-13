@@ -11,6 +11,7 @@ import { buildReport, reportFileName, hasData } from '../report.js';
 import { createSheet } from './book.js';
 import { missionPending, confirmDone, skipToday, currentStreak } from '../mission.js';
 import { birthdayDate } from '../birthday-data.js';
+import { PREVIEW_ALL } from './stickers.js';
 
 const P = STR.parent;
 
@@ -248,6 +249,12 @@ function testerCards(app) {
       h('div', { class: 'row-wrap' },
         button('btn', `+100 ⭐`, () => { storage.addStars(100); refresh(); }),
         button('btn', `+1 🦴`, () => { storage.addBones(1); refresh(); }))),
+    card(P.testerStickersTitle,
+      h('p', { class: 'status', text: storage.uiState(PREVIEW_ALL) === '1' ? P.testerStickersOn : P.testerStickersOff }),
+      h('div', { class: 'row-wrap' },
+        button('btn primary', `🌟 ${P.testerStickersShow}`, () => { storage.setUiState(PREVIEW_ALL, '1'); app.go.stickers(); }),
+        storage.uiState(PREVIEW_ALL) === '1' ? button('btn', P.testerStickersHide, () => { storage.setUiState(PREVIEW_ALL, '0'); refresh(); }) : null),
+      h('p', { class: 'hint-line', text: P.testerStickersHint })),
     card(P.dogTestTitle,
       h('p', { class: 'hint-line', text: P.dogTestHint }),
       button('btn primary', `🧪 ${P.dogTestOpen}`, () => app.go.dogTest())),
