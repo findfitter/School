@@ -691,6 +691,31 @@ if (existsSync(`${challengeDir}/manifest.json`)) {
   notes.push('день рождения: даты, настройки, подарки раз в год, колпак на собаку, нет уборки в этот день проверены');
 }
 
+// 7б4. Наклейки: обычные (альбомы) и супер-наклейки (миры) должны быть разными картинками.
+// Внутри альбомов эмодзи не повторяются; общими с мирами могут быть только эмодзи из ALBUM_WORLD_SHARED
+// (решение владельца: повторы альбомов заменены, эти 12 оставлены сознательно).
+{
+  const ALBUM_WORLD_SHARED = ['🐻', '👸', '🧚‍♀️', '🧜‍♀️', '🎠', '⭐', '🌟', '🐠', '🐴', '🌸', '🚢', '🎈'];
+  const { ALBUMS, WORLDS } = await import('file:///' + `${ROOT}/core/rewards.js`);
+  const norm = (e) => e.replace(/️/g, ''); // ⛸️ и ⛸ — одна картинка
+  const shared = new Set(ALBUM_WORLD_SHARED.map(norm));
+  const seen = new Map();
+  for (const album of ALBUMS) {
+    for (const s of album.items) {
+      const e = norm(s.emoji);
+      if (seen.has(e)) add('НАКЛЕЙКИ', 'core/rewards.js', `${s.emoji} повторяется в альбомах: ${seen.get(e)} и ${s.id}`);
+      else seen.set(e, s.id);
+    }
+  }
+  for (const world of WORLDS) {
+    for (const it of world.items) {
+      const e = norm(it.emoji);
+      if (seen.has(e) && !shared.has(e)) add('НАКЛЕЙКИ', 'core/rewards.js', `${it.emoji} есть и в альбоме (${seen.get(e)}), и в мире ${world.id} — обычная и супер-наклейка должны быть разными`);
+    }
+  }
+  notes.push('наклейки: в альбомах нет повторов, с мирами общие только разрешённые эмодзи');
+}
+
 // 8. Классы в CSS и JS: быстрый поиск мёртвых стилей и неопределённых переменных
 const vars = new Set([...css.map(read).join('\n').matchAll(/--([\w-]+)\s*:/g)].map((m) => m[1]));
 for (const f of css) {
