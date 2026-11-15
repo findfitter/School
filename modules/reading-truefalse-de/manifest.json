@@ -1,0 +1,21 @@
+{
+  "id": "reading-truefalse-de",
+  "title": "Stimmt oder nicht?",
+  "subject": "german",
+  "icon": "🤔",
+  "glyph": "Stimmt",
+  "description": "Lies den Satz: stimmt das?",
+  "version": "1.0.0",
+  "styles": [
+    "../reading-truefalse/style.css"
+  ],
+  "files": [
+    "texts.js",
+    "data.js",
+    "../reading-truefalse/knowledge.js",
+    "../reading-truefalse/bank.js",
+    "../reading-truefalse/chooser.js",
+    "../reading-truefalse/game.js"
+  ],
+  "cycle": "german"
+}

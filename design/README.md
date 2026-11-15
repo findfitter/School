@@ -299,8 +299,8 @@ English (4). Звёзды на карточках (0–3) в приложени�
 |---|---|
 | Математика | `addition-10` `+10`, `addition-20` `+20`, `subtraction-10` `−10`, `subtraction-20` `−20`, `compare-numbers` `5>3`, `word-problems` `2+?`, `money` `€` (в эскизе `₽`, в приложении евро) |
 | Пространство | `left-right` `Л·П`, `left-right-other` `П·Л`, `mental-rotation` `↻`, `top-view` `◎`, `cubes` `▦` |
-| Русский | `reading-ru` `Аа`, `reading-phrases` `Аа Бб`, `reading-pick` `Ищи`, `reading-sentences` `1·2·3`, `reading-long` `Ааа` |
-| Deutsch | `reading-de` `Ww`, `reading-phrases-de` `Ww Zz`, `reading-pick-de` `Such`, `reading-sentences-de` `1·2·3`, `reading-long-de` `Satz`, `german-articles` `der` |
+| Русский | `reading-ru` `Аа`, `reading-phrases` `Аа Бб`, `reading-pick` `Ищи`, `reading-sentences` `1·2·3`, `reading-long` `Ааа`, `reading-truefalse` `✔✖` |
+| Deutsch | `reading-de` `Ww`, `reading-phrases-de` `Ww Zz`, `reading-pick-de` `Such`, `reading-sentences-de` `1·2·3`, `reading-long-de` `Satz`, `reading-truefalse-de` `Stimmt`, `german-articles` `der` |
 | English | `english-words` `Hi!`, `english-quiz` `Abc`, `english-phrases` `Aa Bb`, `english-sentences` `♪` |
 
 ### 9.2 Storybook — экран задания (страницы 8–9)

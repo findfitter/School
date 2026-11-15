@@ -1,0 +1,21 @@
+{
+  "id": "reading-truefalse",
+  "title": "Правда или нет",
+  "subject": "russian",
+  "icon": "🤔",
+  "glyph": "✔✖",
+  "description": "Читаем утверждение: правда или нет?",
+  "version": "1.0.0",
+  "styles": [
+    "style.css"
+  ],
+  "files": [
+    "texts.js",
+    "data.js",
+    "knowledge.js",
+    "bank.js",
+    "chooser.js",
+    "game.js"
+  ],
+  "cycle": "russian"
+}

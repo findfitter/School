@@ -282,6 +282,27 @@ for (const bank of BANKS) {
   notes.push(`${id}: предложений ${SENTENCES.length}${free ? ` (без картинки ${free})` : ''}, разных слов ${rows.length + frequency(SENTENCES, bank.function).filter((r) => r.function).length}, самое частое «${rows[0].word}» ${(rows[0].share * 100).toFixed(1)}%`);
 }
 
+// 7в-2. «Правда или нет» (ru, de): банки утверждений и симуляция повторов — tools/truefalse-sim.mjs, `node tools/truefalse-sim.mjs` печатает подробности.
+// Проверяем: размер банка, повторы и противоречия утверждений, длину, баланс «правда / неправда» и «не», достаточно ли
+// утверждений каждого вида; а симуляция серий — что ни одно знание не повторяется, пока не показан весь банк.
+if (existsSync(`${ROOT}/modules/reading-truefalse/knowledge.js`)) {
+  const tf = await import(pathToFileURL(`${ROOT}/tools/truefalse-sim.mjs`).href);
+  const K = await import(bankUrl('reading-truefalse/knowledge.js'));
+  for (const p of K.validate()) add('ПРАВДА ИЛИ НЕТ', 'knowledge.js', p);
+  for (const b of tf.BANKS) {
+    if (!existsSync(`${ROOT}/modules/${b.id}/data.js`)) continue;
+    const bank = await tf.loadBank(b);
+    const { problems: found, notes: info } = await tf.analyze(bank, b.lang, K);
+    for (const p of found.slice(0, 15)) add('ПРАВДА ИЛИ НЕТ', b.id, p);
+    if (found.length > 15) add('ПРАВДА ИЛИ НЕТ', b.id, `… и ещё ${found.length - 15} (запустите node tools/truefalse-sim.mjs)`);
+    const st = await tf.simulate(bank, { ns: b.ns, series: 120 });
+    if (st.repeatFacts) add('ПРАВДА ИЛИ НЕТ', b.id, `в симуляции 120 серий факты повторились ${st.repeatFacts} раз — до показа всего банка повторов быть не должно`);
+    if (Math.abs(st.trueCount / st.tasks - 0.5) > 0.02) add('ПРАВДА ИЛИ НЕТ', b.id, `верных утверждений ${(st.trueCount / st.tasks * 100).toFixed(1)}% — должно быть пополам`);
+    if (Math.abs(st.negT / st.nT - st.negF / st.nF) > 0.03) add('ПРАВДА ИЛИ НЕТ', b.id, `«не» среди верных ${(st.negT / st.nT * 100).toFixed(1)}%, среди неверных ${(st.negF / st.nF * 100).toFixed(1)}% — по слову «не» ответ угадывается`);
+    notes.push(`${b.id}: ${info[0]}; симуляция 120 серий: повторов фактов ${st.repeatFacts}, правда ${(st.trueCount / st.tasks * 100).toFixed(0)}%, «не» ${(st.negT / st.nT * 100).toFixed(0)}% / ${(st.negF / st.nF * 100).toFixed(0)}%`);
+  }
+}
+
 // 7г. Правило кругов: у каждого модуля любого раздела (английский тоже) должен быть cycle
 // (пройденный модуль закрывается, пока не пройдены все; потом супер-наклейка и круг заново)
 for (const id of registry) {
