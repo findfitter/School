@@ -29,7 +29,7 @@ function pickWord(items, keyOf) {
   return items[items.length - 1];
 }
 
-export function createContext({ container, manifest, services, onFinish, onTask = () => {}, challenge = null }) {
+export function createContext({ container, manifest, services, onFinish, onTask = () => {}, challenge = null, test = null }) {
   const s = storage.settings();
   // озвучка: везде, только в этом модуле или только в сложном задании этого раздела (английский)
   const voice = VOICE_ENABLED || Boolean(manifest.voice) || Boolean(challenge?.voice);
@@ -60,6 +60,7 @@ export function createContext({ container, manifest, services, onFinish, onTask 
       mark: (key) => storage.recordWord(key, true),
       seen: (key) => storage.wordInfo(key).n > 0,
     }),
+    test: test ? Object.freeze({ chapter: test.chapter ?? null }) : null, // пробный запуск из раздела для родителя (null у обычного)
     challenge: challenge ? Object.freeze({ ...challenge, used: Object.freeze([...(challenge.used || [])]) }) : null,
     // Задание закончено (первый заход, не повтор в конце серии): { ok — верно с первой попытки, level — уровень сложности }.
     // Нужно только для журнала серий (core/journal.js → отчёт для родителя); время на задание считает ядро.

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Тест комикса</title>
+<style>
+  body { font: 20px/1.4 system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; color: #3a2e26; background: #fffdf6; }
+  button { font: inherit; font-weight: 700; padding: 14px 28px; border-radius: 14px; border: 3px solid #3a2e26; background: #ffd23f; cursor: pointer; margin: 6px 8px 6px 0; }
+  code { background: #f1e9d8; padding: 2px 6px; border-radius: 6px; }
+  .note { color: #7a6a5c; font-size: 17px; }
+</style>
+</head>
+<body>
+<h1>Тест комикса «Аглая и гусь»</h1>
+<p>Кнопка сбрасывает прогресс комикса и кэш приложения <b>только в этом браузере</b> (остальное — звёзды, наклейки, собаку — не трогает)
+и открывает приложение в нужном режиме. Комикс откроется сам.</p>
+<p>
+  <button data-mode="all">Все главы подряд</button>
+  <button data-mode="1">Глава 1</button>
+  <button data-mode="2">Глава 2</button>
+  <button data-mode="3">Глава 3</button>
+  <button data-mode="4">Глава 4</button>
+  <button data-mode="5">Глава 5</button>
+  <button data-mode="6">Глава 6</button>
+</p>
+<p class="note">«Все главы подряд» проходит шесть глав за одну серию без закрытия модуля в круге. Каждая глава начинается карточкой с названием.
+Комикс откроется сразу. Если вместо него показалось главное меню (браузер взял старую копию файла), обновите страницу — F5 или ⟳ — и он откроется. Чтобы пройти заново, откройте эту страницу ещё раз. Адрес приложения в нужном режиме: <code>/?comic=all</code> или <code>/?comic=3</code>.</p>
+<p id="msg" class="note"></p>
+<p id="nofile" class="note" hidden style="color:#b3261e;font-weight:700">Страница открыта как файл (file://) — так приложение не работает. Запустите сервер (<code>python -m http.server 8080</code> в папке проекта) и откройте <code>http://localhost:8080/tools/comic/test.html</code>.</p>
+<script>
+  if (location.protocol === 'file:') {
+    document.getElementById('nofile').hidden = false;
+    document.querySelectorAll('button').forEach((b) => (b.disabled = true));
+  }
+  document.querySelectorAll('button').forEach((b) => {
+    b.onclick = async () => {
+      const msg = document.getElementById('msg');
+      msg.textContent = 'Сбрасываю…';
+      try {
+        const st = JSON.parse(localStorage.getItem('school-app-v1') || '{}');
+        if (st.cycles) st.cycles.russian = [];
+        if (st.progress) delete st.progress['comic-aglaya'];
+        localStorage.setItem('school-app-v1', JSON.stringify(st));
+        // свежие файлы: убрать офлайн-кэш и service worker этого адреса (при загрузке приложения он поставится заново)
+        for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister();
+        for (const k of await caches.keys()) await caches.delete(k);
+        // обновить в HTTP-кэше браузера главные файлы (иначе может открыться старый main.js и комикс не запустится сам)
+        for (const u of ['/', '/core/main.js', '/modules/registry.json']) await fetch(u, { cache: 'reload' });
+      } catch (e) {
+        msg.textContent = 'Не удалось сбросить: ' + e;
+      }
+      location.href = new URL('../../?comic=' + b.dataset.mode, location.href).href;
+    };
+  });
+</script>
+</body>
+</html>

@@ -98,7 +98,8 @@ const app = {
   services,
   manifests: [], // обычные модули
   challenge: null, // модуль сложных заданий (modules/challenge), в обычные списки не входит
-  go: { menu: showMenu, stickers: showStickers, dog: () => showDog('real'), dogTest: () => showDog('test'), missionTest: showMissionTest, birthdayTest: showBirthdayTest, parent: showParent, play },
+  hidden: [], // модули с "hidden": true: ребёнку не видны, открываются только из раздела для родителя (вкладка «Тестировщик»)
+  go: { menu: showMenu, stickers: showStickers, dog: () => showDog('real'), dogTest: () => showDog('test'), missionTest: showMissionTest, birthdayTest: showBirthdayTest, parent: showParent, play, playTest },
 };
 
 function show(screen, onLeave = null, kind = 'menu') {
@@ -179,15 +180,24 @@ function showLimit() {
 }
 
 // opts.subject — раздел сложного задания (для модуля сложных заданий).
+// Пробный запуск из раздела для родителя (opts.test = { chapter }): серия не записывается, звёзд нет, «домой» и конец — на экран родителя.
+function playTest(manifest, chapter = null) {
+  return play(manifest, { test: { chapter } });
+}
+
 async function play(manifest, opts = {}) {
-  if (isLocked(manifest)) return showMenu();
-  if (limitReached()) return showLimit();
-  if (birthdayInfo()) return showBirthday();
-  if (missionPending()) return showMission();
+  const test = opts.test || null;
+  const toParent = () => show(renderParent(app), null, 'parent');
+  if (!test) {
+    if (isLocked(manifest)) return showMenu();
+    if (limitReached()) return showLimit();
+    if (birthdayInfo()) return showBirthday();
+    if (missionPending()) return showMission();
+  }
   const challenge = manifest.challenge ? challengeInfo(app, opts.subject) : null;
   if (manifest.challenge && !challenge) return showMenu(); // задания уже нет (например, пройдено в другом окне)
   const container = h('div', { class: 'game-container' });
-  const home = homeTag(STR.common.home, () => showMenu());
+  const home = homeTag(STR.common.home, () => (test ? toParent() : showMenu()));
   // Дорожка лапок вместо точек модуля: у сложного задания (один вопрос) и у модулей без серии ("series": false) её нет.
   const track = manifest.challenge || manifest.series === false ? null : createTrack(storage.settings().seriesLength);
   const sheet = createSheet({ className: `game-screen${track ? ' has-track' : ''}` });
@@ -198,7 +208,7 @@ async function play(manifest, opts = {}) {
   show(sheet.el, () => {
     if (typeof stopModule === 'function') stopModule();
     styles.detach();
-    journal.abandon(session); // вышли, не закончив серию (после finish — ничего не делает)
+    if (!test) journal.abandon(session); // вышли, не закончив серию (после finish — ничего не делает)
   }, 'game');
   const mine = runToken;
 
@@ -210,18 +220,20 @@ async function play(manifest, opts = {}) {
       manifest,
       services,
       challenge,
+      test,
       onTask: (info) => {
-        journal.task(session, info);
+        if (!test) journal.task(session, info);
         if (track) track.advance();
       },
       onFinish: (result) => {
         if (mine !== runToken) return;
+        if (test) return toParent(); // пробный запуск: ничего не записываем
         journal.finish(session, result);
         if (challenge) finishChallenge(challenge.subject, result);
         else finishSeries(manifest, result);
       },
     });
-    session = journal.begin({ id: manifest.id, subject: challenge ? challenge.subject : manifest.subject, challenge: Boolean(challenge) });
+    session = test ? null : journal.begin({ id: manifest.id, subject: challenge ? challenge.subject : manifest.subject, challenge: Boolean(challenge) });
     const stop = await mod.start(ctx);
     if (mine !== runToken) {
       if (typeof stop === 'function') stop();
@@ -286,13 +298,18 @@ async function init() {
   try {
     const all = await loadRegistry();
     app.challenge = all.find((m) => m.challenge) || null;
-    app.manifests = all.filter((m) => !m.challenge);
+    app.manifests = all.filter((m) => !m.challenge && !m.hidden);
+    app.hidden = all.filter((m) => m.hidden);
     allManifests = all;
   } catch (err) {
     console.error('Не удалось прочитать реестр модулей', err);
   }
   await pics;
   showMenu();
+  // Проверка комикса на компьютере: адрес /?comic=all или /?comic=3 (страница tools/comic/test.html) сразу открывает его, минуя меню.
+  const comicTest = new URLSearchParams(location.search).get('comic');
+  const comicManifest = comicTest && app.hidden.find((m) => m.id === 'comic-aglaya');
+  if (comicManifest) playTest(comicManifest, comicTest);
   warmCache(allManifests, allPicUrls());
   setInterval(tick, TICK_MS);
 }

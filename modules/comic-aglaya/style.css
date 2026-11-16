@@ -1,0 +1,576 @@
+/* Комикс «Аглая и гусь». Сверху лента главы и точки заданий, в середине «страница» из 3–4 кадров, внизу панель задания.
+   Размеры внутри кадра — в единицах контейнера кадра (cqmin / cqw), чтобы кадр выглядел одинаково и маленьким на странице,
+   и увеличенным (кадр «подъезжает» transform: scale). Все анимации одноразовые; при prefers-reduced-motion отключены
+   (у стартовых keyframes fill-mode backwards, поэтому без анимации всё остаётся видимым). */
+
+.cmx {
+  --ink: #3a2e26;
+  --paper: var(--book-card, #fffdf6);
+  /* значения по умолчанию для переменных, которые скрипт задаёт у каждого элемента отдельно */
+  --hc: #eee;
+  --y: 40%;
+  --dx: 0;
+  --dy: -10cqh;
+  --r: 0deg;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1vh;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  font-family: var(--font);
+  color: var(--ink);
+}
+
+/* ---------- верх ---------- */
+.cmx-top {
+  flex: none;
+  height: clamp(48px, 8vh, 64px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.cmx-ribbon {
+  flex: 1;
+  text-align: center;
+  font-size: clamp(22px, 4vh, 34px);
+  font-weight: 700;
+  color: var(--book-ink-soft, #7a6a5c);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cmx-dots {
+  display: flex;
+  gap: 8px;
+  min-width: 80px;
+}
+.cmx-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #e3d8c4;
+  transition: background 0.3s, transform 0.3s;
+}
+.cmx-dot.done {
+  background: var(--book-done, #2f7d4f);
+  transform: scale(1.15);
+}
+.cmx-repeat {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: var(--book-shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  font-size: 28px;
+}
+.cmx-repeat[hidden] {
+  display: block;
+  visibility: hidden;
+}
+
+/* ---------- страница ---------- */
+.cmx-stage {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+.cmx-page {
+  position: absolute;
+  inset: 0;
+}
+.cmx-page.enter {
+  animation: cmx-page-in 0.4s ease-out backwards;
+}
+.cmx-page.leave {
+  animation: cmx-page-out 0.4s ease-in forwards;
+}
+@keyframes cmx-page-in {
+  from { transform: translateX(8%); opacity: 0; }
+}
+@keyframes cmx-page-out {
+  to { transform: translateX(-8%); opacity: 0; }
+}
+
+.cmx-slot,
+.cmx-panel {
+  position: absolute;
+}
+/* раскладка A: один высокий кадр слева, два справа; B: сетка 2×2 */
+.cmx-page[data-layout='A'] .pos-0 { left: 0; top: 0; width: 56%; height: 100%; }
+.cmx-page[data-layout='A'] .pos-1 { left: 58%; top: 0; width: 42%; height: 49%; }
+.cmx-page[data-layout='A'] .pos-2 { left: 58%; top: 51%; width: 42%; height: 49%; }
+.cmx-page[data-layout='B'] .pos-0 { left: 0; top: 0; width: 49.5%; height: 49%; }
+.cmx-page[data-layout='B'] .pos-1 { left: 50.5%; top: 0; width: 49.5%; height: 49%; }
+.cmx-page[data-layout='B'] .pos-2 { left: 0; top: 51%; width: 49.5%; height: 49%; }
+.cmx-page[data-layout='B'] .pos-3 { left: 50.5%; top: 51%; width: 49.5%; height: 49%; }
+
+.cmx-slot {
+  border: 3px dashed rgba(58, 46, 38, 0.22);
+  border-radius: 12px;
+}
+
+.cmx-panel {
+  container-type: size;
+  border: 4px solid var(--ink);
+  border-radius: 12px;
+  background: var(--paper);
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.16);
+  overflow: hidden;
+  transform-origin: 0 0;
+  transition: transform 0.55s cubic-bezier(0.3, 0.9, 0.3, 1);
+  will-change: transform;
+}
+.cmx-panel.pre {
+  opacity: 0;
+  pointer-events: none;
+}
+.cmx-panel.focus {
+  z-index: 5;
+}
+.cmx-inner {
+  position: absolute;
+  inset: 0;
+}
+.cmx-inner.shaking {
+  animation: cmx-shake 0.5s linear;
+}
+@keyframes cmx-shake {
+  0%, 100% { transform: translate(0, 0); }
+  15% { transform: translate(-2.4cqmin, 1cqmin) rotate(-0.6deg); }
+  35% { transform: translate(2.2cqmin, -1.2cqmin) rotate(0.5deg); }
+  55% { transform: translate(-1.6cqmin, 0.8cqmin); }
+  75% { transform: translate(1.2cqmin, -0.6cqmin); }
+}
+
+/* ---------- фон и герои ---------- */
+.cmx-scene {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+}
+.cmx-scene.zooming {
+  animation: cmx-zoom 1.4s ease-out forwards;
+}
+@keyframes cmx-zoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.14); }
+}
+.cmx-label {
+  position: absolute;
+  left: 3cqmin;
+  bottom: 2cqmin;
+  font: 700 3.4cqmin sans-serif;
+  color: rgba(0, 0, 0, 0.35);
+}
+.cmx-scene.splash {
+  background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.18) 0 4cqmin, transparent 4cqmin 8cqmin);
+}
+
+.cmx-cast,
+.cmx-props,
+.cmx-fx,
+.cmx-bubbles,
+.cmx-sfxbox {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.cmx-hero {
+  position: absolute;
+  bottom: 3%;
+  width: 34%;
+  height: 45%; /* ниже — облачка сверху не наезжают на голову героя (проверка: tools/comic/measure.js) */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+.cmx-hero { transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+.cmx-hero.at-l { left: 7%; }
+.cmx-hero.at-c { left: 33%; }
+.cmx-hero.at-r { right: 7%; }
+.cmx-face {
+  width: 26cqmin;
+  height: 26cqmin;
+  border-radius: 50%;
+  background: var(--hc, #eee);
+  border: 0.8cqmin solid var(--ink);
+  display: grid;
+  place-items: center;
+  font-size: 16cqmin;
+  line-height: 1;
+  box-shadow: 0 1cqmin 0 rgba(0, 0, 0, 0.18);
+}
+.cmx-hero.flip .cmx-face,
+.cmx-hero.flip .cmx-hero-img {
+  transform: scaleX(-1);
+}
+.cmx-hero-img {
+  /* высоту задаёт art.js (относительно самой высокой позы), ширина — по пропорциям; может чуть выходить за коробку героя */
+  height: 100%;
+  width: auto;
+  max-width: none;
+}
+.cmx-pose {
+  margin-top: 1cqmin;
+  padding: 0 1.6cqmin;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.8);
+  font: 700 3cqmin sans-serif;
+}
+.cmx-hero.speaker .cmx-face,
+.cmx-hero.speaker .cmx-hero-img {
+  animation: cmx-hop 0.5s ease-out;
+}
+@keyframes cmx-hop {
+  40% { transform: translateY(-4cqmin) scale(1.06); }
+}
+.cmx-prop {
+  position: absolute;
+  bottom: 5%;
+  font-size: 12cqmin;
+  line-height: 1;
+}
+.cmx-prop img {
+  height: 14cqmin;
+}
+.cmx-prop.at-l { left: 38%; }
+.cmx-prop.at-c { left: 46%; }
+.cmx-prop.at-r { right: 24%; }
+.cmx-prop.at-bench { left: 42%; bottom: 8%; } /* мячик рядом со скамейкой во дворе */
+.cmx-prop.at-path { left: 42%; bottom: 9%; } /* следы на песчаной дорожке двора */
+.cmx-prop.at-bank { right: 6%; bottom: 2%; } /* плед на берегу, под героем */
+.cmx-prop.big img { height: 22cqmin; }
+
+/* «!» и «?» над героем */
+.cmx-mark {
+  position: absolute;
+  top: -2%;
+  right: 14%;
+  font: 700 12cqmin/1 var(--font);
+  color: #e8553a;
+  -webkit-text-stroke: 0.8cqmin #fff;
+  paint-order: stroke fill;
+  animation: cmx-slam 0.5s cubic-bezier(0.2, 1.7, 0.4, 1) 0.2s backwards;
+}
+
+/* ---------- облачка ---------- */
+.cmx-bubbles {
+  display: flex;
+  flex-direction: column;
+  gap: 2cqmin;
+  padding: 3cqmin 4cqmin;
+  align-items: stretch;
+}
+.cmx-bubble {
+  --tail: 50%;
+  position: relative;
+  max-width: 86%;
+  font-size: 5.9cqmin;
+  line-height: 1.2;
+  font-weight: 700;
+  text-align: center;
+}
+.cmx-bubble.at-l { align-self: flex-start; --tail: 22%; }
+.cmx-bubble.at-c { align-self: center; }
+.cmx-bubble.at-r { align-self: flex-end; --tail: 78%; }
+.cmx-bubble.box { align-self: stretch; max-width: none; font-size: 5.2cqmin; text-align: left; font-weight: 400; }
+.cmx-bshell {
+  position: relative;
+  padding: 2.2cqmin 3.4cqmin;
+  background: #fff;
+  border: 0.8cqmin solid var(--ink);
+  border-radius: 4cqmin;
+}
+.cmx-panel.live .cmx-bubble {
+  animation: cmx-bubble-in 0.38s cubic-bezier(0.2, 1.5, 0.4, 1) var(--d, 0s) backwards;
+}
+@keyframes cmx-bubble-in {
+  from { transform: scale(0.4) translateY(3cqmin); opacity: 0; }
+}
+/* хвостик к герою */
+.cmx-bubble.say .cmx-bshell::after,
+.cmx-bubble.whisper .cmx-bshell::after,
+.cmx-bubble.shout .cmx-bshell::after {
+  content: '';
+  position: absolute;
+  left: var(--tail);
+  bottom: -3.2cqmin;
+  width: 3.4cqmin;
+  height: 3.6cqmin;
+  background: #fff;
+  border-right: 0.8cqmin solid var(--ink);
+  border-bottom: 0.8cqmin solid var(--ink);
+  transform: translateX(-50%) skewX(-22deg) rotate(35deg) scaleY(0.8);
+}
+.cmx-bubble.shout { font-size: 6.6cqmin; font-weight: 700; text-transform: none; }
+.cmx-bubble.shout .cmx-bshell {
+  border-color: #e8553a;
+  background: #fff6c8;
+  border-radius: 2cqmin;
+  transform: rotate(-1.2deg);
+}
+.cmx-bubble.shout .cmx-bshell::after { border-color: #e8553a; background: #fff6c8; }
+.cmx-bubble.whisper { font-size: 5.3cqmin; font-weight: 400; }
+.cmx-bubble.whisper .cmx-bshell { border-style: dashed; background: #f3f0ff; }
+.cmx-bubble.think .cmx-bshell { border-radius: 50% / 60%; padding: 3cqmin 5cqmin; background: #f4fbff; }
+.cmx-bubble.think .cmx-bshell::before,
+.cmx-bubble.think .cmx-bshell::after {
+  content: '';
+  position: absolute;
+  left: var(--tail);
+  border: 0.7cqmin solid var(--ink);
+  border-radius: 50%;
+  background: #f4fbff;
+}
+.cmx-bubble.think .cmx-bshell::before { bottom: -3cqmin; width: 2.8cqmin; height: 2.8cqmin; }
+.cmx-bubble.think .cmx-bshell::after { bottom: -6cqmin; width: 1.6cqmin; height: 1.6cqmin; left: calc(var(--tail) - 2cqmin); }
+.cmx-bubble.box .cmx-bshell {
+  background: #ffe9a6;
+  border-radius: 1.2cqmin;
+  padding: 1.6cqmin 2.6cqmin;
+}
+/* задания: пустое облачко, неизвестный автор, пропущенное слово */
+.cmx-bubble.empty .cmx-bshell { background: #eee; color: rgba(0, 0, 0, 0.35); }
+.cmx-bubble.revealed .cmx-btext { animation: cmx-slam 0.45s cubic-bezier(0.2, 1.6, 0.4, 1) backwards; display: inline-block; }
+.cmx-bubble.unknown .cmx-bshell::after,
+.cmx-bubble.unknown .cmx-bshell::before { visibility: hidden; }
+.cmx-bubble.unknown .cmx-bshell { border-style: dotted; border-color: #e8553a; box-shadow: 0 0 0 1.1cqmin rgba(232, 85, 58, 0.28); }
+.cmx-blank {
+  display: inline-block;
+  min-width: 11cqmin;
+  padding: 0 1.6cqmin;
+  border-bottom: 0.9cqmin solid #e8553a;
+  background: rgba(232, 85, 58, 0.14);
+  border-radius: 1cqmin;
+  text-align: center;
+}
+.cmx-blank.filled {
+  border-bottom-color: #2f7d4f;
+  background: rgba(47, 125, 79, 0.16);
+  animation: cmx-slam 0.45s cubic-bezier(0.2, 1.6, 0.4, 1) backwards;
+}
+
+/* ---------- звуки-слова ---------- */
+.cmx-sfx {
+  position: absolute;
+  font-family: var(--font);
+  font-weight: 700;
+  color: #ffd23f;
+  -webkit-text-stroke: 1.7cqmin #3a2e26;
+  paint-order: stroke fill;
+  text-shadow: 0.9cqmin 1cqmin 0 rgba(58, 46, 38, 0.55);
+  white-space: nowrap;
+  transform: rotate(var(--tilt, -4deg));
+  animation: cmx-slam 0.5s cubic-bezier(0.2, 1.7, 0.4, 1) backwards;
+}
+.cmx-sfx.size-m { font-size: 8cqmin; }
+.cmx-sfx.size-l { font-size: 11cqmin; }
+.cmx-sfx.size-xl { font-size: 16cqmin; }
+.cmx-sfx.at-l { left: 5%; }
+.cmx-sfx.at-c { left: 50%; margin-left: -1ch; }
+.cmx-sfx.at-r { right: 5%; }
+@keyframes cmx-slam {
+  from { transform: rotate(var(--tilt, 0deg)) scale(3); opacity: 0; }
+  60% { opacity: 1; }
+}
+
+/* ---------- эффекты ---------- */
+.cmx-speed {
+  position: absolute;
+  inset: -20%;
+  background: repeating-conic-gradient(from 0deg at 50% 50%, rgba(255, 255, 255, 0.55) 0 1.4deg, transparent 1.4deg 6deg);
+  -webkit-mask-image: radial-gradient(circle at 50% 55%, transparent 28%, #000 70%);
+  mask-image: radial-gradient(circle at 50% 55%, transparent 28%, #000 70%);
+  animation: cmx-fade-in 0.35s ease-out backwards;
+}
+.cmx-halftone {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(58, 46, 38, 0.32) 22%, transparent 24%);
+  background-size: 3.2cqmin 3.2cqmin;
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 35%, #000 100%);
+  mask-image: radial-gradient(circle at 50% 50%, transparent 35%, #000 100%);
+  animation: cmx-fade-in 0.4s ease-out backwards;
+}
+.cmx-rain {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(105deg, rgba(220, 235, 255, 0.55) 0 0.5cqmin, transparent 0.5cqmin 5cqmin);
+  animation: cmx-fade-in 0.5s ease-out backwards;
+}
+.cmx-flash {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  animation: cmx-flash 0.5s ease-out;
+}
+@keyframes cmx-fade-in {
+  from { opacity: 0; }
+}
+@keyframes cmx-flash {
+  0% { opacity: 0.95; }
+  100% { opacity: 0; }
+}
+.cmx-burst,
+.cmx-zzz {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  font-size: 8cqmin;
+  line-height: 1;
+  animation: cmx-burst 1.1s ease-out backwards;
+  opacity: 0;
+}
+.cmx-zzz { font-size: 7cqmin; animation-duration: 1.8s; }
+@keyframes cmx-burst {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.3) rotate(0deg); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.1) rotate(var(--r)); }
+}
+
+/* ---------- нижняя панель ---------- */
+.cmx-bar {
+  flex: none;
+  height: clamp(170px, 28vh, 214px); /* всегда одной высоты: иначе сцена прыгает, и кадр съезжает с места */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1vh;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.cmx-bar.active {
+  opacity: 1;
+}
+.cmx-ask {
+  margin: 0;
+  min-height: 1em;
+  font-size: clamp(26px, 4.6vh, 40px);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+}
+.cmx-ask.retry { color: #b5602b; }
+.cmx-ask.praise { color: var(--book-done, #2f7d4f); animation: cmx-slam 0.4s cubic-bezier(0.2, 1.6, 0.4, 1) backwards; }
+.cmx-opts {
+  display: flex;
+  gap: 2vw;
+  align-items: stretch;
+  justify-content: center;
+  width: 100%;
+}
+.cmx-opt,
+.cmx-next {
+  min-height: 72px;
+  min-width: 140px;
+  padding: 1vh 2vw;
+  border-radius: 20px;
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.18);
+  font: 700 clamp(24px, 3.8vh, 34px)/1.15 var(--font);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1vw;
+  transition: transform 0.12s, opacity 0.2s, background 0.2s;
+}
+.cmx-opt { flex: 1 1 0; max-width: 32%; }
+.cmx-opt.hero { flex-direction: column; gap: 0.4vh; }
+.cmx-opt.hero .cmx-face { width: 7vh; height: 7vh; font-size: 4.6vh; border-width: 3px; box-shadow: none; }
+.cmx-opt.pressed,
+.cmx-next.pressed { transform: translateY(3px) scale(0.98); }
+.cmx-opt.right { background: #d7f3dd; border-color: #2f7d4f; }
+.cmx-opt.faded { opacity: 0.35; }
+.cmx-opt.shake { animation: cmx-btn-shake 0.35s; }
+@keyframes cmx-btn-shake {
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+.cmx-num {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #2f7d4f;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  flex: none;
+}
+.cmx-next {
+  background: #ffd23f;
+  min-width: 220px;
+  min-height: 84px;
+  font-size: clamp(28px, 4.6vh, 40px);
+}
+.cmx-arrow { font-size: 0.8em; }
+
+
+/* карточка главы */
+.cmx-title {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.4vh;
+  background: var(--paper);
+  border: 4px solid var(--ink);
+  border-radius: 14px;
+  animation: cmx-page-in 0.4s ease-out backwards;
+}
+.cmx-title-chapter { font-size: clamp(28px, 5vh, 44px); color: var(--book-ink-soft, #7a6a5c); font-weight: 700; }
+.cmx-title-name { font-size: clamp(44px, 9vh, 80px); font-weight: 700; text-align: center; line-height: 1; padding: 0 4vw; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cmx *,
+  .cmx *::before,
+  .cmx *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* пропущенное слово мигает три раза: «сюда вставь» */
+.cmx-blank { animation: cmx-blink 0.8s ease-in-out 3; }
+@keyframes cmx-blink {
+  50% { background: rgba(232, 85, 58, 0.5); }
+}
+/* клеточки 1-2-3 рядом с вопросом (задание «по порядку») */
+.cmx-askrow { display: flex; align-items: center; justify-content: center; gap: 2vw; width: 100%; }
+.cmx-slots { display: flex; gap: 8px; }
+.cmx-slots:empty { display: none; }
+.cmx-slot-dot {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 3px dashed var(--ink);
+  display: grid;
+  place-items: center;
+  font: 700 22px/1 var(--font);
+  color: rgba(58, 46, 38, 0.55);
+  transition: background 0.2s;
+}
+.cmx-slot-dot.done { background: #2f7d4f; border: 3px solid #2f7d4f; color: #fff; }
+
+/* правда или нет: две кнопки в мягких цветах (зелёная и тёплая персиковая — без красного) */
+.cmx-ask { max-width: 92%; text-align: center; white-space: pre-line; line-height: 1.15; }
+.cmx-opt.yes { max-width: 34%; background: #e3f6e8; border-color: #2f7d4f; }
+.cmx-opt.no { max-width: 34%; background: #fde9dc; border-color: #c46a2b; }
+.cmx-opt.yes.faded, .cmx-opt.no.faded { background: var(--paper); }
+
+/* портреты героев на карточках «Кто это сказал?» */
+.cmx-face.portrait { background: #fff; overflow: hidden; }
+.cmx-face.portrait img { width: 100%; height: 100%; object-fit: contain; padding: 4%; box-sizing: border-box; }
+.cmx-opt.hero .cmx-face.portrait { width: 9vh; height: 9vh; }
