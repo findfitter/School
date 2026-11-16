@@ -25,7 +25,9 @@ export function createBook({ className = '', top = [], topLeft = [], left = [], 
   const leftPage = h('div', { class: 'book-page book-left' }, left);
   const rightPage = h('div', { class: 'book-page book-right' }, right);
   const art = bookArt();
-  const el = h('div', { class: `screen book-screen${art ? ' has-book-art' : ''} ${className}`.trim() },
+  // Меню в нарисованной книге лежит над страницей, на которой оно есть (book.css, .has-bar / .has-bar-left).
+  const bars = `${top.some(Boolean) ? ' has-bar' : ''}${topLeft.some(Boolean) ? ' has-bar-left' : ''}`;
+  const el = h('div', { class: `screen book-screen${art ? ' has-book-art' : ''}${bars} ${className}`.trim() },
     h('div', { class: 'book-table', 'aria-hidden': 'true' }),
     h('div', { class: 'book-stage' },
       topLeft.length ? h('div', { class: 'book-top-left' }, topLeft) : null,

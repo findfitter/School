@@ -324,10 +324,10 @@
    Тень уже в картинке: большой слой без фильтров. */
 .book-art {
   --pw: calc(var(--u) * 1192);
-  --ph: calc(var(--u) * 746 - var(--book-top));
+  --ph: calc(var(--u) * 690);
   position: absolute;
   left: calc(var(--u) * 44 - var(--pw) * var(--ba-kx) * var(--ba-x0));
-  top: calc(var(--book-top) + var(--u) * 12 - var(--ph) * var(--ba-ky) * var(--ba-y0));
+  top: calc(var(--u) * 55 - var(--ph) * var(--ba-ky) * var(--ba-y0));
   width: calc(var(--pw) * var(--ba-kx));
   height: calc(var(--ph) * var(--ba-ky));
   max-width: none;
@@ -349,11 +349,34 @@
   box-shadow: none;
 }
 
-/* У нарисованной книги обложка внизу толще, чем кодом (~32 вместо 12): страницы чуть короче (до 758 вместо 776),
-   иначе низ обложки уходит за нижний край экрана (на 1280×720 — на 8 px). --ph выше посчитан на 758. */
-.has-book-art .book-page {
-  bottom: calc(var(--u) * 42);
+/* Нарисованная книга стоит по центру стола: страницы от 55 до 745 по высоте (поля сверху и снизу поровну, обложка
+   ~33 у края каждой), а верхнее меню лежит внутри книги — полоской над страницей, на которой оно есть: справа
+   (счётчики, записки, замок) и слева (кнопка «Назад»). Страница с полоской начинается ниже на --strip. */
+.has-book-art {
+  --strip: calc(var(--bar-h) + var(--u) * 24);
 }
+
+.has-book-art .book-page {
+  top: calc(var(--u) * 55);
+  bottom: calc(var(--u) * 55);
+}
+
+.has-book-art.has-bar .book-right,
+.has-book-art.has-bar-left .book-left {
+  top: calc(var(--u) * 55 + var(--strip));
+}
+
+.has-book-art .book-top,
+.has-book-art .book-top-left {
+  top: calc(var(--u) * 55 + var(--u) * 6);
+}
+
+.has-book-art .book-top { right: calc(var(--u) * 68); }
+.has-book-art .book-top-left { left: calc(var(--u) * 68); }
+
+/* Меню в книге теснее, чтобы поместиться на странице (596): меньше поля у записок */
+.has-book-art .book-top { gap: calc(var(--u) * 8); }
+.has-book-art .book-note { padding: 0 calc(var(--u) * 12) 0 calc(var(--u) * 8); }
 
 /* ---------- Левая страница ---------- */
 .bk-left-head {
@@ -1070,4 +1093,52 @@
 .app-idle .mz-actor,
 .app-idle .mz-spark {
   animation-play-state: paused !important;
+}
+
+
+/* ---------- Главный экран: меню-закладки и счётчики на левой странице ---------- */
+/* Закладки меню свисают с верха левой страницы справа от заголовка; цвет — --s-ribbon, как у закладок глав. */
+.bk-ribbons-menu {
+  left: auto;
+  right: calc(var(--u) * 30);
+}
+
+.bk-menu-tab.m-dog { --s-ribbon: #d9774a; }
+.bk-menu-tab.m-stickers { --s-ribbon: #d9667f; }
+.bk-menu-tab.m-lock { --s-ribbon: #8a7a66; }
+
+.bk-menu-icon {
+  width: calc(var(--u) * 34);
+  height: calc(var(--u) * 34);
+  min-width: 26px;
+  min-height: 26px;
+  margin-bottom: calc(var(--u) * 6);
+}
+
+/* Счётчики звёзд и косточек — под заголовком; рисунок и облачко сдвинуты вниз и чуть уменьшены (--ak) */
+.menu-screen {
+  --ak: 0.9;
+  --art-top: 148;
+}
+
+.has-book-art.menu-screen {
+  --ak: 0.94;
+}
+
+.bk-left-counters {
+  position: absolute;
+  left: calc(var(--u) * 44);
+  top: calc(var(--u) * 90);
+}
+
+.menu-screen .bk-art {
+  left: calc(var(--u) * (40 + 258 * (1 - var(--ak))));
+  top: calc(var(--u) * var(--art-top));
+  width: calc(var(--u) * 516 * var(--ak));
+  height: calc(var(--u) * 432 * var(--ak));
+}
+
+.menu-screen .bk-bubble {
+  left: calc(var(--u) * (40 + 258 * (1 - var(--ak)) + 246 * var(--ak)));
+  top: calc(var(--u) * (var(--art-top) + 70 * var(--ak)));
 }

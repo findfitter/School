@@ -8,8 +8,8 @@ import { moduleIcon } from '../registry.js';
 import { isLocked } from '../cycles.js';
 import { challengeProgress } from '../challenges.js';
 import { starsFor } from '../rewards.js';
-import { createBook, createIllustration, counters, noteButton, lockButton, guideDog } from './book.js';
-import { svgEl, SPEECH_TAIL, starIcon, boneIcon, pawIcon, blob, trackBar } from './book-art.js';
+import { createBook, createIllustration, counters, guideDog } from './book.js';
+import { svgEl, SPEECH_TAIL, starIcon, boneIcon, pawIcon, lockIcon, blob, trackBar } from './book-art.js';
 
 const TILT = [-1.4, 1.1, 0.8, -1, 1.3, -0.7, 1, -1.2]; // наклон карточек, градусы
 const TAPE_TILT = [3, -4, 5, -3, 2, -5, 4, -2]; // наклон полосок скотча
@@ -24,14 +24,6 @@ function plural(n, forms) {
   if (m10 === 1 && m100 !== 11) return forms[0];
   if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return forms[1];
   return forms[2];
-}
-
-function today() {
-  try {
-    return new Date().toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' });
-  } catch {
-    return '';
-  }
 }
 
 // Звёзды карточки задания: 0 — серий ещё не было, иначе по доле верных с первой попытки за всё время (starsFor).
@@ -82,20 +74,6 @@ export function renderMenu(app) {
 
   const book = createBook({
     className: 'menu-screen',
-    top: [
-      counters(storage.balance(), storage.bonesBalance()),
-      noteButton({
-        label: STR.menu.dog,
-        icon: pawIcon(),
-        className: 'bk-note-dog',
-        onTap: () => {
-          app.services.sounds('tap');
-          app.go.dog();
-        },
-      }),
-      noteButton({ label: STR.menu.stickers, icon: starIcon('#D9667F'), className: 'bk-note-stickers', onTap: () => app.go.stickers() }),
-      lockButton(STR.menu.parent, () => app.go.parent()),
-    ],
     left: leftPage(app),
     right: [nav, body],
   });
@@ -106,6 +84,24 @@ export function renderMenu(app) {
 }
 
 // ---------- Левая страница ----------
+
+// Меню — тканевые закладки, свисающие с верха левой страницы (как закладки глав справа): «Моя собака», «Наклейки»
+// и «Родителям» (замок). Подпись — в aria-label и title, на закладке только значок.
+function menuRibbons(app) {
+  const tab = (cls, label, icon, onTap) => {
+    const el = button(`ribbon bk-menu-tab ${cls}`, svgEl(icon, 'bk-menu-icon'), onTap);
+    el.setAttribute('aria-label', label);
+    el.title = label;
+    return el;
+  };
+  return h('nav', { class: 'bk-ribbons bk-ribbons-menu', 'aria-label': STR.book.menuNav },
+    tab('m-dog', STR.menu.dog, pawIcon('#FFFDF6'), () => {
+      app.services.sounds('tap');
+      app.go.dog();
+    }),
+    tab('m-stickers', STR.menu.stickers, starIcon('#FFFDF6'), () => app.go.stickers()),
+    tab('m-lock', STR.menu.parent, lockIcon().replace('#7A6A5C', '#FFFDF6'), () => app.go.parent()));
+}
 
 // Собака ребёнка (первая из купленных) на тропинке; пока своей нет — собака-проводник Бобик (guideDog).
 function leftPage(app) {
@@ -119,8 +115,9 @@ function leftPage(app) {
 
   return [
     h('div', { class: 'bk-left-head' },
-      h('h1', { class: 'bk-title hand', text: STR.appTitle }),
-      h('span', { class: 'bk-date hand', text: today() })),
+      h('h1', { class: 'bk-title hand', text: STR.appTitle })),
+    h('div', { class: 'bk-left-counters' }, counters(storage.balance(), storage.bonesBalance())),
+    menuRibbons(app),
     art,
     dog ? h('div', { class: 'bk-bubble hand' }, pending ? STR.book.helloChallenge : STR.book.hello, svgEl(SPEECH_TAIL, 'bk-bubble-tail')) : null,
     h('div', { class: 'bk-path' },
