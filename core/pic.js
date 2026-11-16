@@ -36,9 +36,16 @@ export function picUrl(emoji, kind = 'sticker') {
   return null;
 }
 
+// Данные к картинке (раздел «meta»: например, где на нарисованной книге страницы — tools/art/book_frame.py).
+export function picMeta(key) {
+  return table.meta?.[key] ?? null;
+}
+
 // Все пути картинок — чтобы service worker положил их в офлайн-кэш (core/main.js → warmCache).
 export function allPicUrls() {
-  return Object.values(table).flatMap((section) => Object.values(section).map((p) => `images/${p}`));
+  return Object.entries(table)
+    .filter(([name]) => name !== 'meta')
+    .flatMap(([, section]) => Object.values(section).filter((p) => typeof p === 'string').map((p) => `images/${p}`));
 }
 
 export function picOrEmoji(emoji, kind, className = '', extra = {}) {

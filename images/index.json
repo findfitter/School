@@ -1,4 +1,14 @@
 {
+ "meta": {
+  "book": {
+   "page": [
+    0.0824,
+    0.11,
+    0.92,
+    0.8866
+   ]
+  }
+ },
  "scene": {
   "candy": "scenes/candy.webp",
   "circus": "scenes/circus.webp",
@@ -8,6 +18,9 @@
   "space": "scenes/space.webp",
   "winter": "scenes/winter.webp",
   "zoo": "scenes/zoo.webp"
+ },
+ "screen": {
+  "book": "screens/book.webp"
  },
  "sticker": {
   "☁️": "stickers/2601.webp",

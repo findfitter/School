@@ -317,6 +317,44 @@
   background-size: 512px 512px;
 }
 
+/* ---------- Нарисованная книга (ветка art, tools/art/book_frame.py; createBook → bookArt) ----------
+   Картинка растягивается так, что её разворот страниц (доли --ba-x0/--ba-y0, 1/ширина --ba-kx, 1/высота --ba-ky)
+   ложится ровно на .book-left + .book-right (44…1236 по ширине, от --book-top + 12 до 776 по высоте). Обложка,
+   корешок и бумага кодом тогда не нужны; страницы прозрачные, содержимое на них остаётся на месте.
+   Тень уже в картинке: большой слой без фильтров. */
+.book-art {
+  --pw: calc(var(--u) * 1192);
+  --ph: calc(var(--u) * 746 - var(--book-top));
+  position: absolute;
+  left: calc(var(--u) * 44 - var(--pw) * var(--ba-kx) * var(--ba-x0));
+  top: calc(var(--book-top) + var(--u) * 12 - var(--ph) * var(--ba-ky) * var(--ba-y0));
+  width: calc(var(--pw) * var(--ba-kx));
+  height: calc(var(--ph) * var(--ba-ky));
+  max-width: none;
+  object-fit: fill;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.has-book-art .book-cover,
+.has-book-art .book-spine,
+.has-book-art .book-paper {
+  display: none;
+}
+
+.has-book-art .book-left,
+.has-book-art .book-right {
+  background: none;
+  box-shadow: none;
+}
+
+/* У нарисованной книги обложка внизу толще, чем кодом (~32 вместо 12): страницы чуть короче (до 758 вместо 776),
+   иначе низ обложки уходит за нижний край экрана (на 1280×720 — на 8 px). --ph выше посчитан на 758. */
+.has-book-art .book-page {
+  bottom: calc(var(--u) * 42);
+}
+
 /* ---------- Левая страница ---------- */
 .bk-left-head {
   position: absolute;

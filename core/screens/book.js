@@ -12,6 +12,7 @@ import { ILLUSTRATION_FRONT, svgEl, illustrationBack, starIcon, boneIcon, lockIc
 import { drawDog } from '../dogs.js';
 import { STR } from '../strings.js';
 import * as storage from '../storage.js';
+import { picUrl, picMeta } from '../pic.js';
 
 // Собака-проводник страниц книги: первая собака ребёнка; пока своей нет (косточки на неё ещё копятся) —
 // золотистый лабрадор Бобик, чтобы страница не была пустой. Это не купленная собака: во дворе её нет.
@@ -23,17 +24,37 @@ export const guideDog = () => storage.dogApi('real').dogs()[0] || GUIDE_DOG;
 export function createBook({ className = '', top = [], topLeft = [], left = [], right = [] } = {}) {
   const leftPage = h('div', { class: 'book-page book-left' }, left);
   const rightPage = h('div', { class: 'book-page book-right' }, right);
-  const el = h('div', { class: `screen book-screen ${className}`.trim() },
+  const art = bookArt();
+  const el = h('div', { class: `screen book-screen${art ? ' has-book-art' : ''} ${className}`.trim() },
     h('div', { class: 'book-table', 'aria-hidden': 'true' }),
     h('div', { class: 'book-stage' },
       topLeft.length ? h('div', { class: 'book-top-left' }, topLeft) : null,
       h('header', { class: 'book-top' }, top),
+      art,
       h('div', { class: 'book-cover', 'aria-hidden': 'true' }),
       leftPage,
       rightPage,
       h('div', { class: 'book-spine', 'aria-hidden': 'true' }),
       h('div', { class: 'book-paper', 'aria-hidden': 'true' })));
   return { el, leftPage, rightPage };
+}
+
+// Нарисованная книга (ветка art, tools/art/book_frame.py): картинка вместо обложки, корешка и бумаги. В meta.page —
+// где на картинке разворот страниц (доли ширины и высоты); CSS (.book-art в book.css) растягивает картинку так, что её
+// страницы ложатся ровно на .book-left/.book-right, поэтому содержимое страниц на всех экранах остаётся на месте.
+// Нет картинки — книга кодом, как раньше.
+function bookArt() {
+  const src = picUrl('book', 'screen');
+  const page = picMeta('book')?.page;
+  if (!src || !Array.isArray(page) || page.length !== 4) return null;
+  const [x0, y0, x1, y1] = page;
+  if (!(x1 > x0 && y1 > y0)) return null;
+  const img = h('img', { class: 'book-art', src, alt: '', 'aria-hidden': 'true', decoding: 'async', draggable: 'false' });
+  img.style.setProperty('--ba-x0', x0);
+  img.style.setProperty('--ba-y0', y0);
+  img.style.setProperty('--ba-kx', 1 / (x1 - x0));
+  img.style.setProperty('--ba-ky', 1 / (y1 - y0));
+  return img;
 }
 
 // Звёзды и косточки на бумажной плашке.
