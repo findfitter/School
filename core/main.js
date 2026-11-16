@@ -98,7 +98,7 @@ const app = {
   services,
   manifests: [], // обычные модули
   challenge: null, // модуль сложных заданий (modules/challenge), в обычные списки не входит
-  hidden: [], // модули с "hidden": true: ребёнку не видны, открываются только из раздела для родителя (вкладка «Тестировщик»)
+  testable: [], // модули с "testChapters": их можно запустить пробно из раздела для родителя (вкладка «Тестировщик»), ничего не записывая
   go: { menu: showMenu, stickers: showStickers, dog: () => showDog('real'), dogTest: () => showDog('test'), missionTest: showMissionTest, birthdayTest: showBirthdayTest, parent: showParent, play, playTest },
 };
 
@@ -299,7 +299,7 @@ async function init() {
     const all = await loadRegistry();
     app.challenge = all.find((m) => m.challenge) || null;
     app.manifests = all.filter((m) => !m.challenge && !m.hidden);
-    app.hidden = all.filter((m) => m.hidden);
+    app.testable = all.filter((m) => m.testChapters);
     allManifests = all;
   } catch (err) {
     console.error('Не удалось прочитать реестр модулей', err);
@@ -308,7 +308,7 @@ async function init() {
   showMenu();
   // Проверка комикса на компьютере: адрес /?comic=all или /?comic=3 (страница tools/comic/test.html) сразу открывает его, минуя меню.
   const comicTest = new URLSearchParams(location.search).get('comic');
-  const comicManifest = comicTest && app.hidden.find((m) => m.id === 'comic-aglaya');
+  const comicManifest = comicTest && app.testable.find((m) => m.id === 'comic-aglaya');
   if (comicManifest) playTest(comicManifest, comicTest);
   warmCache(allManifests, allPicUrls());
   setInterval(tick, TICK_MS);

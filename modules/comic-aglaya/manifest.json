@@ -3,11 +3,10 @@
   "title": "Аглая и гусь",
   "subject": "russian",
   "icon": "🐕",
-  "glyph": "💬",
+  "glyph": "Га-га",
   "description": "Читаем комикс про Аглаю и гуся Гордея",
   "version": "0.1.0",
   "series": false,
-  "hidden": true,
   "testChapters": 6,
   "styles": [
     "style.css"

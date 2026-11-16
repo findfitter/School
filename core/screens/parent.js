@@ -255,7 +255,7 @@ function testerCards(app) {
         button('btn primary', `🌟 ${P.testerStickersShow}`, () => { storage.setUiState(PREVIEW_ALL, '1'); app.go.stickers(); }),
         storage.uiState(PREVIEW_ALL) === '1' ? button('btn', P.testerStickersHide, () => { storage.setUiState(PREVIEW_ALL, '0'); refresh(); }) : null),
       h('p', { class: 'hint-line', text: P.testerStickersHint })),
-    ...app.hidden.map((m) => card(format(P.hiddenTitle, { title: m.title }),
+    ...app.testable.map((m) => card(format(P.hiddenTitle, { title: m.title }),
       m.description ? h('p', { class: 'status', text: m.description }) : null,
       h('div', { class: 'row-wrap' },
         button('btn primary', `📖 ${P.hiddenAll}`, () => app.go.playTest(m, 'all')),
