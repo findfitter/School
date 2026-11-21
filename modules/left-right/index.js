@@ -1,14 +1,27 @@
 // Право и лево: пчёлка на сетке 3×3. Показаны команды (⬅ ➡ ⬆ ⬇), пчёлка стоит в клетке —
 // нужно нажать клетку, куда она придёт. Задания генерируются кодом.
-// Уровни — длина пути, всегда не меньше 5 команд: 0 — 5; 1 — 5–6; 2 — 6–7. После ошибки уровень падает,
-// после двух верных подряд растёт. Ошибочные задания повторяются в конце серии (те же самые).
+// Уровни 0–2 — длина пути, всегда не меньше 5 команд: 0 — 5; 1 — 5–6; 2 — 6–7 (стрелки — стороны экрана).
+// Уровни 3–5 — команды от лица пчёлки: она смотрит в какую-то сторону, «вперёд» — шаг туда, куда смотрит,
+// «налево» и «направо» — поворот пчёлки и шаг: 3 — 4–5 команд, пчёлка смотрит вверх; 4 — 5–6, смотрит куда угодно; 5 — 6–7.
+// Здесь стрелки экрана не помогут: нужно представить себя на месте пчёлки.
+// После ошибки уровень падает, после трёх верных подряд растёт. Ошибочные задания повторяются в конце серии (те же самые).
 
 import { TEXT } from './texts.js';
 
 const BEE = '🐝';
 const GRID = 3;
 const CLEAN_TO_LEVEL_UP = 3; // верных подряд до повышения уровня
-const STEPS_BY_LEVEL = [[5, 5], [5, 6], [6, 7]]; // сколько команд на каждом уровне: от и до
+// Уровни: steps — сколько команд (от и до); rel — команды от лица пчёлки (F — вперёд, L — налево, R — направо); heading — куда она смотрит.
+const LEVELS = [
+  { steps: [5, 5] },
+  { steps: [5, 6] },
+  { steps: [6, 7] },
+  { rel: true, steps: [4, 5], heading: 'U' },
+  { rel: true, steps: [5, 6] },
+  { rel: true, steps: [6, 7] },
+];
+const TURN_LEFT = { U: 'L', L: 'D', D: 'R', R: 'U' };
+const TURN_RIGHT = { U: 'R', R: 'D', D: 'L', L: 'U' };
 const MOVES = { L: [0, -1], R: [0, 1], U: [-1, 0], D: [1, 0] };
 
 const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -40,8 +53,64 @@ function walk(start, steps) {
 }
 
 // Пчёлка стартует в случайной клетке, идёт по командам и не выходит за край; конец пути — не старт.
+// Пчёлка в клетке start смотрит в сторону heading. «Вперёд» — шаг туда, куда смотрит; «налево» / «направо» — поворот и шаг.
+// Возвращает путь [{ cell, heading }, …] (первая запись — старт) или null, если пчёлка выходит за край.
+function walkRel(start, heading, cmds) {
+  let row = Math.floor(start / GRID);
+  let col = start % GRID;
+  let h = heading;
+  const path = [{ cell: start, heading: h }];
+  for (const cmd of cmds) {
+    if (cmd === 'L') h = TURN_LEFT[h];
+    else if (cmd === 'R') h = TURN_RIGHT[h];
+    row += MOVES[h][0];
+    col += MOVES[h][1];
+    if (row < 0 || row >= GRID || col < 0 || col >= GRID) return null;
+    path.push({ cell: row * GRID + col, heading: h });
+  }
+  return path;
+}
+
+const keyOfRel = (start, heading, cmds) => `r${start}${heading}-${cmds.join('')}`;
+
+// Задание «от лица пчёлки»: есть и «налево», и «направо»; прочитанные как стрелки экрана (или как будто пчёлка смотрит вверх)
+// команды приводят в другую клетку — угадать по рисунку нельзя.
+function makeRelTask(cfg) {
+  const [min, max] = cfg.steps;
+  for (let attempt = 0; attempt < 300; attempt++) {
+    const start = rnd(0, GRID * GRID - 1);
+    const heading = cfg.heading || pick(Object.keys(MOVES));
+    let row = Math.floor(start / GRID);
+    let col = start % GRID;
+    let h = heading;
+    const cmds = [];
+    for (let i = rnd(min, max); i > 0; i--) {
+      const options = ['F', 'L', 'R'].filter((cmd) => {
+        const next = cmd === 'L' ? TURN_LEFT[h] : cmd === 'R' ? TURN_RIGHT[h] : h;
+        const r = row + MOVES[next][0];
+        const c = col + MOVES[next][1];
+        return r >= 0 && r < GRID && c >= 0 && c < GRID;
+      });
+      const cmd = pick(options);
+      cmds.push(cmd);
+      h = cmd === 'L' ? TURN_LEFT[h] : cmd === 'R' ? TURN_RIGHT[h] : h;
+      row += MOVES[h][0];
+      col += MOVES[h][1];
+    }
+    if (!cmds.includes('L') || !cmds.includes('R') || row * GRID + col === start) continue;
+    const answer = row * GRID + col;
+    const asScreen = walk(start, cmds.map((c) => (c === 'F' ? 'U' : c))); // как если бы стрелки были сторонами экрана
+    const asUp = heading === 'U' ? null : walkRel(start, 'U', cmds)?.at(-1).cell; // как если бы пчёлка смотрела вверх
+    if (asScreen === answer || asUp === answer) continue;
+    return { rel: true, start, heading, cmds, path: walkRel(start, heading, cmds), answer, key: keyOfRel(start, heading, cmds) };
+  }
+  return null;
+}
+
 function makeTask(level) {
-  const [min, max] = STEPS_BY_LEVEL[level];
+  const cfg = LEVELS[level];
+  if (cfg.rel) return makeRelTask(cfg) || makeTask(0);
+  const [min, max] = cfg.steps;
   for (let attempt = 0; attempt < 50; attempt++) {
     const start = rnd(0, GRID * GRID - 1);
     const steps = [];
@@ -65,6 +134,13 @@ function makeTask(level) {
 
 // Трудное задание из ключа («4-LDR») -> задание; null, если ключ не подходит.
 function taskFromKey(key) {
+  const rel = /^r([0-8])([UDLR])-([FLR]+)$/.exec(key);
+  if (rel) {
+    const start = Number(rel[1]);
+    const cmds = [...rel[3]];
+    const path = walkRel(start, rel[2], cmds);
+    return path && path.at(-1).cell !== start ? { rel: true, start, heading: rel[2], cmds, path, answer: path.at(-1).cell, key } : null;
+  }
   const m = /^([0-8])-([LRUD]+)$/.exec(key);
   if (!m) return null;
   const start = Number(m[1]);
@@ -74,6 +150,10 @@ function taskFromKey(key) {
 }
 
 function spokenText(task) {
+  if (task.rel) {
+    const words = task.cmds.map((c) => TEXT.goRel[c]).join(', ');
+    return { text: `${TEXT.walkRelIntro}: ${words}. ${TEXT.walkAsk}`, key: `walkrel-${task.cmds.join('').toLowerCase()}` };
+  }
   const commands = task.steps.map((s) => TEXT.go[s]).join(', ');
   return { text: `${TEXT.walkIntro}: ${commands}. ${TEXT.walkAsk}`, key: `walk3-${task.steps.join('').toLowerCase()}` };
 }
@@ -100,6 +180,24 @@ const beeSvg = () => svg(`<svg ${SVG_NS} viewBox="0 0 100 100" aria-hidden="true
 
 // Стрелка команды (направо); поворот — классом d-L, d-U, d-D в style.css.
 const arrowSvg = (dir) => svg(`<svg ${SVG_NS} viewBox="0 0 48 48" aria-hidden="true"><path d="M6 19 H26 V9 L43 24 L26 39 V29 H6 Z" fill="#C9623A" stroke="#C9623A" stroke-width="2" stroke-linejoin="round"/></svg>`, `lr-arrow d-${dir}`);
+
+// Команда «от лица пчёлки»: вперёд — прямая стрелка вверх; налево и направо — стрелки-повороты. Под стрелкой — слово.
+const RELATIVE_ARROWS = {
+  F: '<path d="M24 44 V18" fill="none" stroke="#C9623A" stroke-width="7" stroke-linecap="round"/><polygon points="10,20 24,3 38,20" fill="#C9623A" stroke="#C9623A" stroke-width="2" stroke-linejoin="round"/>',
+  L: '<path d="M32 44 V28 Q32 16 20 16 H15" fill="none" stroke="#C9623A" stroke-width="7" stroke-linecap="round"/><polygon points="17,3 2,16 17,29" fill="#C9623A" stroke="#C9623A" stroke-width="2" stroke-linejoin="round"/>',
+  R: '<path d="M16 44 V28 Q16 16 28 16 H33" fill="none" stroke="#C9623A" stroke-width="7" stroke-linecap="round"/><polygon points="31,3 46,16 31,29" fill="#C9623A" stroke="#C9623A" stroke-width="2" stroke-linejoin="round"/>',
+};
+const relArrowSvg = (cmd) => svg(`<svg ${SVG_NS} viewBox="0 0 48 48" aria-hidden="true">${RELATIVE_ARROWS[cmd]}</svg>`, 'lr-arrow');
+
+// Пчёлка, повёрнутая в сторону heading (рисунок смотрит вправо).
+const BEE_TURN = { R: 'none', D: 'rotate(90deg)', U: 'rotate(-90deg)', L: 'scaleX(-1)' };
+function turnedBee(heading) {
+  const wrap = document.createElement('span');
+  wrap.className = 'lr-bee-wrap';
+  wrap.append(beeSvg());
+  wrap.style.transform = BEE_TURN[heading];
+  return wrap;
+}
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -180,19 +278,26 @@ export function start(ctx) {
       let hintRun = 0;
       stage.classList.remove('show-sides');
       stage.replaceChildren();
+      promptBox.textContent = task.rel ? TEXT.relTitle : TEXT.walkTitle;
 
-      const commandEls = task.steps.map((s) => {
-        const cmd = el('span', 'lr-cmd');
-        cmd.append(arrowSvg(s));
-        cmd.setAttribute('aria-label', TEXT.go[s]);
+      const commandEls = (task.rel ? task.cmds : task.steps).map((s) => {
+        const cmd = el('span', task.rel ? 'lr-cmd rel' : 'lr-cmd');
+        if (task.rel) {
+          cmd.append(relArrowSvg(s), el('span', 'lr-cmd-word', TEXT.goRel[s]));
+          cmd.setAttribute('aria-label', TEXT.goRel[s]);
+        } else {
+          cmd.append(arrowSvg(s));
+          cmd.setAttribute('aria-label', TEXT.go[s]);
+        }
         return cmd;
       });
       const commands = el('div', 'lr-commands');
       commands.append(...commandEls);
       const grid = el('div', 'lr-grid');
+      const flyBee = task.rel ? turnedBee(task.heading) : null; // пчёлка «от лица пчёлки»: перелетает по клеткам в подсказке
       for (let i = 0; i < GRID * GRID; i++) {
         const cell = el('button', 'lr-cell');
-        if (i === task.start) cell.append(beeSvg());
+        if (i === task.start) cell.append(flyBee || beeSvg());
         cell.type = 'button';
         onTap(cell, () => choose(i, cell));
         grid.append(cell);
@@ -200,8 +305,9 @@ export function start(ctx) {
       // Подписи «лево/право» — появляются в подсказке.
       const leftMark = el('span', 'lr-ruler-left', `⬅ ${TEXT.rulerLeft}`);
       const rightMark = el('span', 'lr-ruler-right', `${TEXT.rulerRight} ➡`);
-      const ruler = el('div', 'lr-ruler');
-      ruler.append(leftMark, rightMark);
+      const ruler = el('div', task.rel ? 'lr-ruler note' : 'lr-ruler');
+      if (task.rel) ruler.append(el('span', 'lr-ruler-left', TEXT.relHint));
+      else ruler.append(leftMark, rightMark);
       stage.append(commands, grid, ruler);
 
       const sayTask = () => {
@@ -231,6 +337,34 @@ export function start(ctx) {
         }
       }
 
+      // Подсказка «от лица пчёлки»: пчёлка летит по командам. После первой ошибки — только первая команда, после второй — весь путь.
+      function setBee(step) {
+        const point = task.path[step];
+        grid.children[point.cell].append(flyBee);
+        flyBee.style.transform = BEE_TURN[point.heading];
+      }
+
+      async function hintRel() {
+        const mine = ++hintRun;
+        stage.classList.add('show-sides');
+        setBee(0);
+        const upTo = wrong >= 2 ? task.cmds.length : 1;
+        for (let i = 0; i < upTo; i++) {
+          if (!alive || mine !== hintRun) return;
+          commandEls[i].classList.add('lit');
+          await ctx.speak(TEXT.goRel[task.cmds[i]], 'ru');
+          await wait(450);
+          if (!alive || mine !== hintRun) return;
+          setBee(i + 1);
+          await wait(650);
+          commandEls[i].classList.remove('lit');
+        }
+        if (!alive || mine !== hintRun) return;
+        await wait(600);
+        if (!alive || mine !== hintRun) return;
+        setBee(0); // и снова на старт: теперь пробуй сам
+      }
+
       async function choose(value, cell) {
         if (locked || !alive) return;
         if (value !== task.answer) {
@@ -238,11 +372,16 @@ export function start(ctx) {
           cell.disabled = true;
           cell.classList.add('faded');
           ctx.sound('hint');
-          hint();
+          if (task.rel) hintRel();
+          else hint();
           return;
         }
         locked = true;
         hintRun += 1;
+        if (task.rel) {
+          commandEls.forEach((c) => c.classList.remove('lit'));
+          setBee(task.path.length - 1); // пчёлка прилетает в верную клетку
+        }
         cell.classList.add('right');
         ctx.sound('correct');
         ctx.speak(pick(TEXT.praise), 'ru');
@@ -256,7 +395,7 @@ export function start(ctx) {
 
   // ---------- серия ----------
   async function run() {
-    let level = Math.min(ctx.level ?? 0, STEPS_BY_LEVEL.length - 1); // уровень помнится между сериями (core: ctx.level)
+    let level = Math.min(ctx.level ?? 0, LEVELS.length - 1); // уровень помнится между сериями (core: ctx.level)
     let clean = 0;
     let correct = 0;
     const used = new Set();
@@ -281,7 +420,7 @@ export function start(ctx) {
       if (firstTry) {
         correct += 1;
         clean += 1;
-        if (clean >= CLEAN_TO_LEVEL_UP && level < STEPS_BY_LEVEL.length - 1) {
+        if (clean >= CLEAN_TO_LEVEL_UP && level < LEVELS.length - 1) {
           level += 1;
           clean = 0;
         }
@@ -305,7 +444,7 @@ export function start(ctx) {
       correct,
       level,
       total,
-      mistakes: again.map((t) => ({ key: t.key, label: `${BEE} ${t.steps.map((s) => TEXT.arrows[s]).join(' ')}` })),
+      mistakes: again.map((t) => ({ key: t.key, label: `${BEE} ${t.rel ? t.cmds.map((c) => TEXT.goRel[c]).join(' ') : t.steps.map((s) => TEXT.arrows[s]).join(' ')}` })),
     });
   }
 

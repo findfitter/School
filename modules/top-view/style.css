@@ -102,6 +102,11 @@
   box-shadow: var(--book-shadow);
 }
 
+.sv-options.many .sv-option {
+  width: clamp(88px, min(17vh, 11.5vw), 160px);
+  height: clamp(88px, min(17vh, 11.5vw), 160px);
+}
+
 .sv-option.pressed {
   transform: scale(0.96);
   box-shadow: none;

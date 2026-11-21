@@ -1,4 +1,4 @@
-/* Деньги. Монеты рисуются стилями: 1 и 2 ₽ серебристые, 5 и 10 ₽ золотые. */
+/* Деньги. Монеты и банкноты рисуются стилями. */
 
 .money {
   height: 100%;
@@ -382,4 +382,127 @@
 
 .mn-note.n100 .mn-note-main {
   font-size: 1.45em;
+}
+
+/* Много денег в ряд («сколько всего» с единицами): банкноты и монеты чуть меньше */
+.mn-coins.dense .mn-note {
+  --w: clamp(96px, 13vw, 150px);
+}
+
+/* Лоток с шестью номиналами (платим суммой с единицами) */
+.mn-tray.dense {
+  gap: 1.6vw;
+}
+
+.mn-tray.dense .mn-note {
+  --w: clamp(88px, 11vw, 140px);
+}
+
+/* Строка ответа: «пример = ?»; пример прячется до первой ошибки */
+.mn-eq {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  color: var(--ink-soft, #6b6f85);
+  font-size: clamp(28px, 6vh, 50px);
+  font-weight: 800;
+}
+
+.mn-eq-pre {
+  visibility: hidden;
+  white-space: pre;
+}
+
+.show-sub .mn-eq-pre {
+  visibility: visible;
+}
+
+.mn-slot {
+  min-width: 2.4em;
+  padding: 0 0.3em;
+  border-bottom: 5px solid #b9c3e6;
+  color: var(--ink, #2b2d42);
+  text-align: center;
+}
+
+.mn-slot.ok {
+  border-color: var(--good, #52c47a);
+  color: var(--good, #52c47a);
+}
+
+/* Покупка из нескольких вещей: вещи с ценниками в ряд */
+.mn-goods {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5vh 3vw;
+}
+
+.mn-item.small {
+  gap: 1vw;
+}
+
+.mn-item.small .mn-emoji {
+  font-size: clamp(44px, 9vh, 76px);
+}
+
+.mn-item.small .mn-tag {
+  font-size: clamp(26px, 5.4vh, 46px);
+}
+
+/* «Выбери две вещи» */
+.mn-shelf {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2vh 2.5vw;
+}
+
+.mn-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1vh;
+  width: clamp(130px, 17vw, 210px);
+  min-height: clamp(130px, 28vh, 200px);
+  padding: 1.2vh 1vw;
+  border: 6px solid transparent;
+  border-radius: 28px;
+  background: var(--card, #fff);
+  box-shadow: var(--shadow, 0 5px 0 rgba(0, 0, 0, 0.14));
+  touch-action: none;
+  transition: transform 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.mn-card.pressed {
+  box-shadow: none;
+}
+
+.mn-card.sel {
+  border-color: var(--primary, #4f8cff);
+  background: #eaf1ff;
+  transform: translateY(-8px);
+}
+
+.mn-card.right {
+  border-color: var(--good, #52c47a);
+  background: #dff6e7;
+}
+
+.mn-paid.ok {
+  color: var(--good, #52c47a);
+}
+
+.mn-paid.over {
+  color: #d9742a;
+  animation: mn-shake 0.4s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mn-paid.over,
+  .mn-wallet.over {
+    animation: none;
+  }
 }

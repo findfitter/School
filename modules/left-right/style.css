@@ -112,6 +112,26 @@
   display: block;
 }
 
+/* Команды «от лица пчёлки»: стрелка и слово под ней */
+.lr-cmd.rel {
+  flex-direction: column;
+  width: clamp(62px, 11vh, 92px);
+  height: clamp(66px, 12vh, 100px);
+  gap: 0;
+}
+
+.lr-cmd.rel .lr-arrow {
+  width: 60%;
+  height: 60%;
+}
+
+.lr-cmd-word {
+  font-size: clamp(12px, 2.3vh, 18px);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--book-ink);
+}
+
 .lr-arrow.d-L { transform: rotate(180deg); }
 .lr-arrow.d-U { transform: rotate(-90deg); }
 .lr-arrow.d-D { transform: rotate(90deg); }
@@ -132,6 +152,12 @@
   background: var(--book-card);
   box-shadow: var(--book-shadow), inset 0 0 0 2px #eadfcb;
   transition: opacity 0.2s, background 0.15s;
+}
+
+.lr-bee-wrap {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .lr-bee {
@@ -164,6 +190,16 @@
   font-size: clamp(26px, 5vh, 44px);
   font-weight: 700;
   visibility: hidden;
+}
+
+.lr-ruler.note {
+  justify-content: center;
+  visibility: visible;
+}
+
+.lr-ruler.note span {
+  font-size: clamp(18px, 3.4vh, 28px);
+  white-space: nowrap;
 }
 
 .show-sides .lr-ruler {

@@ -88,6 +88,15 @@
   box-shadow: var(--book-shadow);
 }
 
+.mr-options.many {
+  gap: clamp(8px, 1.6vw, 20px);
+}
+
+.mr-options.many .mr-shape {
+  width: clamp(80px, min(16vh, 10vw), 160px);
+  height: clamp(80px, min(16vh, 10vw), 160px);
+}
+
 .mr-option.pressed {
   transform: scale(0.96);
   box-shadow: none;

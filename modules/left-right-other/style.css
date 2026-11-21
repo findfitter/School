@@ -150,6 +150,39 @@
   transform: rotate(-1deg);
 }
 
+/* «У кого в руке?»: четверо людей в ряд, каждый — кнопка */
+.lo-crowd {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 1.8vw, 24px);
+}
+
+.lo-person-btn {
+  padding: 1vh 0.6vw;
+  border-radius: 8px;
+  background: var(--book-card);
+  box-shadow: var(--book-shadow), inset 0 0 0 2px #eadfcb;
+  transition: opacity 0.2s, background 0.15s;
+}
+
+.lo-scene.small {
+  gap: 0.3vw;
+}
+
+.lo-crowd .lo-slot {
+  width: clamp(34px, 7vh, 62px);
+  height: clamp(34px, 7vh, 62px);
+}
+
+.lo-crowd .lo-item {
+  font-size: clamp(30px, 6.4vh, 54px);
+}
+
+.lo-crowd .lo-figure {
+  height: clamp(100px, 28vh, 220px);
+}
+
 /* Руки, на которые можно нажать («покажи руку») */
 .lo-hand {
   width: 100%;
@@ -190,10 +223,19 @@
   transition: opacity 0.2s, background 0.15s;
 }
 
+/* Ответ-картинка («Что в руке?»): четыре предмета в ряд */
+.lo-answer.pic {
+  min-width: 0;
+  width: clamp(90px, 16vw, 170px);
+  font-size: clamp(44px, 9vh, 76px);
+  font-family: inherit;
+}
+
 .lo-answer:nth-child(odd) { transform: rotate(-0.8deg); }
 .lo-answer:nth-child(even) { transform: rotate(0.9deg); }
 
 /* Состояния ответа: верный — зелёное пятно, неверный — карточка бледнеет */
+.lo-person-btn.right,
 .lo-hand.right {
   background: #dcefe0;
   box-shadow: var(--book-shadow), inset 0 0 0 4px var(--book-done);
@@ -204,18 +246,21 @@
   box-shadow: var(--book-shadow), inset 0 0 0 4px var(--book-done);
 }
 
+.lo-person-btn.pressed,
 .lo-hand.pressed,
 .lo-answer.pressed {
   transform: scale(0.96);
   box-shadow: none;
 }
 
+.lo-person-btn.faded,
 .lo-hand.faded,
 .lo-answer.faded {
   opacity: 0.3;
   box-shadow: none;
 }
 
+.lo-person-btn.point,
 .lo-hand.point,
 .lo-answer.point {
   box-shadow: var(--book-shadow), 0 0 0 5px var(--book-gold);
@@ -228,6 +273,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .lo-figure.hop,
+  .lo-person-btn.point,
   .lo-hand.point,
   .lo-answer.point {
     animation: none;

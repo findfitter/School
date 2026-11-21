@@ -3,6 +3,10 @@
 // лицом к тебе (лево и право наоборот) и когда спиной (как у тебя). Уровни:
 //   0 — только «в какой руке», лицом; 1 — добавляется «покажи руку»; 2 — человек стоит спиной;
 //   3 — всё вместе. Задания генерируются кодом.
+// Против угадывания (с двумя ответами шанс 50%) — ещё два вида, с 4 вариантами:
+//   what — в обеих руках разные предметы, «Что у мамы в левой руке?» (ответ — картинка из четырёх);
+//   find — на экране четверо, кто-то лицом, кто-то спиной; «У кого мяч в левой руке?» (нажать на человека). Мяч держат
+//   двое — в левой руке и в правой, поэтому одного предмета для ответа мало. Уровни 4–6.
 // Ошибка = мягкая подсказка словами и ещё одна попытка; после двух ошибок верный ответ подсвечивается.
 // После ошибки уровень падает, после двух верных подряд растёт.
 // Ошибочные типы заданий повторяются в конце серии (с новыми героями и предметами).
@@ -18,6 +22,9 @@ const LEVELS = [
   { 'hold-face': 1, 'hand-face': 2 },
   { 'hold-face': 1, 'hold-back': 2, 'hand-back': 2 },
   { 'hold-face': 1, 'hand-face': 1, 'hold-back': 1, 'hand-back': 1 },
+  { 'what-face': 2, 'what-back': 1 },
+  { 'what-face': 1, 'what-back': 1, find: 2 },
+  { find: 3, 'what-face': 1, 'what-back': 1, 'hand-back': 1 },
 ];
 
 const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -46,12 +53,46 @@ function pickVariant(weights, avoid) {
 
 // Задание: герой, предмет, сторона на экране (где предмет / какую руку просят) и верный ответ.
 // Если человек стоит лицом к ребёнку, сторона относительно него — противоположная той, что на экране.
+// «У кого в руке?»: четверо разных людей, лицом и спиной вперемешку. Предмет, о котором спрашивают, у двоих: у одного — в левой
+// руке, у другого — в правой. Верный — тот, у кого он в нужной руке (сторона на экране зависит от того, лицом человек или спиной).
+function makeFindTask() {
+  const heroes = shuffle(TEXT.heroes).slice(0, 4);
+  const items = shuffle(TEXT.items);
+  const wanted = items[0];
+  const hand = pick(['left', 'right']);
+  let facings;
+  do {
+    facings = Array.from({ length: 4 }, () => pick(['face', 'back']));
+  } while (new Set(facings).size < 2);
+  const people = [
+    { item: wanted, heroHand: hand },
+    { item: wanted, heroHand: opposite(hand) },
+    { item: items[1], heroHand: pick(['left', 'right']) },
+    { item: items[2], heroHand: pick(['left', 'right']) },
+  ].map((p, i) => ({ ...p, hero: heroes[i], facing: facings[i] }));
+  for (const p of people) p.screenSide = p.facing === 'face' ? opposite(p.heroHand) : p.heroHand;
+  const order = shuffle(people);
+  return { variant: 'find', kind: 'find', facing: 'mixed', people: order, answer: order.indexOf(people[0]), prompt: TEXT.findAsk(wanted, hand) };
+}
+
 function makeTask(variant) {
-  const [kind, facing] = variant.split('-'); // kind: hold | hand; facing: face | back
+  if (variant === 'find') return makeFindTask();
+  const [kind, facing] = variant.split('-'); // kind: hold | hand | what; facing: face | back
   const hero = pick(TEXT.heroes);
   const item = pick(TEXT.items);
   const side = pick(['left', 'right']); // для hold — где на экране предмет; для hand — какую руку просят
   const flip = facing === 'face';
+  if (kind === 'what') {
+    // В обеих руках разные предметы; спрашивают про левую или правую руку героя. Ответ — картинка из четырёх.
+    const things = shuffle(TEXT.items).slice(0, 4);
+    const held = { left: things[0], right: things[1] }; // по рукам героя
+    const screenItems = flip ? { left: held.right, right: held.left } : held;
+    const prompt = TEXT.whatAsk(hero, side);
+    return {
+      variant, kind, facing, hero, screenItems, choices: shuffle(things), answer: held[side].emoji,
+      prompt: flip ? prompt : `${TEXT.backIntro(hero)} ${prompt}`,
+    };
+  }
   let answer;
   let prompt;
   if (kind === 'hold') {
@@ -223,7 +264,9 @@ export function start(ctx) {
       // Сцена: слева — слот, в центре — человек (лицом или спиной) с подписью, справа — слот.
       const slot = (side) => {
         const node = el('div', `lo-slot ${side}`);
-        if (task.kind === 'hold') {
+        if (task.kind === 'what') {
+          node.append(el('span', 'lo-item', task.screenItems[side].emoji));
+        } else if (task.kind === 'hold') {
           if (task.screenSide === side) node.append(el('span', 'lo-item', task.item.emoji));
         } else {
           const hand = el('button', 'lo-hand');
@@ -235,16 +278,49 @@ export function start(ctx) {
         }
         return node;
       };
-      const figure = el('div', `lo-figure ${task.facing}`);
-      figure.append(heroSvg(task.hero.who, task.facing));
-      const tag = el('div', 'lo-tag', `${TEXT.facingIcon[task.facing]} ${TEXT.facing[task.facing]}`);
-      const middle = el('div', 'lo-middle');
-      middle.append(figure, tag);
-      const scene = el('div', 'lo-scene');
-      scene.append(slot('left'), middle, slot('right'));
-      stage.append(scene);
+      let figure; // подпрыгивает при верном ответе
+      if (task.kind === 'find') {
+        const crowd = el('div', 'lo-crowd');
+        task.people.forEach((p, i) => {
+          const button = el('button', 'lo-person-btn');
+          button.type = 'button';
+          const row = el('div', 'lo-scene small');
+          const side = (name) => {
+            const node = el('div', `lo-slot ${name}`);
+            if (p.screenSide === name) node.append(el('span', 'lo-item', p.item.emoji));
+            return node;
+          };
+          const fig = el('div', `lo-figure ${p.facing}`);
+          fig.append(heroSvg(p.hero.who, p.facing));
+          row.append(side('left'), fig, side('right'));
+          button.append(row);
+          if (i === task.answer) figure = fig;
+          onTap(button, () => choose(i, button));
+          options.set(i, button);
+          crowd.append(button);
+        });
+        stage.append(crowd);
+      } else {
+        figure = el('div', `lo-figure ${task.facing}`);
+        figure.append(heroSvg(task.hero.who, task.facing));
+        const tag = el('div', 'lo-tag', `${TEXT.facingIcon[task.facing]} ${TEXT.facing[task.facing]}`);
+        const middle = el('div', 'lo-middle');
+        middle.append(figure, tag);
+        const scene = el('div', 'lo-scene');
+        scene.append(slot('left'), middle, slot('right'));
+        stage.append(scene);
+      }
 
-      if (task.kind === 'hold') {
+      if (task.kind === 'what') {
+        for (const thing of task.choices) {
+          const button = el('button', 'lo-answer pic', thing.emoji);
+          button.type = 'button';
+          button.setAttribute('aria-label', thing.name);
+          onTap(button, () => choose(thing.emoji, button));
+          options.set(thing.emoji, button);
+          answersBox.append(button);
+        }
+      } else if (task.kind === 'hold') {
         for (const side of ['left', 'right']) {
           const button = el('button', 'lo-answer', TEXT.answers[side]);
           button.type = 'button';
@@ -259,7 +335,7 @@ export function start(ctx) {
 
       // Подсказка: словами, почему лево и право у человека не такие, как у тебя (или такие же).
       async function hint() {
-        const text = task.facing === 'face' ? TEXT.hintFace : TEXT.hintBack;
+        const text = task.kind === 'find' ? TEXT.hintScene : task.facing === 'face' ? TEXT.hintFace : TEXT.hintBack;
         hintBox.textContent = text;
         hintBox.classList.add('show');
         await ctx.speak(text, 'ru');

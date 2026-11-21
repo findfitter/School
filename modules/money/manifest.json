@@ -5,12 +5,14 @@
   "icon": "💰",
   "glyph": "€",
   "description": "Считаем евро: монеты и банкноты, покупаем",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "styles": [
-    "style.css"
+    "style.css",
+    "../addition-10/keypad.css"
   ],
   "files": [
-    "texts.js"
+    "texts.js",
+    "../addition-10/keypad.js"
   ],
   "cycle": "math"
 }

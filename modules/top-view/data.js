@@ -50,18 +50,54 @@ function pyramid4(base) {
   ]);
 }
 
-// Шестигранная призма (стоит): боковые грани от дальних к ближним, сверху — шестиугольник.
-function hexPrism(base) {
+// Прямая призма с правильным n-угольником в основании (стоит): видны только передние боковые грани, сверху — n-угольник.
+// Свет слева: грань светлее, чем больше она повёрнута к левому нижнему углу. offsetDeg — поворот основания.
+function nPrism(n, base, offsetDeg = 0) {
   const t = tone(base);
-  const ring = (z) => Array.from({ length: 6 }, (_, k) => [1 + 0.9 * Math.cos((k * Math.PI) / 3), 1 + 0.9 * Math.sin((k * Math.PI) / 3), z]);
+  const rad = (deg) => (deg * Math.PI) / 180;
+  const ring = (z) => Array.from({ length: n }, (_, k) => [1 + 0.9 * Math.cos(rad(offsetDeg + (360 * k) / n)), 1 + 0.9 * Math.sin(rad(offsetDeg + (360 * k) / n)), z]);
   const low = ring(0);
   const high = ring(1.1);
   const sides = low
-    .map((p, k) => ({ pts: [p, low[(k + 1) % 6], high[(k + 1) % 6], high[k]], depth: p[0] + p[1] + low[(k + 1) % 6][0] + low[(k + 1) % 6][1] }))
-    .sort((a, b) => a.depth - b.depth)
-    .map((f, i) => ({ pts: f.pts, fill: i % 2 ? t.left : t.right }));
+    .map((p, k) => ({ pts: [p, low[(k + 1) % n], high[(k + 1) % n], high[k]], mid: rad(offsetDeg + (360 * (k + 0.5)) / n) }))
+    .filter((f) => Math.cos(f.mid - Math.PI / 4) > 0)
+    .map((f) => ({ pts: f.pts, fill: mix(base, '#000000', 0.3 * (1 - (1 + Math.cos(f.mid - rad(110))) / 2)) }));
   return solid([...sides, { pts: high, fill: t.top }]);
 }
+
+// Лесенка из трёх ступеней: самая высокая — дальняя.
+function stairs(base) {
+  const t = tone(base);
+  const d = 1.4;
+  const faces = [];
+  [3, 2, 1].forEach((h, i) => {
+    faces.push({ pts: [[i, d, 0], [i + 1, d, 0], [i + 1, d, h], [i, d, h]], fill: t.left });
+    faces.push({ pts: [[i + 1, 0, 0], [i + 1, d, 0], [i + 1, d, h], [i + 1, 0, h]], fill: t.right });
+    faces.push({ pts: [[i, 0, h], [i + 1, 0, h], [i + 1, d, h], [i, d, h]], fill: t.top });
+  });
+  return solid(faces);
+}
+
+// ---------- Плоские рисунки по формулам ----------
+const pt = (cx, cy, r, deg) => [cx + r * Math.cos((deg * Math.PI) / 180), cy + r * Math.sin((deg * Math.PI) / 180)];
+const fmt = (pts) => pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+// правильный n-угольник: первая вершина под углом startDeg (−90 — вершина вверху)
+const ngon = (n, startDeg, r, cy = 50) => fmt(Array.from({ length: n }, (_, k) => pt(50, cy, r, startDeg + (360 * k) / n)));
+// звезда с n лучами
+const star = (n, rOut, rIn) => fmt(Array.from({ length: n * 2 }, (_, k) => pt(50, 50, k % 2 ? rIn : rOut, -90 + (180 * k) / n)));
+// круг, разрезанный на n долек по цветам (зонтик сверху)
+const pie = (n, r, colors) =>
+  Array.from({ length: n }, (_, k) => {
+    const [x1, y1] = pt(50, 50, r, -90 + (360 * k) / n);
+    const [x2, y2] = pt(50, 50, r, -90 + (360 * (k + 1)) / n);
+    return `<path d="M50 50 L${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)} Z" fill="${colors[k % colors.length]}"/>`;
+  }).join('');
+// n кружков по кругу (лепестки)
+const petals = (n, dist, r, attrs, cy = 50) =>
+  Array.from({ length: n }, (_, k) => {
+    const [x, y] = pt(50, cy, dist, -90 + (360 * k) / n);
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" ${attrs}/>`;
+  }).join('');
 
 // Треугольная призма «палатка» (лежит): скат и торец.
 function prismTent(base) {
@@ -75,7 +111,7 @@ function prismTent(base) {
   ]);
 }
 
-const GEOM_COLORS = { cube: '#7fb3d5', cuboid: '#afa2df', pyramid: '#f4c34e', hex: '#8fc27a', tent: '#e58aa0' };
+const GEOM_COLORS = { cube: '#7fb3d5', cuboid: '#afa2df', pyramid: '#f4c34e', hex: '#8fc27a', tent: '#e58aa0', prism3: '#e0a06a', prism5: '#6fbfb0', oct: '#b48fd4', stairs: '#d3a679' };
 
 export const SOLIDS = [
   // ----- предметы -----
@@ -120,6 +156,36 @@ export const SOLIDS = [
     topKey: 'roof',
     front: '<rect x="22" y="48" width="56" height="36" fill="#F7E3A0"/><polygon points="14,48 50,18 86,48" fill="#C94A3A"/><rect x="44" y="62" width="12" height="22" fill="#7A4A2A"/>',
     top: '<rect x="10" y="24" width="80" height="26" fill="#C94A3A"/><rect x="10" y="50" width="80" height="26" fill="#E0604E"/><line x1="10" y1="50" x2="90" y2="50" stroke="#8A3A22" stroke-width="3"/>',
+  },
+  {
+    id: 'umbrella',
+    topKey: 'umbrella',
+    front: '<path d="M50 54 V78 a7 7 0 0 1 -14 0" fill="none" stroke="#7A4A2A" stroke-width="4" stroke-linecap="round"/><path d="M10 54 Q50 -18 90 54 Q80 46 70 54 Q60 46 50 54 Q40 46 30 54 Q20 46 10 54 Z" fill="#E0604E"/><path d="M50 19 L30 54 Q40 46 50 54 Z" fill="#F7E3A0"/><path d="M50 19 L70 54 Q80 46 90 54 Z" fill="#F7E3A0"/><circle cx="50" cy="16" r="3" fill="#7A4A2A"/>',
+    top: pie(8, 38, ['#E0604E', '#F7E3A0']) + '<circle cx="50" cy="50" r="38" fill="none" stroke="#B8402E" stroke-width="3"/><circle cx="50" cy="50" r="5" fill="#7A4A2A"/>',
+  },
+  {
+    id: 'fir',
+    topKey: 'fir',
+    front: '<rect x="44" y="76" width="12" height="12" fill="#8A5A3A"/><polygon points="50,40 18,80 82,80" fill="#3F8A52"/><polygon points="50,24 24,58 76,58" fill="#4F9A5B"/><polygon points="50,8 30,38 70,38" fill="#6FB46C"/>',
+    top: `<polygon points="${star(8, 42, 26)}" fill="#3F8A52" stroke="#2F6B3F" stroke-width="2" stroke-linejoin="round"/><polygon points="${star(8, 30, 17)}" fill="#4F9A5B" stroke="#2F6B3F" stroke-width="2" stroke-linejoin="round"/><circle cx="50" cy="50" r="6" fill="#8A5A3A"/>`,
+  },
+  {
+    id: 'flower',
+    topKey: 'flower',
+    front: '<path d="M50 44 V90" stroke="#4F9A5B" stroke-width="5" stroke-linecap="round"/><ellipse cx="36" cy="76" rx="12" ry="6" fill="#6FB46C" transform="rotate(-25 36 76)"/><ellipse cx="64" cy="66" rx="12" ry="6" fill="#6FB46C" transform="rotate(25 64 66)"/>' + petals(6, 15, 11, 'fill="#F28FB0"', 32) + '<circle cx="50" cy="32" r="9" fill="#F4C34E"/>',
+    top: petals(8, 24, 15, 'fill="#F28FB0" stroke="#C8587E" stroke-width="2"') + '<circle cx="50" cy="50" r="15" fill="#F4C34E" stroke="#D9A020" stroke-width="2"/>',
+  },
+  {
+    id: 'boat',
+    topKey: 'boat',
+    front: '<path d="M10 64 H90 L76 82 H24 Z" fill="#B8603E"/><rect x="48" y="14" width="4" height="50" fill="#7A4A2A"/><path d="M54 16 V58 H82 Z" fill="#F4F0E6" stroke="#B9AE98" stroke-width="1.5" stroke-linejoin="round"/><path d="M46 24 V58 H22 Z" fill="#F7E3A0" stroke="#B9AE98" stroke-width="1.5" stroke-linejoin="round"/>',
+    top: '<path d="M94 50 Q70 18 14 24 Q6 50 14 76 Q70 82 94 50 Z" fill="#B8603E" stroke="#7A3A22" stroke-width="3" stroke-linejoin="round"/><path d="M84 50 Q66 28 18 32 Q14 50 18 68 Q66 72 84 50 Z" fill="#E3B27A"/><rect x="30" y="47" width="46" height="6" rx="3" fill="#F4F0E6"/><circle cx="40" cy="50" r="4" fill="#7A4A2A"/>',
+  },
+  {
+    id: 'car',
+    topKey: 'car',
+    front: '<rect x="8" y="52" width="84" height="22" rx="8" fill="#E0604E"/><path d="M24 54 L35 34 H65 L78 54 Z" fill="#E8806F"/><path d="M30 52 L38 38 H48 V52 Z" fill="#CFE8F2"/><path d="M52 52 V38 H63 L72 52 Z" fill="#CFE8F2"/><circle cx="29" cy="74" r="10" fill="#3B4050"/><circle cx="29" cy="74" r="4" fill="#B4BAC6"/><circle cx="71" cy="74" r="10" fill="#3B4050"/><circle cx="71" cy="74" r="4" fill="#B4BAC6"/>',
+    top: '<rect x="20" y="22" width="14" height="8" rx="3" fill="#3B4050"/><rect x="66" y="22" width="14" height="8" rx="3" fill="#3B4050"/><rect x="20" y="70" width="14" height="8" rx="3" fill="#3B4050"/><rect x="66" y="70" width="14" height="8" rx="3" fill="#3B4050"/><rect x="8" y="28" width="84" height="44" rx="14" fill="#E0604E" stroke="#8A3A22" stroke-width="3"/><path d="M62 34 L74 39 V61 L62 66 Z" fill="#CFE8F2"/><path d="M34 34 L24 40 V60 L34 66 Z" fill="#CFE8F2"/><rect x="36" y="33" width="24" height="34" rx="4" fill="#E8806F"/>',
   },
   // ----- геометрические тела (стоят и лежат: сверху выглядят по-разному) -----
   {
@@ -167,7 +233,7 @@ export const SOLIDS = [
   {
     id: 'g-hex',
     topKey: 'hex',
-    front: hexPrism(GEOM_COLORS.hex),
+    front: nPrism(6, GEOM_COLORS.hex),
     top: '<polygon points="88,50 69,83 31,83 12,50 31,17 69,17" fill="#B6DEB0" stroke="#4F8A5B" stroke-width="3" stroke-linejoin="round"/>',
   },
   {
@@ -188,12 +254,39 @@ export const SOLIDS = [
     front: '<circle cx="50" cy="52" r="36" fill="#7FB3D5" stroke="#2F4A7A" stroke-width="1.5"/><ellipse cx="38" cy="38" rx="11" ry="7" fill="#fff" opacity="0.45" transform="rotate(-30 38 38)"/>',
     top: '<circle cx="50" cy="50" r="38" fill="#AFC8EC" stroke="#4372B8" stroke-width="3"/><ellipse cx="40" cy="38" rx="12" ry="8" fill="#fff" opacity="0.4" transform="rotate(-30 40 38)"/>',
   },
+  {
+    id: 'g-prism3',
+    topKey: 'tri',
+    front: nPrism(3, GEOM_COLORS.prism3, 30),
+    top: `<polygon points="${ngon(3, -90, 44, 61)}" fill="#F3D2AE" stroke="#B8702E" stroke-width="3" stroke-linejoin="round"/>`,
+  },
+  {
+    id: 'g-prism5',
+    topKey: 'pent',
+    front: nPrism(5, GEOM_COLORS.prism5, 45),
+    top: `<polygon points="${ngon(5, -90, 42, 54)}" fill="#BFE6DE" stroke="#3F8A7C" stroke-width="3" stroke-linejoin="round"/>`,
+  },
+  {
+    id: 'g-oct',
+    topKey: 'oct',
+    front: nPrism(8, GEOM_COLORS.oct),
+    top: `<polygon points="${ngon(8, 22.5, 42)}" fill="#DCCBEE" stroke="#7A52A8" stroke-width="3" stroke-linejoin="round"/>`,
+  },
+  {
+    id: 'g-stairs',
+    topKey: 'stairs',
+    front: stairs(GEOM_COLORS.stairs),
+    top: '<rect x="12" y="16" width="76" height="22" fill="#F6DDBF"/><rect x="12" y="38" width="76" height="22" fill="#E9C396"/><rect x="12" y="60" width="76" height="22" fill="#D6A676"/><rect x="12" y="16" width="76" height="66" fill="none" stroke="#8A5A3A" stroke-width="3"/><line x1="12" y1="38" x2="88" y2="38" stroke="#8A5A3A" stroke-width="3"/><line x1="12" y1="60" x2="88" y2="60" stroke="#8A5A3A" stroke-width="3"/>',
+  },
 ];
 
-// Пулы по уровням: предметы попроще, все предметы, геометрия попроще, вся геометрия (стоят и лежат).
+// Пулы по уровням: предметы попроще, все предметы, геометрия попроще, вся геометрия (стоят и лежат), всё вместе (5 и 6 вариантов).
+const ALL = SOLIDS.map((s) => s.id);
 export const POOLS = [
   ['ball', 'cube', 'house', 'pyramid'],
-  ['ball', 'cube', 'can', 'cone', 'pyramid', 'mug', 'house'],
-  ['g-cube', 'g-cyl', 'g-pyr4', 'g-hex', 'g-torus', 'g-sphere'],
+  ['ball', 'cube', 'can', 'cone', 'pyramid', 'mug', 'house', 'umbrella', 'fir', 'flower', 'boat', 'car'],
+  ['g-cube', 'g-cyl', 'g-pyr4', 'g-hex', 'g-torus', 'g-sphere', 'g-prism5', 'g-stairs'],
   SOLIDS.filter((s) => s.id.startsWith('g-')).map((s) => s.id),
+  ALL,
+  ALL,
 ];
